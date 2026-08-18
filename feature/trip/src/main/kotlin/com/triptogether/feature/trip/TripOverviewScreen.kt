@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
@@ -54,6 +55,7 @@ import kotlinx.datetime.todayIn
 /** S05 — trip header with countdown, members + invite share, shared note, owner menu. */
 @Composable
 fun TripOverviewScreen(
+    onOpenPlan: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TripOverviewViewModel = hiltViewModel(),
@@ -79,6 +81,7 @@ fun TripOverviewScreen(
         onArchive = viewModel::archiveTrip,
         onCloseInvite = viewModel::closeInvite,
         onShareInvite = { trip -> shareInvite(context, trip) },
+        onOpenPlan = onOpenPlan,
         onBack = onBack,
         modifier = modifier,
     )
@@ -94,6 +97,7 @@ private fun TripOverviewContent(
     onArchive: () -> Unit,
     onCloseInvite: () -> Unit,
     onShareInvite: (Trip) -> Unit,
+    onOpenPlan: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -132,6 +136,7 @@ private fun TripOverviewContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 HeaderCard(trip = trip)
+                PlanLinkCard(onClick = { onOpenPlan(trip.id) })
                 MembersCard(members = uiState.members, onShareInvite = { onShareInvite(trip) })
                 MoneySummaryCard()
                 NoteCard(
@@ -258,6 +263,26 @@ private fun MembersCard(
     }
 }
 
+@Composable
+private fun PlanLinkCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(imageVector = Icons.Default.Map, contentDescription = null)
+            Text(
+                text = stringResource(R.string.overview_open_plan),
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+    }
+}
+
 /** Placeholder amounts until expense/settlement logic lands in M4/M5. */
 @Composable
 private fun MoneySummaryCard(modifier: Modifier = Modifier) {
@@ -354,6 +379,7 @@ private fun TripOverviewContentPreview() {
             onArchive = {},
             onCloseInvite = {},
             onShareInvite = {},
+            onOpenPlan = {},
             onBack = {},
         )
     }

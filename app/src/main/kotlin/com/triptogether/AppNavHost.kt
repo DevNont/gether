@@ -5,6 +5,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.triptogether.feature.plan.navigation.DayPlanRoute
+import com.triptogether.feature.plan.navigation.dayPlanScreen
 import com.triptogether.feature.trip.navigation.CreateTripRoute
 import com.triptogether.feature.trip.navigation.JoinTripRoute
 import com.triptogether.feature.trip.navigation.TripListRoute
@@ -55,6 +57,15 @@ fun AppNavHost(
             },
             onBack = { navController.popBackStack() },
         )
-        tripOverviewScreen(onBack = { navController.popBackStack() })
+        tripOverviewScreen(
+            onOpenPlan = { tripId -> navController.navigate(DayPlanRoute(tripId)) },
+            onBack = { navController.popBackStack() },
+        )
+        dayPlanScreen(
+            // S07 ActivityEditor hooks in with M3.3.
+            onAddActivity = {},
+            onEditActivity = { _, _ -> },
+            onBack = { navController.popBackStack() },
+        )
     }
 }

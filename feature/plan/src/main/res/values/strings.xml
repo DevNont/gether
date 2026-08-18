@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="day_plan_title">แผนการเดินทาง</string>
+    <string name="day_plan_back">ย้อนกลับ</string>
+    <string name="day_plan_add">เพิ่มกิจกรรม</string>
+    <string name="day_plan_empty">ยังไม่มีแผนวันนี้</string>
+    <string name="day_plan_empty_hint">กดปุ่ม + เพื่อเพิ่มกิจกรรมแรก</string>
+    <string name="day_plan_has_attachments">มีไฟล์แนบ</string>
+</resources>

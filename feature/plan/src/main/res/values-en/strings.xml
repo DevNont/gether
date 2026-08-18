@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="day_plan_title">Itinerary</string>
+    <string name="day_plan_back">Back</string>
+    <string name="day_plan_add">Add activity</string>
+    <string name="day_plan_empty">Nothing planned for this day</string>
+    <string name="day_plan_empty_hint">Tap + to add the first activity</string>
+    <string name="day_plan_has_attachments">Has attachments</string>
+</resources>

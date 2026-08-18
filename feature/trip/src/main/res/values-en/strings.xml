@@ -43,4 +43,5 @@
     <string name="overview_note_placeholder">Write anything for the whole group…</string>
     <string name="overview_note_save">Save note</string>
     <string name="overview_note_error">Could not save the note</string>
+    <string name="overview_open_plan">Itinerary</string>
 </resources>
