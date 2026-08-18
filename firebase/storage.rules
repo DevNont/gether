@@ -1,0 +1,40 @@
+rules_version = '2';
+
+// Storage mirrors the Firestore membership check: you can touch a trip's files
+// only if you are in that trip. Slip images are capped at 5 MB and must be
+// images — the client already compresses to well under this.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isMember(tripId) {
+      return request.auth != null
+        && request.auth.uid in firestore.get(/databases/(default)/documents/trips/$(tripId)).data.memberIds;
+    }
+
+    function isImageUnder(mb) {
+      return request.resource.contentType.matches('image/.*')
+        && request.resource.size < mb * 1024 * 1024;
+    }
+
+    match /users/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId && isImageUnder(5);
+    }
+
+    match /trips/{tripId}/slips/{expenseId}/{fileName} {
+      allow read: if isMember(tripId);
+      allow write: if isMember(tripId) && isImageUnder(5);
+    }
+
+    match /trips/{tripId}/attachments/{activityId}/{fileName} {
+      allow read: if isMember(tripId);
+      allow write: if isMember(tripId) && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    match /trips/{tripId}/{fileName} {
+      allow read: if isMember(tripId);
+      allow write: if isMember(tripId) && isImageUnder(5);
+    }
+  }
+}

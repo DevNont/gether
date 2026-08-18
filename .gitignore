@@ -1,0 +1,19 @@
+# Firebase config — never commit (CLAUDE.md rule 7)
+google-services.json
+
+# Gradle / Android
+.gradle/
+build/
+local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Handoff archive
+triptogether-handoff.zip

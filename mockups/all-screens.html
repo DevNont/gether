@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TripTogether — mockup ครบทุกหน้า</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#f4f2ed; --card:#ffffff; --line:#e3e0d8; --line2:#cfccc2;
+  --ink:#26251f; --ink2:#6b6960; --ink3:#96938a;
+  --accent:#185fa5; --accent-bg:#e6f1fb;
+  --ok:#3b6d11; --ok-bg:#eaf3de;
+  --bad:#a32d2d; --bad-bg:#fcebeb;
+  --warn:#854f0b; --warn-bg:#faeeda;
+  --r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI","Noto Sans Thai",sans-serif;padding:32px 20px 80px;line-height:1.5}
+header{max-width:1400px;margin:0 auto 28px}
+header h1{font-size:24px;font-weight:600}
+header p{color:var(--ink2);font-size:14px;margin-top:6px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.legend span{font-size:12px;background:var(--card);border:1px solid var(--line);padding:4px 10px;border-radius:20px;color:var(--ink2)}
+.grid{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:28px}
+.frame{background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;min-height:600px}
+.frame > .cap{background:#26251f;color:#fff;padding:8px 14px;font-size:12px;letter-spacing:.3px;display:flex;justify-content:space-between;align-items:center}
+.cap b{font-weight:500}
+.cap i{opacity:.6;font-style:normal}
+.body{flex:1;display:flex;flex-direction:column}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid var(--line)}
+.nav .t{font-size:17px;font-weight:500;display:flex;align-items:center;gap:8px}
+.nav .a{font-size:14px;color:var(--accent)}
+.pad{padding:14px 15px}
+.sub{font-size:13px;color:var(--ink2)}
+.mut{font-size:12px;color:var(--ink3)}
+.lbl{font-size:12px;color:var(--ink2);margin-bottom:5px}
+.fld{border:1px solid var(--line2);border-radius:var(--r);padding:9px 11px;font-size:15px;display:flex;justify-content:space-between;align-items:center;background:#fff}
+.fld.ph{color:var(--ink3)}
+.row{display:flex;gap:10px}
+.row>*{flex:1;min-width:0}
+.btn{border:1px solid var(--line2);border-radius:var(--r);padding:9px;text-align:center;font-size:14px;background:#fff}
+.btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill{font-size:11px;padding:2px 8px;border-radius:20px;display:inline-block}
+.pill.a{background:var(--accent-bg);color:var(--accent)}
+.pill.o{background:var(--ok-bg);color:var(--ok)}
+.pill.b{background:var(--bad-bg);color:var(--bad)}
+.pill.w{background:var(--warn-bg);color:var(--warn)}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat{background:#faf9f6;border-radius:var(--r);padding:11px}
+.stat .v{font-size:21px;font-weight:600;margin-top:2px}
+.li{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.av{width:28px;height:28px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.avs{display:flex}
+.avs .av{width:26px;height:26px;margin-left:-7px;border:2px solid #fff}
+.avs .av:first-child{margin-left:0}
+.tabs{display:flex;gap:5px;background:#faf9f6;padding:4px;border-radius:var(--r)}
+.tabs div{flex:1;text-align:center;font-size:13px;padding:7px 0;color:var(--ink2);border-radius:var(--r)}
+.tabs div.on{background:#fff;color:var(--ink);font-weight:500;border:1px solid var(--line)}
+.bar{display:flex;justify-content:space-around;padding:9px 0 11px;border-top:1px solid var(--line);background:#faf9f6;margin-top:auto}
+.bar div{text-align:center;color:var(--ink3);font-size:10px}
+.bar div i{font-size:20px;display:block;margin-bottom:1px}
+.bar div.on{color:var(--accent)}
+.banner{padding:10px 12px;border-radius:var(--r);display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.banner.b{background:var(--bad-bg);color:var(--bad)}
+.banner.o{background:var(--ok-bg);color:var(--ok)}
+.sep{height:1px;background:var(--line);margin:12px 0}
+.note{font-size:12px;color:var(--ink2);background:#faf9f6;border-left:3px solid var(--line2);padding:8px 10px;margin:0 15px 14px}
+.tl{display:flex;gap:11px;margin-bottom:14px}
+.tl .tm{width:46px;flex-shrink:0;text-align:right;font-size:13px;color:var(--ink2);padding-top:1px}
+.tl .ln{width:1px;background:var(--line2);flex-shrink:0}
+.tl .ct{flex:1;min-width:0}
+.tl .ct b{font-size:15px;font-weight:500;display:block}
+.days{display:flex;gap:7px;padding:11px 15px;border-bottom:1px solid var(--line)}
+.days div{flex:1;text-align:center;padding:7px 0;border-radius:var(--r)}
+.days div.on{background:#eeece5}
+.days div .d{font-size:11px;color:var(--ink2)}
+.days div .n{font-size:15px}
+.days div.on .n{font-weight:600}
+.thumb{width:60px;height:60px;border-radius:var(--r);background:#f0eee8;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:22px}
+.thumb.d{border:1px dashed var(--line2);background:#fff;flex-direction:column;font-size:18px;gap:2px}
+.thumb.d span{font-size:10px}
+.code{display:flex;gap:7px}
+.code div{flex:1;aspect-ratio:1/1.25;border:1px solid var(--line2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600}
+.code div.e{color:var(--ink3);font-weight:400}
+.chips{display:flex;gap:6px;overflow:hidden}
+.chips span{font-size:12px;padding:5px 11px;border:1px solid var(--line);border-radius:20px;color:var(--ink2);white-space:nowrap}
+.chips span.on{background:#26251f;color:#fff;border-color:#26251f}
+.fab{position:absolute;right:16px;bottom:70px;width:48px;height:48px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
+.rel{position:relative;flex:1;display:flex;flex-direction:column}
+.gh{font-size:12px;color:var(--ink2);display:flex;justify-content:space-between;padding:12px 0 6px}
+.qr{width:150px;height:150px;background:#26251f;margin:0 auto;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:#fff;font-size:44px}
+.vote{margin-bottom:11px}
+.vote .vt{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px}
+.vote .vb{height:7px;background:#f0eee8;border-radius:5px;overflow:hidden}
+.vote .vb i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.ck{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px}
+.ck i{font-size:20px;color:var(--ink3)}
+.ck i.on{color:var(--ok)}
+.ck s{color:var(--ink3)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>TripTogether — mockup ครบทุกหน้า</h1>
+  <p>แอปวางแผนทริปกลุ่มพร้อมหารค่าอาหาร · Android first · 14 หน้าจอ · อ้างอิงรหัสหน้า S01–S14 ตาม docs/03-screens.md</p>
+  <div class="legend">
+    <span>สีน้ำเงิน = action หลัก / สถานะที่เลือก</span>
+    <span>สีแดง = ยอดไม่ตรง / ติดเงิน</span>
+    <span>สีเขียว = เคลียร์แล้ว / คนอื่นติดเรา</span>
+    <span>สีเหลือง = รอดำเนินการ</span>
+  </div>
+</header>
+
+<div class="grid">
+
+<!-- S01 -->
+<div class="frame">
+  <div class="cap"><b>S01</b><i>SignIn</i></div>
+  <div class="body">
+    <div class="pad" style="flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:8px">
+      <div style="font-size:44px;color:var(--accent)"><i class="ti ti-map-2"></i></div>
+      <div style="font-size:22px;font-weight:600">TripTogether</div>
+      <div class="sub" style="margin-bottom:26px">วางแผนทริป หารค่าอาหาร จบในแอปเดียว</div>
+      <div class="btn" style="display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-brand-google"></i>เข้าสู่ระบบด้วย Google</div>
+      <div class="mut" style="margin-top:12px">การเข้าสู่ระบบถือว่ายอมรับเงื่อนไขการใช้งาน</div>
+    </div>
+  </div>
+</div>
+
+<!-- S02 -->
+<div class="frame">
+  <div class="cap"><b>S02</b><i>TripList</i></div>
+  <div class="body">
+    <div class="nav"><div class="t">ทริปของฉัน</div><div class="a"><i class="ti ti-ticket"></i> ใส่รหัส</div></div>
+    <div class="rel">
+      <div class="pad" style="padding-top:10px">
+        <div class="gh"><span>กำลังจะถึง</span></div>
+        <div class="card" style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div><b style="font-size:16px;font-weight:500">เชียงใหม่ 3 วัน 2 คืน</b>
+            <div class="sub" style="margin-top:2px">12–14 ธ.ค. 2569</div></div>
+            <span class="pill a">อีก 21 วัน</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:11px">
+            <div class="avs"><div class="av">ต</div><div class="av">ฟ</div><div class="av">บ</div><div class="av">ม</div><div class="av">ก</div></div>
+            <span class="pill b">ค้างจ่าย 830</span>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:10px">
+          <div><b style="font-size:16px;font-weight:500">ทะเลหัวหิน</b>
+          <div class="sub" style="margin-top:2px">4–5 ม.ค. 2570</div></div>
+          <div style="margin-top:11px"><div class="avs"><div class="av">ต</div><div class="av">ม</div><div class="av">ก</div></div></div>
+        </div>
+        <div class="gh"><span>จบแล้ว</span></div>
+        <div class="card" style="opacity:.62">
+          <div><b style="font-size:16px;font-weight:500">ปีใหม่ เขาใหญ่</b>
+          <div class="sub" style="margin-top:2px">30 ธ.ค. – 1 ม.ค.</div></div>
+          <div style="margin-top:11px;display:flex;justify-content:space-between;align-items:center">
+            <div class="avs"><div class="av">ต</div><div class="av">ฟ</div><div class="av">บ</div></div>
+            <span class="pill o">เคลียร์แล้ว</span>
+          </div>
+        </div>
+      </div>
+      <div class="fab"><i class="ti ti-plus"></i></div>
+      <div class="bar">
+        <div class="on"><i class="ti ti-map-2"></i>ทริป</div>
+        <div><i class="ti ti-user"></i>ฉัน</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S03 -->
+<div class="frame">
+  <div class="cap"><b>S03</b><i>CreateTrip</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-x" style="font-size:20px;color:var(--ink2)"></i>สร้างทริป</div><div class="a">สร้าง</div></div>
+    <div class="pad">
+      <div class="lbl">ชื่อทริป</div>
+      <div class="fld" style="margin-bottom:14px">เชียงใหม่ 3 วัน 2 คืน</div>
+      <div class="row" style="margin-bottom:14px">
+        <div><div class="lbl">วันเริ่ม</div><div class="fld">12 ธ.ค. 69<i class="ti ti-calendar" style="color:var(--ink3)"></i></div></div>
+        <div><div class="lbl">วันจบ</div><div class="fld">14 ธ.ค. 69<i class="ti ti-calendar" style="color:var(--ink3)"></i></div></div>
+      </div>
+      <div class="lbl">รูปปก (ข้ามได้)</div>
+      <div style="border:1px dashed var(--line2);border-radius:var(--r);padding:26px;text-align:center;color:var(--ink3);margin-bottom:14px">
+        <i class="ti ti-photo-plus" style="font-size:26px"></i>
+        <div class="mut" style="margin-top:5px">แตะเพื่อเลือกรูป</div>
+      </div>
+      <div class="note" style="margin:0">ระบบจะสร้างวันในแผนให้อัตโนมัติ 3 วัน และสร้างรหัสเชิญให้ทันที</div>
+    </div>
+  </div>
+</div>
+
+<!-- S04 -->
+<div class="frame">
+  <div class="cap"><b>S04</b><i>JoinTrip</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-arrow-left" style="font-size:20px;color:var(--ink2)"></i>เข้าร่วมทริป</div></div>
+    <div class="pad">
+      <div class="sub" style="margin-bottom:12px">กรอกรหัส 6 หลักที่เพื่อนส่งมา</div>
+      <div class="code" style="margin-bottom:16px">
+        <div>K</div><div>7</div><div>M</div><div>2</div><div>X</div><div class="e">_</div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="mut">พบทริป</div>
+        <b style="font-size:16px;font-weight:500;display:block;margin-top:3px">เชียงใหม่ 3 วัน 2 คืน</b>
+        <div class="sub" style="margin-top:2px">12–14 ธ.ค. · 4 คน · จัดโดยต้น</div>
+      </div>
+      <div class="btn p">เข้าร่วมทริปนี้</div>
+      <div class="sep"></div>
+      <div class="mut" style="text-align:center">หรือเปิดลิงก์ที่เพื่อนแชร์ใน LINE ได้เลย</div>
+    </div>
+  </div>
+</div>
+
+<!-- S05 -->
+<div class="frame">
+  <div class="cap"><b>S05</b><i>Overview</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-arrow-left" style="font-size:20px;color:var(--ink2)"></i>เชียงใหม่ 3 วัน</div><i class="ti ti-dots-vertical" style="color:var(--ink2)"></i></div>
+    <div class="rel">
+      <div class="pad">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+          <div class="sub"><i class="ti ti-calendar"></i> 12–14 ธ.ค.</div>
+          <span class="pill a">อีก 21 วัน</span>
+        </div>
+        <div class="row" style="margin-bottom:14px">
+          <div class="stat"><div class="mut">ใช้ไปแล้ว</div><div class="v">14,320</div></div>
+          <div class="stat"><div class="mut">ฉันคงเหลือ</div><div class="v" style="color:var(--bad)">−830</div></div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <b style="font-size:15px;font-weight:500">สมาชิก 5 คน</b>
+            <span class="a" style="font-size:13px;color:var(--accent)"><i class="ti ti-user-plus"></i> ชวนเพื่อน</span>
+          </div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <div style="text-align:center"><div class="av">ต</div><div class="mut" style="margin-top:3px">ต้น</div></div>
+            <div style="text-align:center"><div class="av">ฟ</div><div class="mut" style="margin-top:3px">ฟ้า</div></div>
+            <div style="text-align:center"><div class="av">บ</div><div class="mut" style="margin-top:3px">บอส</div></div>
+            <div style="text-align:center"><div class="av">ม</div><div class="mut" style="margin-top:3px">มายด์</div></div>
+            <div style="text-align:center"><div class="av">ก</div><div class="mut" style="margin-top:3px">เก่ง</div></div>
+          </div>
+          <div class="sep"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="mut">รหัสเชิญ</div><b style="font-size:18px;letter-spacing:3px;font-weight:600">K7M2X9</b></div>
+            <span style="font-size:13px;color:var(--accent)"><i class="ti ti-share"></i> แชร์</span>
+          </div>
+        </div>
+        <div class="lbl">โน้ตของทริป</div>
+        <div class="fld ph" style="min-height:56px;align-items:flex-start">จอดรถที่ลานหน้าโรงแรมได้ ฟรี</div>
+      </div>
+      <div class="bar">
+        <div class="on"><i class="ti ti-layout-grid"></i>ภาพรวม</div>
+        <div><i class="ti ti-calendar-event"></i>แผน</div>
+        <div><i class="ti ti-receipt"></i>ค่าใช้จ่าย</div>
+        <div><i class="ti ti-scale"></i>สรุปยอด</div>
+        <div><i class="ti ti-checkbox"></i>อื่นๆ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S06 -->
+<div class="frame">
+  <div class="cap"><b>S06</b><i>DayPlan</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-arrow-left" style="font-size:20px;color:var(--ink2)"></i>แผนการเดินทาง</div></div>
+    <div class="days">
+      <div class="on"><div class="d">ศุกร์</div><div class="n">12</div></div>
+      <div><div class="d">เสาร์</div><div class="n">13</div></div>
+      <div><div class="d">อาทิตย์</div><div class="n">14</div></div>
+    </div>
+    <div class="rel">
+      <div class="pad">
+        <div class="tl"><div class="tm">08:00</div><div class="ln"></div><div class="ct">
+          <b>ออกเดินทางจากกรุงเทพ</b><div class="sub"><i class="ti ti-map-pin"></i> หมอชิต 2</div></div></div>
+        <div class="tl"><div class="tm">18:30</div><div class="ln"></div><div class="ct">
+          <b>เช็คอินที่พัก</b><div class="sub"><i class="ti ti-map-pin"></i> นิมมานเหมินท์</div>
+          <span class="pill" style="background:#f0eee8;color:var(--ink2);margin-top:5px"><i class="ti ti-paperclip"></i> booking.pdf</span></div></div>
+        <div class="tl"><div class="tm">20:00</div><div class="ln"></div><div class="ct">
+          <b>มื้อเย็น — ร้านหมูกระทะ</b>
+          <span class="pill w" style="margin-top:5px"><i class="ti ti-chart-pie"></i> รอโหวต 3/5</span></div></div>
+        <div class="tl" style="opacity:.55"><div class="tm">—</div><div class="ln"></div><div class="ct">
+          <b>ยังไม่ระบุเวลา: เดินถนนคนเดิน</b></div></div>
+      </div>
+      <div class="fab"><i class="ti ti-plus"></i></div>
+      <div class="bar">
+        <div><i class="ti ti-layout-grid"></i>ภาพรวม</div>
+        <div class="on"><i class="ti ti-calendar-event"></i>แผน</div>
+        <div><i class="ti ti-receipt"></i>ค่าใช้จ่าย</div>
+        <div><i class="ti ti-scale"></i>สรุปยอด</div>
+        <div><i class="ti ti-checkbox"></i>อื่นๆ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S07 -->
+<div class="frame">
+  <div class="cap"><b>S07</b><i>ActivityEditor</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-x" style="font-size:20px;color:var(--ink2)"></i>แก้ไขกิจกรรม</div><div class="a">บันทึก</div></div>
+    <div class="pad">
+      <div class="lbl">ชื่อกิจกรรม</div>
+      <div class="fld" style="margin-bottom:13px">มื้อเย็น — ร้านหมูกระทะ</div>
+      <div class="row" style="margin-bottom:13px">
+        <div><div class="lbl">เวลาเริ่ม</div><div class="fld">20:00<i class="ti ti-clock" style="color:var(--ink3)"></i></div></div>
+        <div><div class="lbl">เวลาจบ</div><div class="fld ph">—<i class="ti ti-clock" style="color:var(--ink3)"></i></div></div>
+      </div>
+      <div class="lbl">สถานที่</div>
+      <div class="fld" style="margin-bottom:13px">ร้านหมูกระทะ นิมมาน<i class="ti ti-map-pin" style="color:var(--accent)"></i></div>
+      <div class="lbl">โน้ต</div>
+      <div class="fld ph" style="min-height:52px;align-items:flex-start;margin-bottom:13px">จองโต๊ะไว้แล้ว ชื่อต้น</div>
+      <div class="lbl">ไฟล์แนบ</div>
+      <div style="display:flex;gap:9px;margin-bottom:16px">
+        <div class="thumb"><i class="ti ti-file-text"></i></div>
+        <div class="thumb d"><i class="ti ti-plus"></i><span>เพิ่ม</span></div>
+      </div>
+      <div class="btn" style="color:var(--bad);border-color:#f0d5d5"><i class="ti ti-trash"></i> ลบกิจกรรมนี้</div>
+    </div>
+  </div>
+</div>
+
+<!-- S08 -->
+<div class="frame">
+  <div class="cap"><b>S08</b><i>ExpenseList</i></div>
+  <div class="body">
+    <div class="nav"><div class="t">ค่าใช้จ่าย</div><i class="ti ti-search" style="color:var(--ink2)"></i></div>
+    <div style="padding:11px 15px;border-bottom:1px solid var(--line)">
+      <div class="row" style="margin-bottom:11px">
+        <div class="stat"><div class="mut">ยอดรวมทริป</div><div class="v">14,320</div></div>
+        <div class="stat"><div class="mut">ฉันใช้ไป</div><div class="v">3,694</div></div>
+      </div>
+      <div class="chips"><span class="on">ทั้งหมด</span><span>อาหาร</span><span>ที่พัก</span><span>เดินทาง</span></div>
+    </div>
+    <div class="rel">
+      <div class="pad" style="padding-top:6px">
+        <div class="gh"><span>12 ธ.ค.</span><span>5,240</span></div>
+        <div class="li">
+          <div style="display:flex;gap:10px;align-items:center;min-width:0">
+            <div class="av" style="background:#faeeda;color:var(--warn)"><i class="ti ti-tools-kitchen-2" style="font-size:15px"></i></div>
+            <div style="min-width:0"><div style="font-size:15px">มื้อเย็น หมูกระทะ</div><div class="mut">ต้นจ่าย · ฉัน 380</div></div>
+          </div>
+          <div style="font-size:15px;font-weight:500">1,850</div>
+        </div>
+        <div class="li">
+          <div style="display:flex;gap:10px;align-items:center;min-width:0">
+            <div class="av" style="background:#e1f5ee;color:#0f6e56"><i class="ti ti-bed" style="font-size:15px"></i></div>
+            <div style="min-width:0"><div style="font-size:15px">ที่พัก 2 คืน</div><div class="mut">มายด์จ่าย · ฉัน 640</div></div>
+          </div>
+          <div style="font-size:15px;font-weight:500">3,200</div>
+        </div>
+        <div class="li">
+          <div style="display:flex;gap:10px;align-items:center;min-width:0">
+            <div class="av" style="background:#e6f1fb;color:var(--accent)"><i class="ti ti-gas-station" style="font-size:15px"></i></div>
+            <div style="min-width:0"><div style="font-size:15px">ค่าน้ำมัน</div><div class="mut">บอสจ่าย · ฉัน 38</div></div>
+          </div>
+          <div style="font-size:15px;font-weight:500">190</div>
+        </div>
+        <div class="gh"><span>13 ธ.ค.</span><span>2,410</span></div>
+        <div class="li">
+          <div style="display:flex;gap:10px;align-items:center;min-width:0">
+            <div class="av" style="background:#faeeda;color:var(--warn)"><i class="ti ti-coffee" style="font-size:15px"></i></div>
+            <div style="min-width:0"><div style="font-size:15px">คาเฟ่เช้า</div><div class="mut">ฟ้าจ่าย · ฉัน 145</div></div>
+          </div>
+          <div style="font-size:15px;font-weight:500">725</div>
+        </div>
+      </div>
+      <div class="fab"><i class="ti ti-plus"></i></div>
+      <div class="bar">
+        <div><i class="ti ti-layout-grid"></i>ภาพรวม</div>
+        <div><i class="ti ti-calendar-event"></i>แผน</div>
+        <div class="on"><i class="ti ti-receipt"></i>ค่าใช้จ่าย</div>
+        <div><i class="ti ti-scale"></i>สรุปยอด</div>
+        <div><i class="ti ti-checkbox"></i>อื่นๆ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S09 -->
+<div class="frame" style="border-color:var(--accent);border-width:2px">
+  <div class="cap" style="background:var(--accent)"><b>S09</b><i>ExpenseEditor — หน้าสำคัญที่สุด</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-x" style="font-size:20px;color:var(--ink2)"></i>เพิ่มบิล</div><div class="a" style="color:var(--ink3)">บันทึก</div></div>
+    <div class="pad">
+      <div class="lbl">ชื่อรายการ</div>
+      <div class="fld" style="margin-bottom:12px">มื้อเย็น — ร้านหมูกระทะ</div>
+      <div class="row" style="margin-bottom:12px">
+        <div><div class="lbl">ยอดรวม</div><div class="fld" style="font-weight:600;font-size:17px">1,850.00</div></div>
+        <div><div class="lbl">คนจ่าย</div><div class="fld">ต้น<i class="ti ti-chevron-down" style="color:var(--ink3)"></i></div></div>
+      </div>
+      <div class="lbl">สลิป</div>
+      <div style="display:flex;gap:9px;margin-bottom:14px">
+        <div class="thumb"><i class="ti ti-photo"></i></div>
+        <div class="thumb d"><i class="ti ti-camera"></i><span>ถ่าย</span></div>
+      </div>
+      <div class="tabs" style="margin-bottom:12px"><div>หารเท่า</div><div class="on">ใส่เอง</div><div>ตามสัดส่วน</div></div>
+
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><i class="ti ti-square-check" style="font-size:20px;color:var(--accent)"></i><span style="font-size:15px">ต้น</span><span class="pill a">จ่ายบิล</span></div><div class="fld" style="padding:4px 9px;min-width:78px;text-align:right;display:block">520.00</div></div>
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><i class="ti ti-square-check" style="font-size:20px;color:var(--accent)"></i><span style="font-size:15px">ฟ้า</span></div><div class="fld" style="padding:4px 9px;min-width:78px;text-align:right;display:block">380.00</div></div>
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><i class="ti ti-square-check" style="font-size:20px;color:var(--accent)"></i><span style="font-size:15px">บอส</span></div><div class="fld" style="padding:4px 9px;min-width:78px;text-align:right;display:block">450.00</div></div>
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><i class="ti ti-square-check" style="font-size:20px;color:var(--accent)"></i><span style="font-size:15px">มายด์</span></div><div class="fld" style="padding:4px 9px;min-width:78px;text-align:right;display:block">300.00</div></div>
+      <div class="li" style="opacity:.55"><div style="display:flex;gap:9px;align-items:center"><i class="ti ti-square" style="font-size:20px;color:var(--ink3)"></i><span style="font-size:15px">เก่ง</span><span class="mut">ไม่ได้กิน</span></div><div class="mut" style="min-width:78px;text-align:right">—</div></div>
+
+      <div class="banner b" style="margin-top:12px"><span>ยังไม่ครบ ขาดอีก</span><b style="font-weight:600">200.00</b></div>
+      <div class="row" style="margin-top:9px">
+        <div class="btn" style="font-size:13px">เกลี่ยส่วนที่เหลือ</div>
+        <div class="btn" style="font-size:13px">+ ค่าบริการ 10%</div>
+      </div>
+      <div class="note" style="margin:12px 0 0">ปุ่มบันทึกจะเปิดใช้งานก็ต่อเมื่อยอดรวมของทุกคนเท่ากับยอดบิลพอดี</div>
+    </div>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="frame">
+  <div class="cap"><b>S10</b><i>ExpenseDetail + SlipViewer</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-arrow-left" style="font-size:20px;color:var(--ink2)"></i>รายละเอียดบิล</div><i class="ti ti-edit" style="color:var(--accent)"></i></div>
+    <div class="pad">
+      <div style="text-align:center;margin-bottom:14px">
+        <div class="mut">มื้อเย็น — ร้านหมูกระทะ</div>
+        <div style="font-size:30px;font-weight:600;margin-top:2px">1,850.00</div>
+        <div class="sub" style="margin-top:3px">ต้นจ่าย · 12 ธ.ค. 20:14</div>
+        <span class="pill" style="background:#faeeda;color:var(--warn);margin-top:7px"><i class="ti ti-tools-kitchen-2"></i> อาหาร</span>
+      </div>
+      <div style="background:#26251f;border-radius:var(--r);height:110px;display:flex;align-items:center;justify-content:center;color:#fff;gap:7px;margin-bottom:14px">
+        <i class="ti ti-receipt" style="font-size:30px"></i><span style="font-size:13px">แตะเพื่อดูสลิปเต็มจอ</span>
+      </div>
+      <div class="lbl">แบ่งจ่าย (ใส่เอง)</div>
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><div class="av">ต</div>ต้น</div><b style="font-weight:500">520.00</b></div>
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><div class="av">ฟ</div>ฟ้า</div><b style="font-weight:500">380.00</b></div>
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><div class="av">บ</div>บอส</div><b style="font-weight:500">450.00</b></div>
+      <div class="li"><div style="display:flex;gap:9px;align-items:center"><div class="av">ม</div>มายด์</div><b style="font-weight:500">500.00</b></div>
+      <div class="banner o" style="margin-top:12px"><span><i class="ti ti-check"></i> ยอดตรงกับบิล</span><b style="font-weight:600">1,850.00</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="frame">
+  <div class="cap"><b>S11</b><i>Settlement</i></div>
+  <div class="body">
+    <div class="nav"><div class="t">สรุปยอด</div></div>
+    <div class="rel">
+      <div class="pad">
+        <div class="row" style="margin-bottom:13px">
+          <div class="stat"><div class="mut">ใช้ไปทั้งทริป</div><div class="v">14,320</div></div>
+          <div class="stat"><div class="mut">เฉลี่ยต่อคน</div><div class="v">2,864</div></div>
+        </div>
+        <div class="lbl">ยอดคงเหลือของแต่ละคน</div>
+        <div class="li"><span>ต้น</span><b style="color:var(--ok);font-weight:500">+1,240</b></div>
+        <div class="li"><span>มายด์</span><b style="color:var(--ok);font-weight:500">+610</b></div>
+        <div class="li"><span>ฟ้า</span><b style="color:var(--bad);font-weight:500">−830</b></div>
+        <div class="li"><span>บอส</span><b style="color:var(--bad);font-weight:500">−720</b></div>
+        <div class="li"><span>เก่ง</span><b style="color:var(--bad);font-weight:500">−300</b></div>
+
+        <div class="lbl" style="margin-top:15px">โอน 3 ครั้ง จบทั้งทริป</div>
+        <div class="card" style="margin-bottom:9px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:7px;align-items:center;font-size:15px">ฟ้า <i class="ti ti-arrow-right" style="color:var(--ink3)"></i> ต้น</div>
+            <b style="font-size:16px;font-weight:600">830</b>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="btn" style="font-size:13px"><i class="ti ti-qrcode"></i> QR พร้อมเพย์</div>
+            <div class="btn" style="font-size:13px">โอนแล้ว</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:9px;background:var(--warn-bg);border-color:#e8d5ae">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:7px;align-items:center;font-size:15px;color:var(--warn)">บอส <i class="ti ti-arrow-right"></i> ต้น</div>
+            <b style="font-size:16px;font-weight:600;color:var(--warn)">410</b>
+          </div>
+          <div class="mut" style="color:var(--warn);margin-top:5px">รอต้นยืนยันว่าได้รับเงินแล้ว</div>
+        </div>
+        <div class="card" style="background:var(--ok-bg);border-color:#cfe0b4">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:7px;align-items:center;font-size:15px;color:var(--ok)"><i class="ti ti-check"></i> เก่ง <i class="ti ti-arrow-right"></i> มายด์</div>
+            <b style="font-size:16px;font-weight:600;color:var(--ok)">300</b>
+          </div>
+          <div class="mut" style="color:var(--ok);margin-top:5px">ยืนยันแล้วเมื่อวาน 21:14</div>
+        </div>
+      </div>
+      <div class="bar">
+        <div><i class="ti ti-layout-grid"></i>ภาพรวม</div>
+        <div><i class="ti ti-calendar-event"></i>แผน</div>
+        <div><i class="ti ti-receipt"></i>ค่าใช้จ่าย</div>
+        <div class="on"><i class="ti ti-scale"></i>สรุปยอด</div>
+        <div><i class="ti ti-checkbox"></i>อื่นๆ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S11b QR -->
+<div class="frame">
+  <div class="cap"><b>S11b</b><i>PromptPayQr</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-x" style="font-size:20px;color:var(--ink2)"></i>โอนให้ต้น</div></div>
+    <div class="pad" style="text-align:center;flex:1;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div class="sub">ยอดที่ต้องโอน</div>
+        <div style="font-size:32px;font-weight:600">830.00</div>
+      </div>
+      <div class="qr"><i class="ti ti-qrcode"></i></div>
+      <div>
+        <div class="mut">พร้อมเพย์</div>
+        <div style="font-size:15px">08x-xxx-4471 · ต้น</div>
+      </div>
+      <div class="btn" style="margin-top:auto"><i class="ti ti-download"></i> บันทึกรูป QR</div>
+      <div class="btn p">แจ้งว่าโอนแล้ว</div>
+      <div class="mut">ต้นจะได้รับการแจ้งเตือนให้กดยืนยัน</div>
+    </div>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="frame">
+  <div class="cap"><b>S12</b><i>Checklist</i></div>
+  <div class="body">
+    <div class="nav"><div class="t">ของที่ต้องเอา</div></div>
+    <div class="pad" style="padding-bottom:0"><div class="tabs"><div class="on">ของส่วนกลาง</div><div>ของส่วนตัว</div></div></div>
+    <div class="rel">
+      <div class="pad">
+        <div class="ck"><i class="ti ti-square-check on"></i><s>ปลั๊กพ่วง</s><div style="margin-left:auto"><div class="av">ต</div></div></div>
+        <div class="ck"><i class="ti ti-square-check on"></i><s>ลำโพงบลูทูธ</s><div style="margin-left:auto"><div class="av">ม</div></div></div>
+        <div class="ck"><i class="ti ti-square"></i>ยาสามัญ<div style="margin-left:auto"><div class="av">ฟ</div></div></div>
+        <div class="ck"><i class="ti ti-square"></i>ร่ม 2 คัน<div style="margin-left:auto"><div class="av">บ</div></div></div>
+        <div class="ck"><i class="ti ti-square"></i>กระติกน้ำแข็ง<div style="margin-left:auto"><span class="pill" style="background:#f0eee8;color:var(--ink2)">ยังไม่มีคนรับ</span></div></div>
+        <div class="ck" style="color:var(--ink3);border-bottom:0"><i class="ti ti-plus"></i>เพิ่มรายการ…</div>
+        <div class="note" style="margin:10px 0 0">ของส่วนกลาง: ติ๊กแล้วทุกคนเห็นเหมือนกัน · ของส่วนตัว: แต่ละคนติ๊กของตัวเอง</div>
+      </div>
+      <div class="bar">
+        <div><i class="ti ti-layout-grid"></i>ภาพรวม</div>
+        <div><i class="ti ti-calendar-event"></i>แผน</div>
+        <div><i class="ti ti-receipt"></i>ค่าใช้จ่าย</div>
+        <div><i class="ti ti-scale"></i>สรุปยอด</div>
+        <div class="on"><i class="ti ti-checkbox"></i>อื่นๆ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="frame">
+  <div class="cap"><b>S13</b><i>Poll</i></div>
+  <div class="body">
+    <div class="nav"><div class="t"><i class="ti ti-arrow-left" style="font-size:20px;color:var(--ink2)"></i>โหวต</div><div class="a">ปิดโหวต</div></div>
+    <div class="pad">
+      <b style="font-size:16px;font-weight:500;display:block;margin-bottom:3px">มื้อเย็นวันศุกร์กินอะไรดี</b>
+      <div class="mut" style="margin-bottom:14px">โหวตแล้ว 4 จาก 5 คน · เลือกได้ 1 ข้อ</div>
+
+      <div class="vote">
+        <div class="vt"><span><i class="ti ti-circle-check" style="color:var(--accent)"></i> หมูกระทะ</span><span>2</span></div>
+        <div class="vb"><i style="width:50%"></i></div>
+        <div style="margin-top:5px" class="avs"><div class="av">ต</div><div class="av">ฟ</div></div>
+      </div>
+      <div class="vote">
+        <div class="vt"><span><i class="ti ti-circle" style="color:var(--ink3)"></i> ข้าวซอย</span><span>1</span></div>
+        <div class="vb"><i style="width:25%"></i></div>
+        <div style="margin-top:5px" class="avs"><div class="av">ม</div></div>
+      </div>
+      <div class="vote">
+        <div class="vt"><span><i class="ti ti-circle" style="color:var(--ink3)"></i> ปิ้งย่างเกาหลี</span><span>1</span></div>
+        <div class="vb"><i style="width:25%"></i></div>
+        <div style="margin-top:5px" class="avs"><div class="av">บ</div></div>
+      </div>
+      <div class="vote">
+        <div class="vt"><span><i class="ti ti-circle" style="color:var(--ink3)"></i> ตามใจคนขับ</span><span>0</span></div>
+        <div class="vb"><i style="width:0"></i></div>
+      </div>
+      <div class="sep"></div>
+      <div class="mut">ยังไม่โหวต: เก่ง</div>
+    </div>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="frame">
+  <div class="cap"><b>S14</b><i>Settings</i></div>
+  <div class="body">
+    <div class="nav"><div class="t">โปรไฟล์และตั้งค่า</div></div>
+    <div class="pad">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div class="av" style="width:52px;height:52px;font-size:19px">ต</div>
+        <div><b style="font-size:16px;font-weight:500">ต้น</b><div class="mut">ton@example.com</div></div>
+      </div>
+      <div class="lbl">ชื่อที่แสดง</div>
+      <div class="fld" style="margin-bottom:12px">ต้น</div>
+      <div class="lbl">เบอร์พร้อมเพย์</div>
+      <div class="fld" style="margin-bottom:5px">08x-xxx-4471<i class="ti ti-check" style="color:var(--ok)"></i></div>
+      <div class="mut" style="margin-bottom:16px">ใช้สร้าง QR ให้เพื่อนโอนเงินคืน</div>
+
+      <div class="lbl">การแจ้งเตือน</div>
+      <div class="li"><span style="font-size:15px">มีบิลใหม่ในทริป</span><i class="ti ti-toggle-right" style="font-size:26px;color:var(--accent)"></i></div>
+      <div class="li"><span style="font-size:15px">แผนการเดินทางเปลี่ยน</span><i class="ti ti-toggle-right" style="font-size:26px;color:var(--accent)"></i></div>
+      <div class="li"><span style="font-size:15px">เรื่องการโอนเงิน</span><i class="ti ti-toggle-right" style="font-size:26px;color:var(--accent)"></i></div>
+      <div class="li" style="border-bottom:0"><span style="font-size:15px">สรุปทริปประจำวัน</span><i class="ti ti-toggle-left" style="font-size:26px;color:var(--ink3)"></i></div>
+
+      <div class="sep"></div>
+      <div class="btn" style="color:var(--bad);border-color:#f0d5d5">ออกจากระบบ</div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

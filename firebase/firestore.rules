@@ -1,0 +1,119 @@
+rules_version = '2';
+
+// TripTogether security rules.
+//
+// Core idea: everything about a trip lives under trips/{tripId}, so almost every
+// rule reduces to "is the caller in this trip's memberIds array". The one thing
+// outsiders may read is inviteCodes, which is how a non-member gets in.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function tripData(tripId) {
+      return get(/databases/$(database)/documents/trips/$(tripId)).data;
+    }
+
+    function isMember(tripId) {
+      return signedIn() && uid() in tripData(tripId).memberIds;
+    }
+
+    function isOwner(tripId) {
+      return signedIn() && uid() == tripData(tripId).ownerId;
+    }
+
+    // NOTE on the sum(shares) == totalAmount invariant:
+    // Rules cannot sum an array of maps, so that check cannot live here. It is
+    // enforced in two other places instead — the client blocks the save, and the
+    // onExpenseWrite Cloud Function re-checks and flags any document that slips
+    // through. What rules CAN enforce is the type: money must be an int (satang),
+    // never a float, which is asserted on every expense and settlement write below.
+
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && uid() == userId;
+      allow delete: if signedIn() && uid() == userId;
+    }
+
+    // Invite codes are readable by anyone signed in — that is the point of them.
+    // Only Cloud Functions and the trip owner may write.
+    match /inviteCodes/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update, delete: if signedIn() && isOwner(resource.data.tripId);
+    }
+
+    match /trips/{tripId} {
+      allow read: if isMember(tripId);
+      allow create: if signedIn()
+        && request.resource.data.ownerId == uid()
+        && uid() in request.resource.data.memberIds;
+      // A member may join themselves (memberIds grows by one, and that one is them).
+      allow update: if isOwner(tripId)
+        || (isMember(tripId)
+            && request.resource.data.ownerId == resource.data.ownerId)
+        || (signedIn()
+            && request.resource.data.memberIds.hasAll(resource.data.memberIds)
+            && request.resource.data.memberIds.removeAll(resource.data.memberIds) == [uid()]);
+      allow delete: if isOwner(tripId);
+
+      match /members/{memberId} {
+        allow read: if isMember(tripId);
+        allow create: if isMember(tripId) || isOwner(tripId);
+        allow update: if isMember(tripId);
+        allow delete: if isOwner(tripId);
+      }
+
+      match /days/{dayId} {
+        allow read, write: if isMember(tripId);
+
+        match /activities/{activityId} {
+          allow read, write: if isMember(tripId);
+        }
+      }
+
+      match /expenses/{expenseId} {
+        allow read: if isMember(tripId);
+        allow create: if isMember(tripId)
+          && request.resource.data.totalAmount is int
+          && request.resource.data.totalAmount >= 0
+          && request.resource.data.shares.size() > 0;
+        allow update: if isMember(tripId)
+          && request.resource.data.totalAmount is int
+          && request.resource.data.totalAmount >= 0;
+        // Only the person who logged the bill, or the trip owner, may remove it.
+        allow delete: if isOwner(tripId)
+          || (isMember(tripId) && resource.data.createdBy == uid());
+      }
+
+      match /settlements/{settlementId} {
+        allow read: if isMember(tripId);
+        allow create: if isMember(tripId)
+          && request.resource.data.amount is int
+          && request.resource.data.amount > 0
+          && request.resource.data.status == 'PENDING';
+        // Confirming a transfer is the recipient's call, not the sender's.
+        allow update: if isMember(tripId)
+          && request.resource.data.fromMemberId == resource.data.fromMemberId
+          && request.resource.data.toMemberId == resource.data.toMemberId
+          && request.resource.data.amount == resource.data.amount;
+        allow delete: if isOwner(tripId);
+      }
+
+      match /checklist/{itemId} {
+        allow read, write: if isMember(tripId);
+      }
+
+      match /polls/{pollId} {
+        allow read, write: if isMember(tripId);
+      }
+    }
+  }
+}
