@@ -19,6 +19,8 @@
     <string name="create_trip_range_too_long">ช่วงทริปยาวได้ไม่เกิน %1$d วัน</string>
     <string name="create_trip_save">สร้างทริป</string>
     <string name="create_trip_error">สร้างทริปไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="create_trip_date_in_past">เลือกวันที่ผ่านมาแล้วไม่ได้</string>
+    <string name="create_trip_date_overlap">ช่วงวันที่ทับกับทริป "%1$s"</string>
     <string name="edit_trip_title">แก้ไขทริป</string>
     <string name="edit_trip_save">บันทึกการแก้ไข</string>
     <string name="edit_trip_shrink_title">ย่นช่วงวันที่?</string>

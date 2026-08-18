@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -39,11 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.triptogether.core.ui.theme.TripTogetherTheme
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 import java.time.format.DateTimeFormatter
 
 /** S03 — name + date range (max 60 days); cover image arrives once Storage is available. */
@@ -169,6 +173,13 @@ private fun CreateTripContent(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            uiState.dateErrorResId?.let { resId ->
+                Text(
+                    text = stringResource(resId, uiState.dateErrorArg),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             Button(
                 onClick = onSave,
                 enabled = uiState.canSave,
@@ -187,6 +198,8 @@ private fun CreateTripContent(
 
     if (showDatePicker) {
         TripDateRangePickerDialog(
+            // Past dates are only pickable when editing an already-started trip.
+            allowPastDates = uiState.isExisting,
             onConfirm = { start, end ->
                 onDatesSelected(start, end)
                 showDatePicker = false
@@ -199,10 +212,19 @@ private fun CreateTripContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TripDateRangePickerDialog(
+    allowPastDates: Boolean,
     onConfirm: (LocalDate, LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val pickerState = rememberDateRangePickerState()
+    val pickerState =
+        rememberDateRangePickerState(
+            selectableDates =
+                if (allowPastDates) {
+                    DatePickerDefaults.AllDates
+                } else {
+                    remember { futureOnlyDates() }
+                },
+        )
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -229,6 +251,17 @@ private fun TripDateRangePickerDialog(
 
 /** The Material picker reports UTC-midnight millis, so convert back in UTC. */
 private fun Long.toUtcLocalDate(): LocalDate = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC).date
+
+/** Greys out days before today in the range picker (new trips only). */
+@OptIn(ExperimentalMaterial3Api::class)
+private fun futureOnlyDates(): SelectableDates {
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    return object : SelectableDates {
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean = utcTimeMillis.toUtcLocalDate() >= today
+
+        override fun isSelectableYear(year: Int): Boolean = year >= today.year
+    }
+}
 
 @Composable
 private fun dateRangeLabel(

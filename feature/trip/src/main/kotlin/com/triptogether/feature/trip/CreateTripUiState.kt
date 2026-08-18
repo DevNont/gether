@@ -15,6 +15,10 @@ data class CreateTripUiState(
     val isLoading: Boolean = false,
     /** Editing shrank the date range — confirm that dropped days lose their activities. */
     val showShrinkConfirm: Boolean = false,
+    /** Set by the ViewModel: dates in the past (create only) or overlapping another trip. */
+    @StringRes val dateErrorResId: Int? = null,
+    /** Name of the trip the selected range collides with, for the error message. */
+    val dateErrorArg: String = "",
 ) {
     val dayCount: Int?
         get() =
@@ -23,7 +27,9 @@ data class CreateTripUiState(
     val isRangeTooLong: Boolean get() = (dayCount ?: 0) > MAX_TRIP_DAYS
 
     val canSave: Boolean
-        get() = name.isNotBlank() && startDate != null && endDate != null && !isRangeTooLong && !isSaving
+        get() =
+            name.isNotBlank() && startDate != null && endDate != null &&
+                !isRangeTooLong && dateErrorResId == null && !isSaving
 }
 
 sealed interface CreateTripEvent {

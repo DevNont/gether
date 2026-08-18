@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.domain.model.TripDraft
 import com.triptogether.core.domain.repository.AnalyticsLogger
+import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.TripRepository
 import com.triptogether.feature.trip.navigation.CreateTripRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import javax.inject.Inject
 
 /** Creates a new trip or edits an existing one (route.tripId != null). */
@@ -29,6 +33,7 @@ class CreateTripViewModel
     @Inject
     constructor(
         private val tripRepository: TripRepository,
+        private val authRepository: AuthRepository,
         private val analytics: AnalyticsLogger,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
@@ -42,9 +47,12 @@ class CreateTripViewModel
 
         private var existing: Trip? = null
 
+        /** The user's other trips, for the no-overlap rule. */
+        private var otherTrips: List<Trip> = emptyList()
+
         init {
-            route.tripId?.let { tripId ->
-                viewModelScope.launch {
+            viewModelScope.launch {
+                route.tripId?.let { tripId ->
                     val trip = tripRepository.observeTrip(tripId).filterNotNull().first()
                     existing = trip
                     _uiState.update {
@@ -57,7 +65,31 @@ class CreateTripViewModel
                         )
                     }
                 }
+                val userId = authRepository.observeAuthState().filterNotNull().first().id
+                otherTrips =
+                    tripRepository.observeTrips(userId).first().filter { it.id != route.tripId }
+                revalidateDates()
             }
+        }
+
+        private fun revalidateDates() {
+            val state = _uiState.value
+            val start = state.startDate
+            val end = state.endDate
+            if (start == null || end == null) {
+                _uiState.update { it.copy(dateErrorResId = null, dateErrorArg = "") }
+                return
+            }
+            val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+            val overlapping = otherTrips.firstOrNull { start <= it.endDate && it.startDate <= end }
+            val (errorRes, errorArg) =
+                when {
+                    // Editing keeps old ranges legal; only new trips must start today or later.
+                    !state.isExisting && start < today -> R.string.create_trip_date_in_past to ""
+                    overlapping != null -> R.string.create_trip_date_overlap to overlapping.name
+                    else -> null to ""
+                }
+            _uiState.update { it.copy(dateErrorResId = errorRes, dateErrorArg = errorArg) }
         }
 
         fun onNameChange(name: String) {
@@ -69,6 +101,7 @@ class CreateTripViewModel
             end: LocalDate,
         ) {
             _uiState.update { it.copy(startDate = start, endDate = end) }
+            revalidateDates()
         }
 
         fun dismissShrinkConfirm() {
