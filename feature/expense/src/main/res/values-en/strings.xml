@@ -35,4 +35,15 @@
     <string name="expense_service_charge">+ 10%% service charge</string>
     <string name="expense_editor_save">Save bill</string>
     <string name="expense_editor_error">Could not save. Please try again.</string>
+
+    <string name="expense_detail_edit">Edit</string>
+    <string name="expense_detail_delete">Delete bill</string>
+    <string name="expense_detail_cancel">Cancel</string>
+    <string name="expense_detail_delete_confirm_title">Delete this bill?</string>
+    <string name="expense_detail_delete_confirm_text">This cannot be undone. Everyone\'s totals will change.</string>
+    <string name="expense_detail_delete_error">Could not delete. Please try again.</string>
+    <string name="expense_detail_not_found">Bill not found</string>
+    <string name="expense_detail_created_by">Created by %1$s</string>
+    <string name="expense_detail_shares_title">Split (%1$s)</string>
+    <string name="expense_detail_slips">Slips</string>
 </resources>

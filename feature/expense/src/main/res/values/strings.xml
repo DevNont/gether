@@ -35,4 +35,15 @@
     <string name="expense_service_charge">+ ค่าบริการ 10%%</string>
     <string name="expense_editor_save">บันทึกบิล</string>
     <string name="expense_editor_error">บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+
+    <string name="expense_detail_edit">แก้ไข</string>
+    <string name="expense_detail_delete">ลบบิล</string>
+    <string name="expense_detail_cancel">ยกเลิก</string>
+    <string name="expense_detail_delete_confirm_title">ลบบิลนี้?</string>
+    <string name="expense_detail_delete_confirm_text">ลบแล้วกู้คืนไม่ได้ ยอดสรุปของทุกคนจะเปลี่ยน</string>
+    <string name="expense_detail_delete_error">ลบไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="expense_detail_not_found">ไม่พบบิลนี้</string>
+    <string name="expense_detail_created_by">สร้างโดย %1$s</string>
+    <string name="expense_detail_shares_title">การหาร (%1$s)</string>
+    <string name="expense_detail_slips">สลิป</string>
 </resources>

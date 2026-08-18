@@ -6,6 +6,7 @@ package com.triptogether.feature.expense.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.triptogether.feature.expense.ExpenseDetailScreen
 import com.triptogether.feature.expense.ExpenseEditorScreen
 import com.triptogether.feature.expense.ExpenseListScreen
 import kotlinx.serialization.Serializable
@@ -18,6 +19,25 @@ data class ExpenseEditorRoute(
     val tripId: String,
     val expenseId: String? = null,
 )
+
+@Serializable
+data class ExpenseDetailRoute(
+    val tripId: String,
+    val expenseId: String,
+)
+
+fun NavGraphBuilder.expenseDetailScreen(
+    onEdit: (ExpenseEditorRoute) -> Unit,
+    onBack: () -> Unit,
+) {
+    composable<ExpenseDetailRoute> { backStackEntry ->
+        val route = backStackEntry.toRoute<ExpenseDetailRoute>()
+        ExpenseDetailScreen(
+            onEdit = { onEdit(ExpenseEditorRoute(tripId = route.tripId, expenseId = route.expenseId)) },
+            onBack = onBack,
+        )
+    }
+}
 
 fun NavGraphBuilder.expenseEditorScreen(
     onDone: () -> Unit,
