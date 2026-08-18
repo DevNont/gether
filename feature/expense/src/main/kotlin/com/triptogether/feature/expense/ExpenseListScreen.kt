@@ -198,6 +198,22 @@ private fun GroupedList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 88.dp),
     ) {
+        if (uiState.prepaid.isNotEmpty()) {
+            item(key = "header-prepaid") {
+                SectionHeader(
+                    label = stringResource(R.string.expense_prepaid_group),
+                    total = uiState.prepaidTotal,
+                )
+            }
+            items(uiState.prepaid, key = { it.id }) { expense ->
+                ExpenseRow(
+                    expense = expense,
+                    paidByName = uiState.memberName(expense.paidByMemberId),
+                    myShare = uiState.myMemberId?.let { expense.shareOf(it) } ?: Money.ZERO,
+                    onClick = { onExpenseClick(expense.id) },
+                )
+            }
+        }
         uiState.groups.forEach { group ->
             item(key = "header-${group.date}") {
                 DayHeader(date = group.date, total = group.total)
@@ -211,6 +227,29 @@ private fun GroupedList(
                 )
             }
         }
+    }
+}
+
+/** Group header for a non-date section (e.g. prepaid), mirroring DayHeader. */
+@Composable
+private fun SectionHeader(
+    label: String,
+    total: Money,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.tertiary,
+        )
+        Text(
+            text = total.formatWithSymbol(),
+            style = MaterialTheme.typography.titleSmall,
+        )
     }
 }
 

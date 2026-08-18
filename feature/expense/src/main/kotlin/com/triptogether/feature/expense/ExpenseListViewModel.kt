@@ -8,6 +8,7 @@ import com.triptogether.core.domain.model.Expense
 import com.triptogether.core.domain.model.ExpenseCategory
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Money
+import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.domain.model.User
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.ExpenseRepository
@@ -38,9 +39,10 @@ class ExpenseListViewModel
                 expenseRepository.observeExpenses(route.tripId),
                 tripRepository.observeMembers(route.tripId),
                 authRepository.observeAuthState(),
+                tripRepository.observeTrip(route.tripId),
                 filter,
-            ) { expenses, members, user, filter ->
-                buildState(expenses, members, user, filter)
+            ) { expenses, members, user, trip, filter ->
+                buildState(expenses, members, user, trip, filter)
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -55,12 +57,21 @@ class ExpenseListViewModel
             expenses: List<Expense>,
             members: List<Member>,
             user: User?,
+            trip: Trip?,
             filter: ExpenseCategory?,
         ): ExpenseListUiState {
             val myMemberId = members.firstOrNull { it.userId == user?.id }?.id
             val filtered = if (filter == null) expenses else expenses.filter { it.category == filter }
+
+            // Bills dated before the trip starts are "paid in advance" — shown apart, counted the same.
+            val (prepaid, duringTrip) =
+                if (trip == null) {
+                    emptyList<Expense>() to filtered
+                } else {
+                    filtered.partition { it.date < trip.startDate }
+                }
             val groups =
-                filtered
+                duringTrip
                     .groupBy { it.date }
                     .toSortedMap(compareByDescending { it })
                     .map { (date, dayExpenses) ->
@@ -73,6 +84,8 @@ class ExpenseListViewModel
             // Header totals always cover the whole trip, not the active filter.
             return ExpenseListUiState(
                 isLoading = false,
+                prepaid = prepaid.sortedByDescending { it.date },
+                prepaidTotal = Money(prepaid.sumOf { it.totalAmount.satang }),
                 groups = groups,
                 members = members,
                 myMemberId = myMemberId,

@@ -31,7 +31,11 @@ data class ExpenseEditorUiState(
     val rows: List<MemberSplitRow> = emptyList(),
     val isExisting: Boolean = false,
     val isSaving: Boolean = false,
+    /** First day of the trip; a bill dated before it is a prepaid expense. */
+    val tripStart: LocalDate? = null,
 ) {
+    val isPrepaid: Boolean get() = date != null && tripStart != null && date < tripStart
+
     val total: Money? get() = Money.parse(totalInput.trim())
 
     val selectedRows: List<MemberSplitRow> get() = rows.filter { it.selected }

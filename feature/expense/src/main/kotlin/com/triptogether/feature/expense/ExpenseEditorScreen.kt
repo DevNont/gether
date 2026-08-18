@@ -205,6 +205,13 @@ internal fun ExpenseEditorContent(
                     modifier = Modifier.weight(1f),
                 )
             }
+            if (uiState.isPrepaid) {
+                Text(
+                    text = stringResource(R.string.expense_editor_prepaid_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            }
             SplitModeSelector(selected = uiState.splitMode, onSelect = callbacks.onSplitModeChange)
             uiState.rows.forEach { row ->
                 MemberRow(

@@ -14,6 +14,8 @@ data class ExpenseDayGroup(
 
 data class ExpenseListUiState(
     val isLoading: Boolean = true,
+    val prepaid: List<Expense> = emptyList(),
+    val prepaidTotal: Money = Money.ZERO,
     val groups: List<ExpenseDayGroup> = emptyList(),
     val members: List<Member> = emptyList(),
     val myMemberId: String? = null,
@@ -21,7 +23,7 @@ data class ExpenseListUiState(
     val tripTotal: Money = Money.ZERO,
     val myTotal: Money = Money.ZERO,
 ) {
-    val isEmpty: Boolean get() = !isLoading && groups.isEmpty()
+    val isEmpty: Boolean get() = !isLoading && groups.isEmpty() && prepaid.isEmpty()
 
     fun memberName(memberId: String): String = members.firstOrNull { it.id == memberId }?.displayName ?: ""
 }

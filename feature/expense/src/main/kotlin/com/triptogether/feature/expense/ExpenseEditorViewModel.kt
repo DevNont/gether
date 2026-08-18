@@ -77,6 +77,7 @@ class ExpenseEditorViewModel
                         isLoading = false,
                         paidByMemberId = myMemberId,
                         date = defaultDate,
+                        tripStart = trip.startDate,
                         rows = members.map { member -> MemberSplitRow(member = member) },
                     )
                 } else {
@@ -87,6 +88,7 @@ class ExpenseEditorViewModel
                         totalInput = expense.totalAmount.format(),
                         paidByMemberId = expense.paidByMemberId,
                         date = expense.date,
+                        tripStart = trip.startDate,
                         splitMode = expense.splitMode,
                         isExisting = true,
                         rows =

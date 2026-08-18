@@ -14,6 +14,8 @@
     <string name="expense_category_other">Other</string>
     <string name="expense_paid_by">Paid by %1$s</string>
     <string name="expense_my_share">Mine %1$s</string>
+    <string name="expense_prepaid_group">Paid in advance</string>
+    <string name="expense_editor_prepaid_hint">Prepaid (paid before the trip starts)</string>
 
     <string name="expense_editor_title_new">Add bill</string>
     <string name="expense_editor_title_edit">Edit bill</string>

@@ -14,6 +14,8 @@
     <string name="expense_category_other">อื่นๆ</string>
     <string name="expense_paid_by">จ่ายโดย %1$s</string>
     <string name="expense_my_share">ของฉัน %1$s</string>
+    <string name="expense_prepaid_group">รายจ่ายล่วงหน้า</string>
+    <string name="expense_editor_prepaid_hint">รายจ่ายล่วงหน้า (จ่ายก่อนทริปเริ่ม)</string>
 
     <string name="expense_editor_title_new">เพิ่มบิล</string>
     <string name="expense_editor_title_edit">แก้ไขบิล</string>
