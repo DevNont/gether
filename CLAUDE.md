@@ -8,9 +8,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## สถานะปัจจุบัน
 
-ยังไม่มี Android/Gradle project ใน repo — มีแค่เอกสาร, mockup, โค้ด domain อ้างอิง และ Firebase config
-งานแรกคือ M1.1 (สร้างโครงโปรเจกต์) ตาม `docs/06-roadmap.md`
-ก่อนเริ่ม M1.5 ต้องมี Firebase project + `google-services.json` ใน `app/` + SHA-1 debug keystore ใน console (ดู README.md)
+โครงโปรเจกต์ครบทุกโมดูลแล้ว ทำถึง M7 ตาม `docs/06-roadmap.md` (ดู git log — commit ตั้งชื่อตามรหัส task)
+Firebase project = `triptogether-703c3` (Firestore asia-southeast1 + Auth Google เปิดแล้ว, rules/indexes deploy แล้ว)
+
+**สิ่งที่ยังทำไม่ได้เพราะติด blocker ภายนอก:**
+- Storage bucket ยังไม่มี (ต้อง upgrade Blaze) → M3.4, M4.6, รูปปก, รูปโปรไฟล์, และ `storage.rules` ยังไม่ deploy
+- Cloud Functions (`firebase/functions/`) เขียนเสร็จ tsc ผ่าน แต่ deploy ต้อง Blaze → FCM ฝั่ง client ยังไม่ต่อ
+- เทสต์บนเครื่องจริง/emulator ยังไม่เคยรัน: sign-in E2E, เกณฑ์ multi-device (M2.6/M3), Compose UI test (M4.8), สแกน QR ด้วยแอปธนาคาร 2 แอป (บังคับก่อน release), M7.5 baseline profile
+- `google-services.json` อยู่ที่ `app/` (gitignored) — CI ใช้ placeholder ที่สร้างใน workflow
 
 ## อ่านก่อนเริ่มงานเสมอ
 
