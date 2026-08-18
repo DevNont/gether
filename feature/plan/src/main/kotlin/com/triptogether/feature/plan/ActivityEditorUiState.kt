@@ -1,10 +1,12 @@
 package com.triptogether.feature.plan
 
 import androidx.annotation.StringRes
+import com.triptogether.core.domain.model.ActivityType
 import kotlinx.datetime.LocalTime
 
 data class ActivityEditorUiState(
     val title: String = "",
+    val type: ActivityType = ActivityType.PLACE,
     val startTime: LocalTime? = null,
     val endTime: LocalTime? = null,
     val placeName: String = "",

@@ -23,4 +23,9 @@
     <string name="activity_editor_time_ok">OK</string>
     <string name="activity_editor_time_clear">No time</string>
     <string name="activity_editor_error">Could not save. Please try again.</string>
+
+    <string name="activity_type_place">Place</string>
+    <string name="activity_type_food">Restaurant</string>
+    <string name="activity_type_stay">Stay</string>
+    <string name="day_plan_stay_label">Tonight\'s stay</string>
 </resources>

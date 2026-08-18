@@ -19,6 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -39,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.triptogether.core.domain.model.ActivityType
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.LocalTime
 
@@ -68,6 +72,7 @@ fun ActivityEditorScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onTitleChange = viewModel::onTitleChange,
+        onTypeChange = viewModel::onTypeChange,
         onPlaceChange = viewModel::onPlaceChange,
         onNoteChange = viewModel::onNoteChange,
         onStartTimeChange = viewModel::onStartTimeChange,
@@ -85,6 +90,7 @@ private fun ActivityEditorContent(
     uiState: ActivityEditorUiState,
     snackbarHostState: SnackbarHostState,
     onTitleChange: (String) -> Unit,
+    onTypeChange: (ActivityType) -> Unit,
     onPlaceChange: (String) -> Unit,
     onNoteChange: (String) -> Unit,
     onStartTimeChange: (LocalTime?) -> Unit,
@@ -140,6 +146,7 @@ private fun ActivityEditorContent(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
+            ActivityTypeSelector(selected = uiState.type, onSelect = onTypeChange)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TimeField(
                     label = stringResource(R.string.activity_editor_start),
@@ -229,6 +236,33 @@ private fun ActivityEditorContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+private fun ActivityTypeSelector(
+    selected: ActivityType,
+    onSelect: (ActivityType) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
+        ActivityType.entries.forEachIndexed { index, type ->
+            SegmentedButton(
+                selected = selected == type,
+                onClick = { onSelect(type) },
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = ActivityType.entries.size),
+            ) {
+                Text(stringResource(type.labelRes()))
+            }
+        }
+    }
+}
+
+internal fun ActivityType.labelRes(): Int =
+    when (this) {
+        ActivityType.PLACE -> R.string.activity_type_place
+        ActivityType.FOOD -> R.string.activity_type_food
+        ActivityType.STAY -> R.string.activity_type_stay
+    }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 private fun TimeField(
     label: String,
     value: LocalTime?,
@@ -292,6 +326,7 @@ private fun ActivityEditorContentPreview() {
                 ),
             snackbarHostState = SnackbarHostState(),
             onTitleChange = {},
+            onTypeChange = {},
             onPlaceChange = {},
             onNoteChange = {},
             onStartTimeChange = {},

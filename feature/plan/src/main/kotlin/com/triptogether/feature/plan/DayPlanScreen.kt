@@ -22,8 +22,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Attachment
+import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -45,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.triptogether.core.domain.model.Activity
+import com.triptogether.core.domain.model.ActivityType
 import com.triptogether.core.domain.model.DayPlan
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.Clock
@@ -123,9 +127,10 @@ private fun DayPlanContent(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
-                uiState.timeline.isEmpty() -> EmptyDay()
+                uiState.isDayEmpty -> EmptyDay()
                 else ->
                     Timeline(
+                        stays = uiState.stays,
                         activities = uiState.timeline,
                         onEditActivity = { activityId ->
                             uiState.selectedDayId?.let { onEditActivity(it, activityId) }
@@ -209,6 +214,7 @@ private fun EmptyDay(modifier: Modifier = Modifier) {
 
 @Composable
 private fun Timeline(
+    stays: List<Activity>,
     activities: List<Activity>,
     onEditActivity: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -218,8 +224,54 @@ private fun Timeline(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
     ) {
+        // The day's stay sits pinned on top — it frames the whole day.
+        items(stays, key = { "stay-${it.id}" }) { stay ->
+            StayCard(activity = stay, onClick = { onEditActivity(stay.id) })
+        }
         items(activities, key = { it.id }) { activity ->
             ActivityRow(activity = activity, onClick = { onEditActivity(activity.id) })
+        }
+    }
+}
+
+@Composable
+private fun StayCard(
+    activity: Activity,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    Card(
+        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Hotel,
+                contentDescription = stringResource(R.string.activity_type_stay),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.day_plan_stay_label),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+                Text(text = activity.title, style = MaterialTheme.typography.titleSmall)
+            }
+            if (activity.placeName != null) {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier =
+                        Modifier.size(20.dp).clickable { openInMaps(context, activity) },
+                )
+            }
         }
     }
 }
@@ -245,7 +297,20 @@ private fun ActivityRow(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(text = activity.title, style = MaterialTheme.typography.titleSmall)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        if (activity.type == ActivityType.FOOD) {
+                            Icon(
+                                imageVector = Icons.Default.Restaurant,
+                                contentDescription = stringResource(R.string.activity_type_food),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                        Text(text = activity.title, style = MaterialTheme.typography.titleSmall)
+                    }
                     if (activity.attachments.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Default.Attachment,

@@ -1,12 +1,14 @@
 package com.triptogether.core.data.dto
 
 import com.triptogether.core.domain.model.Activity
+import com.triptogether.core.domain.model.ActivityType
 import com.triptogether.core.domain.model.Attachment
 import kotlinx.datetime.LocalTime
 
 /** Firestore shape of trips/{tripId}/days/{dayId}/activities/{activityId}. Times are HH:mm strings. */
 data class ActivityDto(
     val title: String = "",
+    val type: String = "PLACE",
     val startTime: String? = null,
     val endTime: String? = null,
     val placeName: String? = null,
@@ -28,6 +30,7 @@ fun ActivityDto.toDomain(id: String): Activity =
     Activity(
         id = id,
         title = title,
+        type = runCatching { ActivityType.valueOf(type) }.getOrDefault(ActivityType.PLACE),
         startTime = startTime?.let(LocalTime::parse),
         endTime = endTime?.let(LocalTime::parse),
         placeName = placeName,
@@ -42,6 +45,7 @@ fun ActivityDto.toDomain(id: String): Activity =
 fun Activity.toDto(): ActivityDto =
     ActivityDto(
         title = title,
+        type = type.name,
         startTime = startTime?.toHHmm(),
         endTime = endTime?.toHHmm(),
         placeName = placeName,

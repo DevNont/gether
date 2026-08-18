@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.triptogether.core.domain.model.Activity
+import com.triptogether.core.domain.model.ActivityType
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.PlanRepository
 import com.triptogether.core.domain.repository.TripRepository
@@ -59,6 +60,7 @@ class ActivityEditorViewModel
                     } else {
                         it.copy(
                             title = activity.title,
+                            type = activity.type,
                             startTime = activity.startTime,
                             endTime = activity.endTime,
                             placeName = activity.placeName.orEmpty(),
@@ -72,6 +74,8 @@ class ActivityEditorViewModel
         }
 
         fun onTitleChange(value: String) = _uiState.update { it.copy(title = value) }
+
+        fun onTypeChange(value: ActivityType) = _uiState.update { it.copy(type = value) }
 
         fun onPlaceChange(value: String) = _uiState.update { it.copy(placeName = value) }
 
@@ -90,6 +94,7 @@ class ActivityEditorViewModel
                     Activity(
                         id = existing?.id ?: "",
                         title = state.title.trim(),
+                        type = state.type,
                         startTime = state.startTime,
                         endTime = state.endTime,
                         placeName = state.placeName.trim().ifBlank { null },

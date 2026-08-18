@@ -49,9 +49,13 @@ data class DayPlan(
     val activities: List<Activity> = emptyList(),
 )
 
+/** What a plan entry is: a place to visit, a restaurant to eat at, or the day's stay. */
+enum class ActivityType { PLACE, FOOD, STAY }
+
 data class Activity(
     val id: String,
     val title: String,
+    val type: ActivityType = ActivityType.PLACE,
     val startTime: LocalTime? = null,
     val endTime: LocalTime? = null,
     val placeName: String? = null,
