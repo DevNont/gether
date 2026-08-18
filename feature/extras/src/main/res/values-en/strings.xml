@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_back">Back</string>
+    <string name="checklist_title">Checklist</string>
+    <string name="checklist_tab_shared">Shared</string>
+    <string name="checklist_tab_personal">Personal</string>
+    <string name="checklist_add_hint">Type an item and press enter…</string>
+    <string name="checklist_empty">No items yet — type above to add one</string>
+    <string name="checklist_error">Action failed. Please try again.</string>
+</resources>

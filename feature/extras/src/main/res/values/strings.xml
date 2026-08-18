@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extras_back">ย้อนกลับ</string>
+    <string name="checklist_title">เช็คลิสต์</string>
+    <string name="checklist_tab_shared">ของส่วนกลาง</string>
+    <string name="checklist_tab_personal">ของส่วนตัว</string>
+    <string name="checklist_add_hint">พิมพ์รายการแล้วกด enter…</string>
+    <string name="checklist_empty">ยังไม่มีรายการ พิมพ์ด้านบนเพื่อเพิ่ม</string>
+    <string name="checklist_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+</resources>

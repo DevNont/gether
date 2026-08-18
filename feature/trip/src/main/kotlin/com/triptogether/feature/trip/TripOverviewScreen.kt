@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -59,6 +60,7 @@ fun TripOverviewScreen(
     onOpenPlan: (String) -> Unit,
     onOpenExpenses: (String) -> Unit,
     onOpenSettlement: (String) -> Unit,
+    onOpenChecklist: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TripOverviewViewModel = hiltViewModel(),
@@ -87,6 +89,7 @@ fun TripOverviewScreen(
         onOpenPlan = onOpenPlan,
         onOpenExpenses = onOpenExpenses,
         onOpenSettlement = onOpenSettlement,
+        onOpenChecklist = onOpenChecklist,
         onBack = onBack,
         modifier = modifier,
     )
@@ -105,6 +108,7 @@ private fun TripOverviewContent(
     onOpenPlan: (String) -> Unit,
     onOpenExpenses: (String) -> Unit,
     onOpenSettlement: (String) -> Unit,
+    onOpenChecklist: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -143,8 +147,21 @@ private fun TripOverviewContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 HeaderCard(trip = trip)
-                PlanLinkCard(onClick = { onOpenPlan(trip.id) })
-                ExpensesLinkCard(onClick = { onOpenExpenses(trip.id) })
+                LinkCard(
+                    icon = Icons.Default.Map,
+                    label = stringResource(R.string.overview_open_plan),
+                    onClick = { onOpenPlan(trip.id) },
+                )
+                LinkCard(
+                    icon = Icons.AutoMirrored.Filled.ReceiptLong,
+                    label = stringResource(R.string.overview_open_expenses),
+                    onClick = { onOpenExpenses(trip.id) },
+                )
+                LinkCard(
+                    icon = Icons.Default.Checklist,
+                    label = stringResource(R.string.overview_open_checklist),
+                    onClick = { onOpenChecklist(trip.id) },
+                )
                 MembersCard(members = uiState.members, onShareInvite = { onShareInvite(trip) })
                 MoneySummaryCard(onClick = { onOpenSettlement(trip.id) })
                 NoteCard(
@@ -272,7 +289,9 @@ private fun MembersCard(
 }
 
 @Composable
-private fun PlanLinkCard(
+private fun LinkCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -282,31 +301,8 @@ private fun PlanLinkCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Icon(imageVector = Icons.Default.Map, contentDescription = null)
-            Text(
-                text = stringResource(R.string.overview_open_plan),
-                style = MaterialTheme.typography.titleMedium,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ExpensesLinkCard(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ReceiptLong, contentDescription = null)
-            Text(
-                text = stringResource(R.string.overview_open_expenses),
-                style = MaterialTheme.typography.titleMedium,
-            )
+            Icon(imageVector = icon, contentDescription = null)
+            Text(text = label, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -413,6 +409,7 @@ private fun TripOverviewContentPreview() {
             onOpenPlan = {},
             onOpenExpenses = {},
             onOpenSettlement = {},
+            onOpenChecklist = {},
             onBack = {},
         )
     }

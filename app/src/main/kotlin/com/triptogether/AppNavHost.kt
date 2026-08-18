@@ -11,6 +11,8 @@ import com.triptogether.feature.expense.navigation.ExpenseListRoute
 import com.triptogether.feature.expense.navigation.expenseDetailScreen
 import com.triptogether.feature.expense.navigation.expenseEditorScreen
 import com.triptogether.feature.expense.navigation.expenseListScreen
+import com.triptogether.feature.extras.navigation.ChecklistRoute
+import com.triptogether.feature.extras.navigation.checklistScreen
 import com.triptogether.feature.plan.navigation.DayPlanRoute
 import com.triptogether.feature.plan.navigation.activityEditorScreen
 import com.triptogether.feature.plan.navigation.dayPlanScreen
@@ -70,9 +72,11 @@ fun AppNavHost(
             onOpenPlan = { tripId -> navController.navigate(DayPlanRoute(tripId)) },
             onOpenExpenses = { tripId -> navController.navigate(ExpenseListRoute(tripId)) },
             onOpenSettlement = { tripId -> navController.navigate(SettlementRoute(tripId)) },
+            onOpenChecklist = { tripId -> navController.navigate(ChecklistRoute(tripId)) },
             onBack = { navController.popBackStack() },
         )
         settlementScreen(onBack = { navController.popBackStack() })
+        checklistScreen(onBack = { navController.popBackStack() })
         expenseListScreen(
             onAddExpense = { tripId -> navController.navigate(ExpenseEditorRoute(tripId)) },
             onExpenseClick = { tripId, expenseId ->
