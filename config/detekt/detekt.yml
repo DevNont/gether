@@ -1,7 +1,12 @@
 complexity:
-  # Screen files legitimately hold many small @Composable functions.
+  # Stateless @Composable functions take one callback per interaction and hoist all state —
+  # parameter count and body length rules fit poorly there.
   TooManyFunctions:
     ignoreAnnotatedFunctions: ['Composable']
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+  LongMethod:
+    ignoreAnnotated: ['Composable']
 
 naming:
   FunctionNaming:

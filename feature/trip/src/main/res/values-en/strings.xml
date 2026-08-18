@@ -8,4 +8,14 @@
     <string name="trip_list_create">Create trip</string>
     <string name="trip_list_join">Join with code</string>
     <string name="trip_list_avatar_overflow">+%1$d</string>
+
+    <string name="create_trip_title">New trip</string>
+    <string name="create_trip_back">Back</string>
+    <string name="create_trip_name_label">Trip name</string>
+    <string name="create_trip_dates_label">Pick start–end dates</string>
+    <string name="create_trip_dates_confirm">OK</string>
+    <string name="create_trip_dates_cancel">Cancel</string>
+    <string name="create_trip_range_too_long">A trip can be at most %1$d days long</string>
+    <string name="create_trip_save">Create trip</string>
+    <string name="create_trip_error">Could not create the trip. Please try again.</string>
 </resources>

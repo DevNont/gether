@@ -8,4 +8,14 @@
     <string name="trip_list_create">สร้างทริป</string>
     <string name="trip_list_join">เข้าร่วมด้วยรหัส</string>
     <string name="trip_list_avatar_overflow">+%1$d</string>
+
+    <string name="create_trip_title">สร้างทริปใหม่</string>
+    <string name="create_trip_back">ย้อนกลับ</string>
+    <string name="create_trip_name_label">ชื่อทริป</string>
+    <string name="create_trip_dates_label">เลือกวันเริ่ม–วันจบ</string>
+    <string name="create_trip_dates_confirm">ตกลง</string>
+    <string name="create_trip_dates_cancel">ยกเลิก</string>
+    <string name="create_trip_range_too_long">ช่วงทริปยาวได้ไม่เกิน %1$d วัน</string>
+    <string name="create_trip_save">สร้างทริป</string>
+    <string name="create_trip_error">สร้างทริปไม่สำเร็จ ลองใหม่อีกครั้ง</string>
 </resources>

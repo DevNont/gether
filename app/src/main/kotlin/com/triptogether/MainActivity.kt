@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import com.triptogether.feature.auth.SignInScreen
-import com.triptogether.feature.trip.TripListScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,13 +28,7 @@ class MainActivity : ComponentActivity() {
                 when (authState) {
                     AuthUiState.Loading -> LoadingScreen()
                     AuthUiState.SignedOut -> SignInScreen()
-                    is AuthUiState.SignedIn ->
-                        TripListScreen(
-                            // Wired to S03 CreateTrip and S04 JoinTrip in M2.4/M2.5.
-                            onCreateTrip = {},
-                            onJoinTrip = {},
-                            onTripClick = {},
-                        )
+                    is AuthUiState.SignedIn -> AppNavHost()
                 }
             }
         }
