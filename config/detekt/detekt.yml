@@ -1,0 +1,13 @@
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+style:
+  # Reference money-logic code (docs/04) uses early returns in Money.parse — do not rewrite it.
+  ReturnCount:
+    max: 4
+  # Satang arithmetic (x100, /100) makes literal 100 idiomatic throughout money code.
+  MagicNumber:
+    active: false
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']

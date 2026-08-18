@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: ktlint
+        run: ./gradlew ktlintCheck
+
+      - name: detekt
+        run: ./gradlew detekt
+
+      - name: Unit tests
+        run: ./gradlew test
+
+      - name: Assemble debug
+        run: ./gradlew assembleDebug
+
+      - name: Check core:domain has no Android/Firebase imports
+        run: |
+          if grep -rnE '^import (android|androidx|com\.google\.firebase)' core/domain/src/main; then
+            echo "core:domain must not depend on Android or Firebase (CLAUDE.md rule 3)"
+            exit 1
+          fi

@@ -12,7 +12,6 @@ import com.triptogether.core.domain.model.Transfer
  * sections 3 and 4.
  */
 object BalanceCalculator {
-
     /**
      * Net position per member. Positive means the others owe them.
      *
@@ -55,7 +54,6 @@ object BalanceCalculator {
 }
 
 object DebtSimplifier {
-
     /**
      * Reduces a set of balances to the shortest practical list of transfers,
      * ignoring who originally owed whom: if A owes B and B owes C, A pays C.
@@ -69,17 +67,19 @@ object DebtSimplifier {
      * Ties are broken by memberId so every device renders the same list.
      */
     fun simplify(balances: List<Balance>): List<Transfer> {
-        val creditors = balances
-            .filter { it.amount.isPositive }
-            .sortedWith(compareByDescending<Balance> { it.amount.satang }.thenBy { it.memberId })
-            .map { it.memberId to it.amount.satang }
-            .toMutableList()
+        val creditors =
+            balances
+                .filter { it.amount.isPositive }
+                .sortedWith(compareByDescending<Balance> { it.amount.satang }.thenBy { it.memberId })
+                .map { it.memberId to it.amount.satang }
+                .toMutableList()
 
-        val debtors = balances
-            .filter { it.amount.isNegative }
-            .sortedWith(compareBy<Balance> { it.amount.satang }.thenBy { it.memberId })
-            .map { it.memberId to -it.amount.satang }
-            .toMutableList()
+        val debtors =
+            balances
+                .filter { it.amount.isNegative }
+                .sortedWith(compareBy<Balance> { it.amount.satang }.thenBy { it.memberId })
+                .map { it.memberId to -it.amount.satang }
+                .toMutableList()
 
         val transfers = mutableListOf<Transfer>()
 
@@ -91,11 +91,12 @@ object DebtSimplifier {
         while (ci < creditors.size && di < debtors.size) {
             val amount = minOf(creditorLeft, debtorLeft)
             if (amount > 0) {
-                transfers += Transfer(
-                    fromMemberId = debtors[di].first,
-                    toMemberId = creditors[ci].first,
-                    amount = Money(amount),
-                )
+                transfers +=
+                    Transfer(
+                        fromMemberId = debtors[di].first,
+                        toMemberId = creditors[ci].first,
+                        amount = Money(amount),
+                    )
             }
             creditorLeft -= amount
             debtorLeft -= amount

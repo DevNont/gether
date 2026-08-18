@@ -15,14 +15,16 @@ import com.triptogether.core.domain.model.Share
  * whatever order a query happened to return.
  */
 object ExpenseSplitter {
-
     /**
      * Splits [total] equally between [memberIds].
      *
      * The leftover satang (total % n) are handed out one each, to the members
      * whose ids sort first. See money-logic section 2.4.
      */
-    fun splitEqually(total: Money, memberIds: List<String>): List<Share> {
+    fun splitEqually(
+        total: Money,
+        memberIds: List<String>,
+    ): List<Share> {
         require(memberIds.isNotEmpty()) { "Cannot split between zero members" }
         val ordered = memberIds.sorted()
         val n = ordered.size
@@ -41,25 +43,30 @@ object ExpenseSplitter {
      * Uses the largest-remainder method: whoever lost the most to integer
      * truncation gets the leftover satang first, ties broken by memberId.
      */
-    fun splitByWeights(total: Money, weights: Map<String, Int>): List<Share> {
+    fun splitByWeights(
+        total: Money,
+        weights: Map<String, Int>,
+    ): List<Share> {
         require(weights.isNotEmpty()) { "Cannot split between zero members" }
         require(weights.values.all { it > 0 }) { "Weights must be positive" }
 
         val ordered = weights.entries.sortedBy { it.key }
         val totalWeight = ordered.sumOf { it.value.toLong() }
 
-        val raw = ordered.map { (memberId, weight) ->
-            val exact = total.satang * weight
-            val floor = exact / totalWeight
-            Triple(memberId, floor, exact - floor * totalWeight)
-        }
+        val raw =
+            ordered.map { (memberId, weight) ->
+                val exact = total.satang * weight
+                val floor = exact / totalWeight
+                Triple(memberId, floor, exact - floor * totalWeight)
+            }
 
         var remainder = total.satang - raw.sumOf { it.second }
-        val bonusIds = raw
-            .sortedWith(compareByDescending<Triple<String, Long, Long>> { it.third }.thenBy { it.first })
-            .take(remainder.toInt())
-            .map { it.first }
-            .toSet()
+        val bonusIds =
+            raw
+                .sortedWith(compareByDescending<Triple<String, Long, Long>> { it.third }.thenBy { it.first })
+                .take(remainder.toInt())
+                .map { it.first }
+                .toSet()
 
         return raw.map { (memberId, floor, _) ->
             val extra = if (memberId in bonusIds) 1L else 0L
@@ -96,13 +103,17 @@ object ExpenseSplitter {
      * Returns the new shares together with the new total, which the caller must
      * write back to the expense — the old total no longer matches.
      */
-    fun applySurcharge(shares: List<Share>, percent: Double): Pair<List<Share>, Money> {
+    fun applySurcharge(
+        shares: List<Share>,
+        percent: Double,
+    ): Pair<List<Share>, Money> {
         require(percent >= 0) { "Surcharge cannot be negative" }
-        val multiplierBasisPoints = Math.round(percent * 100)  // 10% -> 1000
-        val updated = shares.sortedBy { it.memberId }.map { share ->
-            val extra = share.amount.satang * multiplierBasisPoints / 10_000
-            share.copy(amount = Money(share.amount.satang + extra))
-        }
+        val multiplierBasisPoints = Math.round(percent * 100) // 10% -> 1000
+        val updated =
+            shares.sortedBy { it.memberId }.map { share ->
+                val extra = share.amount.satang * multiplierBasisPoints / 10_000
+                share.copy(amount = Money(share.amount.satang + extra))
+            }
         return updated to Money(updated.sumOf { it.amount.satang })
     }
 
@@ -111,6 +122,8 @@ object ExpenseSplitter {
      * Zero means the expense may be saved; anything else must block the save
      * and be shown to the user.
      */
-    fun validationDelta(total: Money, shares: List<Share>): Money =
-        Money(shares.sumOf { it.amount.satang }) - total
+    fun validationDelta(
+        total: Money,
+        shares: List<Share>,
+    ): Money = Money(shares.sumOf { it.amount.satang }) - total
 }

@@ -90,8 +90,7 @@ data class Expense(
     /** Must always hold. Enforced on save and asserted in tests. */
     val isBalanced: Boolean get() = shares.sumOf { it.amount.satang } == totalAmount.satang
 
-    fun shareOf(memberId: String): Money =
-        shares.firstOrNull { it.memberId == memberId }?.amount ?: Money.ZERO
+    fun shareOf(memberId: String): Money = shares.firstOrNull { it.memberId == memberId }?.amount ?: Money.ZERO
 }
 
 enum class SettlementStatus { PENDING, CONFIRMED }

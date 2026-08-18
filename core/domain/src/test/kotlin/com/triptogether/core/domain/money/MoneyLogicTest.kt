@@ -22,13 +22,11 @@ import kotlin.random.Random
  * is a change that quietly loses someone's money.
  */
 class MoneyLogicTest {
-
     private val date = LocalDate(2026, 12, 12)
 
     @Nested
     @DisplayName("Equal split")
     inner class EqualSplit {
-
         @Test fun `T1 - divides evenly`() {
             val shares = ExpenseSplitter.splitEqually(Money(10_000), listOf("a", "b", "c", "d"))
             assertEquals(listOf(2500L, 2500L, 2500L, 2500L), shares.map { it.amount.satang })
@@ -70,24 +68,26 @@ class MoneyLogicTest {
     @Nested
     @DisplayName("Exact split validation")
     inner class ExactSplit {
-
         private val total = Money(185_000)
 
         @Test fun `T7 - matching shares validate`() {
-            val shares = listOf(52_000L, 38_000L, 45_000L, 50_000L)
-                .mapIndexed { i, v -> Share("m$i", Money(v)) }
+            val shares =
+                listOf(52_000L, 38_000L, 45_000L, 50_000L)
+                    .mapIndexed { i, v -> Share("m$i", Money(v)) }
             assertEquals(0L, ExpenseSplitter.validationDelta(total, shares).satang)
         }
 
         @Test fun `T8 - shortfall reported as negative`() {
-            val shares = listOf(52_000L, 38_000L, 45_000L, 30_000L)
-                .mapIndexed { i, v -> Share("m$i", Money(v)) }
+            val shares =
+                listOf(52_000L, 38_000L, 45_000L, 30_000L)
+                    .mapIndexed { i, v -> Share("m$i", Money(v)) }
             assertEquals(-20_000L, ExpenseSplitter.validationDelta(total, shares).satang)
         }
 
         @Test fun `T9 - overage reported as positive`() {
-            val shares = listOf(52_000L, 38_000L, 45_000L, 70_000L)
-                .mapIndexed { i, v -> Share("m$i", Money(v)) }
+            val shares =
+                listOf(52_000L, 38_000L, 45_000L, 70_000L)
+                    .mapIndexed { i, v -> Share("m$i", Money(v)) }
             assertEquals(20_000L, ExpenseSplitter.validationDelta(total, shares).satang)
         }
     }
@@ -95,22 +95,23 @@ class MoneyLogicTest {
     @Nested
     @DisplayName("Weighted split")
     inner class WeightedSplit {
-
         @Test fun `T10 - proportional to weights`() {
-            val shares = ExpenseSplitter.splitByWeights(
-                Money(10_000),
-                mapOf("a" to 1, "b" to 1, "c" to 2),
-            )
+            val shares =
+                ExpenseSplitter.splitByWeights(
+                    Money(10_000),
+                    mapOf("a" to 1, "b" to 1, "c" to 2),
+                )
             assertEquals(2500L, shares.first { it.memberId == "a" }.amount.satang)
             assertEquals(2500L, shares.first { it.memberId == "b" }.amount.satang)
             assertEquals(5000L, shares.first { it.memberId == "c" }.amount.satang)
         }
 
         @Test fun `T11 - remainder still sums to total`() {
-            val shares = ExpenseSplitter.splitByWeights(
-                Money(10_000),
-                mapOf("a" to 1, "b" to 1, "c" to 1),
-            )
+            val shares =
+                ExpenseSplitter.splitByWeights(
+                    Money(10_000),
+                    mapOf("a" to 1, "b" to 1, "c" to 1),
+                )
             assertEquals(10_000L, shares.sumOf { it.amount.satang })
         }
     }
@@ -118,38 +119,39 @@ class MoneyLogicTest {
     @Nested
     @DisplayName("Balances and settlement")
     inner class Balances {
-
         @Test fun `T12 - balances always sum to zero`() {
             val members = (1..5).map { "m$it" }
             val rng = Random(20261212)
-            val expenses = (1..20).map { i ->
-                val total = Money(rng.nextLong(5_000, 500_000))
-                val participants = members.shuffled(rng).take(rng.nextInt(2, 6))
-                Expense(
-                    id = "e$i",
-                    title = "bill $i",
-                    category = ExpenseCategory.FOOD,
-                    totalAmount = total,
-                    paidByMemberId = members.random(rng),
-                    date = date,
-                    splitMode = SplitMode.EQUAL,
-                    shares = ExpenseSplitter.splitEqually(total, participants),
-                    createdBy = "m1",
-                )
-            }
+            val expenses =
+                (1..20).map { i ->
+                    val total = Money(rng.nextLong(5_000, 500_000))
+                    val participants = members.shuffled(rng).take(rng.nextInt(2, 6))
+                    Expense(
+                        id = "e$i",
+                        title = "bill $i",
+                        category = ExpenseCategory.FOOD,
+                        totalAmount = total,
+                        paidByMemberId = members.random(rng),
+                        date = date,
+                        splitMode = SplitMode.EQUAL,
+                        shares = ExpenseSplitter.splitEqually(total, participants),
+                        createdBy = "m1",
+                    )
+                }
             expenses.forEach { assertTrue(it.isBalanced, "expense ${it.id} is not balanced") }
             val balances = BalanceCalculator.calculate(members, expenses, emptyList())
             BalanceCalculator.assertBalanced(balances)
         }
 
         @Test fun `T13 and T14 - simplify clears everyone in at most n-1 transfers`() {
-            val balances = listOf(
-                Balance("boss", Money(-72_000)),
-                Balance("fah", Money(-83_000)),
-                Balance("keng", Money(-30_000)),
-                Balance("mind", Money(61_000)),
-                Balance("ton", Money(124_000)),
-            )
+            val balances =
+                listOf(
+                    Balance("boss", Money(-72_000)),
+                    Balance("fah", Money(-83_000)),
+                    Balance("keng", Money(-30_000)),
+                    Balance("mind", Money(61_000)),
+                    Balance("ton", Money(124_000)),
+                )
             val transfers = DebtSimplifier.simplify(balances)
 
             assertTrue(transfers.size <= 4, "expected at most 4 transfers, got ${transfers.size}")
@@ -163,13 +165,14 @@ class MoneyLogicTest {
         }
 
         @Test fun `T15 - simplify is deterministic`() {
-            val balances = listOf(
-                Balance("e", Money(-40_000)),
-                Balance("a", Money(15_000)),
-                Balance("d", Money(-15_000)),
-                Balance("b", Money(15_000)),
-                Balance("c", Money(25_000)),
-            )
+            val balances =
+                listOf(
+                    Balance("e", Money(-40_000)),
+                    Balance("a", Money(15_000)),
+                    Balance("d", Money(-15_000)),
+                    Balance("b", Money(15_000)),
+                    Balance("c", Money(25_000)),
+                )
             val first = DebtSimplifier.simplify(balances)
             repeat(100) {
                 assertEquals(first, DebtSimplifier.simplify(balances.shuffled()))
@@ -182,15 +185,16 @@ class MoneyLogicTest {
         }
 
         @Test fun `pending settlements do not move money`() {
-            val expenses = listOf(
-                Expense(
-                    id = "e1", title = "dinner", category = ExpenseCategory.FOOD,
-                    totalAmount = Money(10_000), paidByMemberId = "a", date = date,
-                    splitMode = SplitMode.EQUAL,
-                    shares = ExpenseSplitter.splitEqually(Money(10_000), listOf("a", "b")),
-                    createdBy = "a",
-                ),
-            )
+            val expenses =
+                listOf(
+                    Expense(
+                        id = "e1", title = "dinner", category = ExpenseCategory.FOOD,
+                        totalAmount = Money(10_000), paidByMemberId = "a", date = date,
+                        splitMode = SplitMode.EQUAL,
+                        shares = ExpenseSplitter.splitEqually(Money(10_000), listOf("a", "b")),
+                        createdBy = "a",
+                    ),
+                )
             val pending = Settlement("s1", "b", "a", Money(5_000), SettlementStatus.PENDING, "b")
             val withPending = BalanceCalculator.calculate(listOf("a", "b"), expenses, listOf(pending))
             assertEquals(5_000L, withPending.first { it.memberId == "a" }.amount.satang)
@@ -204,7 +208,6 @@ class MoneyLogicTest {
     @Nested
     @DisplayName("Editor helpers")
     inner class Helpers {
-
         @Test fun `T17 - distributing the remainder fills the bill exactly`() {
             val total = Money(185_000)
             val entered = listOf(Share("a", Money(52_000)), Share("b", Money(38_000)))
@@ -214,11 +217,12 @@ class MoneyLogicTest {
         }
 
         @Test fun `T18 - surcharge keeps proportions and returns the new total`() {
-            val shares = listOf(
-                Share("a", Money(52_000)),
-                Share("b", Money(38_000)),
-                Share("c", Money(45_000)),
-            )
+            val shares =
+                listOf(
+                    Share("a", Money(52_000)),
+                    Share("b", Money(38_000)),
+                    Share("c", Money(45_000)),
+                )
             val (updated, newTotal) = ExpenseSplitter.applySurcharge(shares, 10.0)
             assertEquals(newTotal.satang, updated.sumOf { it.amount.satang })
             assertEquals(57_200L, updated.first { it.memberId == "a" }.amount.satang)
@@ -243,15 +247,16 @@ class MoneyLogicTest {
     @Test
     @DisplayName("T20 - guest members participate like anyone else")
     fun guestMembersCarryBalances() {
-        val expenses = listOf(
-            Expense(
-                id = "e1", title = "lunch", category = ExpenseCategory.FOOD,
-                totalAmount = Money(30_000), paidByMemberId = "user-a", date = date,
-                splitMode = SplitMode.EQUAL,
-                shares = ExpenseSplitter.splitEqually(Money(30_000), listOf("user-a", "guest-x")),
-                createdBy = "user-a",
-            ),
-        )
+        val expenses =
+            listOf(
+                Expense(
+                    id = "e1", title = "lunch", category = ExpenseCategory.FOOD,
+                    totalAmount = Money(30_000), paidByMemberId = "user-a", date = date,
+                    splitMode = SplitMode.EQUAL,
+                    shares = ExpenseSplitter.splitEqually(Money(30_000), listOf("user-a", "guest-x")),
+                    createdBy = "user-a",
+                ),
+            )
         val balances = BalanceCalculator.calculate(listOf("user-a", "guest-x"), expenses, emptyList())
         BalanceCalculator.assertBalanced(balances)
         assertEquals(-15_000L, balances.first { it.memberId == "guest-x" }.amount.satang)
