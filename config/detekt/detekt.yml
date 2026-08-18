@@ -8,6 +8,8 @@ complexity:
     thresholdInInterfaces: 20
   LongParameterList:
     ignoreAnnotated: ['Composable']
+    # Hilt ViewModels aggregate repositories/use cases via constructor injection.
+    constructorThreshold: 10
   LongMethod:
     ignoreAnnotated: ['Composable']
 

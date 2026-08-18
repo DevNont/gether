@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settlement_title">Settlement</string>
+    <string name="settlement_back">Back</string>
+    <string name="settlement_trip_total">Trip total</string>
+    <string name="settlement_per_person">Per person</string>
+    <string name="settlement_balances">Balances</string>
+    <string name="settlement_suggested">Suggested transfers</string>
+    <string name="settlement_pending">Awaiting confirmation</string>
+    <string name="settlement_cleared">Cleared</string>
+    <string name="settlement_all_clear">Everyone is settled up</string>
+    <string name="settlement_transfer_line">%1$s → %2$s %3$s</string>
+    <string name="settlement_qr">PromptPay QR</string>
+    <string name="settlement_no_promptpay">No PromptPay set up</string>
+    <string name="settlement_mark_paid">Transferred</string>
+    <string name="settlement_confirm">Confirm received</string>
+    <string name="settlement_waiting">Waiting for the receiver</string>
+    <string name="settlement_marked">Transfer recorded, waiting for confirmation</string>
+    <string name="settlement_confirmed">Confirmed</string>
+    <string name="settlement_error">Action failed. Please try again.</string>
+    <string name="settlement_qr_invalid">The receiver\'s PromptPay id is invalid</string>
+    <string name="settlement_qr_close">Close</string>
+</resources>

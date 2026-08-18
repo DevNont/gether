@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -57,6 +58,7 @@ import kotlinx.datetime.todayIn
 fun TripOverviewScreen(
     onOpenPlan: (String) -> Unit,
     onOpenExpenses: (String) -> Unit,
+    onOpenSettlement: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TripOverviewViewModel = hiltViewModel(),
@@ -84,6 +86,7 @@ fun TripOverviewScreen(
         onShareInvite = { trip -> shareInvite(context, trip) },
         onOpenPlan = onOpenPlan,
         onOpenExpenses = onOpenExpenses,
+        onOpenSettlement = onOpenSettlement,
         onBack = onBack,
         modifier = modifier,
     )
@@ -101,6 +104,7 @@ private fun TripOverviewContent(
     onShareInvite: (Trip) -> Unit,
     onOpenPlan: (String) -> Unit,
     onOpenExpenses: (String) -> Unit,
+    onOpenSettlement: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -140,8 +144,9 @@ private fun TripOverviewContent(
             ) {
                 HeaderCard(trip = trip)
                 PlanLinkCard(onClick = { onOpenPlan(trip.id) })
+                ExpensesLinkCard(onClick = { onOpenExpenses(trip.id) })
                 MembersCard(members = uiState.members, onShareInvite = { onShareInvite(trip) })
-                MoneySummaryCard(onClick = { onOpenExpenses(trip.id) })
+                MoneySummaryCard(onClick = { onOpenSettlement(trip.id) })
                 NoteCard(
                     note = uiState.noteDraft,
                     changed = uiState.noteChanged,
@@ -286,7 +291,27 @@ private fun PlanLinkCard(
     }
 }
 
-/** Placeholder amounts until settlement logic lands in M5; tap opens the expense list. */
+@Composable
+private fun ExpensesLinkCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(imageVector = Icons.AutoMirrored.Filled.ReceiptLong, contentDescription = null)
+            Text(
+                text = stringResource(R.string.overview_open_expenses),
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+    }
+}
+
+/** Tap opens S11 Settlement; inline totals land once the overview observes expenses. */
 @Composable
 private fun MoneySummaryCard(
     onClick: () -> Unit,
@@ -387,6 +412,7 @@ private fun TripOverviewContentPreview() {
             onShareInvite = {},
             onOpenPlan = {},
             onOpenExpenses = {},
+            onOpenSettlement = {},
             onBack = {},
         )
     }
