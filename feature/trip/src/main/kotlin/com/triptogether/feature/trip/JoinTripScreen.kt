@@ -1,5 +1,6 @@
 package com.triptogether.feature.trip
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -39,11 +42,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.triptogether.core.domain.model.INVITE_CODE_LENGTH
 import com.triptogether.core.domain.model.InvitePreview
 import com.triptogether.core.ui.theme.TripTogetherTheme
 
-/** S04 — six-slot invite code entry with trip-name preview before confirming the join. */
+/** S04 — six-slot invite code entry (typed or QR-scanned) with trip-name preview before joining. */
 @Composable
 fun JoinTripScreen(
     onJoined: (String) -> Unit,
@@ -55,6 +60,14 @@ fun JoinTripScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val scanLauncher =
+        rememberLauncherForActivityResult(ScanContract()) { result ->
+            result.contents?.let { scanned ->
+                parseScannedInvite(scanned)?.let(viewModel::onCodeChange)
+            }
+        }
+    val scanPrompt = stringResource(R.string.join_trip_scan_prompt)
 
     LaunchedEffect(initialCode) {
         if (!initialCode.isNullOrBlank()) viewModel.onCodeChange(initialCode)
@@ -73,10 +86,32 @@ fun JoinTripScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onCodeChange = viewModel::onCodeChange,
+        onScan = {
+            scanLauncher.launch(
+                ScanOptions()
+                    .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                    .setPrompt(scanPrompt)
+                    .setBeepEnabled(false)
+                    .setOrientationLocked(true),
+            )
+        },
         onConfirm = viewModel::confirmJoin,
         onBack = onBack,
         modifier = modifier,
     )
+}
+
+/** Accepts the QR payloads we issue (deep link / https link) or a bare 6-char code. */
+internal fun parseScannedInvite(text: String): String? {
+    val trimmed = text.trim()
+    val raw =
+        when {
+            trimmed.startsWith("triptogether://join/") -> trimmed.substringAfter("join/")
+            trimmed.contains("triptogether.app/join/") -> trimmed.substringAfterLast("/")
+            else -> trimmed
+        }
+    val code = raw.uppercase().filter { it.isLetterOrDigit() }
+    return code.takeIf { it.length == INVITE_CODE_LENGTH }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +120,7 @@ private fun JoinTripContent(
     uiState: JoinTripUiState,
     snackbarHostState: SnackbarHostState,
     onCodeChange: (String) -> Unit,
+    onScan: () -> Unit,
     onConfirm: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -119,6 +155,13 @@ private fun JoinTripContent(
                 style = MaterialTheme.typography.bodyMedium,
             )
             CodeInput(code = uiState.code, onCodeChange = onCodeChange)
+            OutlinedButton(onClick = onScan) {
+                Icon(imageVector = Icons.Default.QrCodeScanner, contentDescription = null)
+                Text(
+                    text = stringResource(R.string.join_trip_scan),
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
             when {
                 uiState.isLookingUp -> CircularProgressIndicator()
                 uiState.notFound ->
@@ -221,6 +264,7 @@ private fun JoinTripContentPreview() {
                 ),
             snackbarHostState = SnackbarHostState(),
             onCodeChange = {},
+            onScan = {},
             onConfirm = {},
             onBack = {},
         )

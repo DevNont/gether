@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
+    implementation(libs.zxing.embedded)
 
     debugImplementation(libs.compose.ui.tooling)
 }

@@ -19,6 +19,7 @@ googleId = "1.1.1"
 coil = "2.7.0"
 camerax = "1.4.1"
 zxing = "3.5.3"
+zxingEmbedded = "4.3.0"
 accompanistPermissions = "0.36.0"
 junit5 = "5.11.4"
 junit5Plugin = "1.11.3.0"
@@ -78,6 +79,7 @@ camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", vers
 camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
 
 junit5-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }

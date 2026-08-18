@@ -36,6 +36,8 @@
     <string name="join_trip_not_found">Code not found</string>
     <string name="join_trip_confirm">Join this trip</string>
     <string name="join_trip_error">Could not join. Please try again.</string>
+    <string name="join_trip_scan">Scan QR</string>
+    <string name="join_trip_scan_prompt">Point the camera at the trip\'s QR</string>
 
     <string name="overview_menu">Menu</string>
     <string name="overview_archive">Archive trip</string>

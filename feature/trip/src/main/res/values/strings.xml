@@ -36,6 +36,8 @@
     <string name="join_trip_not_found">ไม่พบรหัสนี้</string>
     <string name="join_trip_confirm">เข้าร่วมทริปนี้</string>
     <string name="join_trip_error">เข้าร่วมไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="join_trip_scan">สแกน QR</string>
+    <string name="join_trip_scan_prompt">ส่องกล้องไปที่ QR ของทริป</string>
 
     <string name="overview_menu">เมนู</string>
     <string name="overview_archive">เก็บเข้าคลัง</string>
