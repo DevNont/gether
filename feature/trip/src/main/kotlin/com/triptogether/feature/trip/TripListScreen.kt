@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,6 +52,7 @@ fun TripListScreen(
     onTripClick: (String) -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
+    devMode: Boolean = false,
     viewModel: TripListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -60,6 +62,7 @@ fun TripListScreen(
         onJoinTrip = onJoinTrip,
         onTripClick = onTripClick,
         onOpenSettings = onOpenSettings,
+        onSeedDemo = if (devMode) viewModel::seedDemoTrip else null,
         modifier = modifier,
     )
 }
@@ -72,6 +75,7 @@ private fun TripListContent(
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    onSeedDemo: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -80,6 +84,14 @@ private fun TripListContent(
             TopAppBar(
                 title = { Text(stringResource(R.string.trip_list_title)) },
                 actions = {
+                    if (onSeedDemo != null) {
+                        IconButton(onClick = onSeedDemo) {
+                            Icon(
+                                imageVector = Icons.Default.Science,
+                                contentDescription = stringResource(R.string.trip_list_seed_demo),
+                            )
+                        }
+                    }
                     IconButton(onClick = onJoinTrip) {
                         Icon(
                             imageVector = Icons.Default.GroupAdd,
@@ -277,6 +289,7 @@ private fun TripListContentPreview() {
             onJoinTrip = {},
             onTripClick = {},
             onOpenSettings = {},
+            onSeedDemo = null,
         )
     }
 }
@@ -291,6 +304,7 @@ private fun TripListEmptyPreview() {
             onJoinTrip = {},
             onTripClick = {},
             onOpenSettings = {},
+            onSeedDemo = null,
         )
     }
 }

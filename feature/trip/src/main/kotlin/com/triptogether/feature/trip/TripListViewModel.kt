@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.domain.repository.AuthRepository
+import com.triptogether.core.domain.repository.DemoSeeder
 import com.triptogether.core.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -27,7 +29,13 @@ class TripListViewModel
     constructor(
         authRepository: AuthRepository,
         private val tripRepository: TripRepository,
+        private val demoSeeder: DemoSeeder,
     ) : ViewModel() {
+        /** Debug builds only — populate a demo trip to browse every screen. */
+        fun seedDemoTrip() {
+            viewModelScope.launch { demoSeeder.seedJapanTrip() }
+        }
+
         val uiState: StateFlow<TripListUiState> =
             authRepository.observeAuthState()
                 .filterNotNull()
