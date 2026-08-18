@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_app_title">TripTogether</string>
+    <string name="auth_sign_in_with_google">เข้าสู่ระบบด้วย Google</string>
+    <string name="auth_sign_in_error">เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+</resources>

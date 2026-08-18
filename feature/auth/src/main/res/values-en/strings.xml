@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_app_title">TripTogether</string>
+    <string name="auth_sign_in_with_google">Sign in with Google</string>
+    <string name="auth_sign_in_error">Sign-in failed. Please try again.</string>
+</resources>

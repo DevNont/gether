@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TripTogether</string>
-    <string name="placeholder_under_construction">กำลังพัฒนา — เริ่มจาก M2 ตาม roadmap</string>
+    <string name="home_signed_in_as">เข้าสู่ระบบเป็น %1$s</string>
+    <string name="home_sign_out">ออกจากระบบ</string>
 </resources>
