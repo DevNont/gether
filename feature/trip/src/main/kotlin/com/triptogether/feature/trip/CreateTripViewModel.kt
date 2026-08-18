@@ -22,8 +22,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import javax.inject.Inject
 
@@ -68,9 +71,21 @@ class CreateTripViewModel
                 val userId = authRepository.observeAuthState().filterNotNull().first().id
                 otherTrips =
                     tripRepository.observeTrips(userId).first().filter { it.id != route.tripId }
+                _uiState.update {
+                    it.copy(
+                        busyDates = otherTrips.flatMap { trip -> datesOf(trip) }.toSet(),
+                        busyRanges =
+                            otherTrips
+                                .sortedBy { trip -> trip.startDate }
+                                .map { trip -> BusyRange(trip.name, trip.startDate, trip.endDate) },
+                    )
+                }
                 revalidateDates()
             }
         }
+
+        private fun datesOf(trip: Trip): List<LocalDate> =
+            (0..trip.startDate.daysUntil(trip.endDate)).map { trip.startDate.plus(it, DateTimeUnit.DAY) }
 
         private fun revalidateDates() {
             val state = _uiState.value

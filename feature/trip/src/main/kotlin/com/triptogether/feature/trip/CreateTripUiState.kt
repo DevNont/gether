@@ -6,6 +6,13 @@ import kotlinx.datetime.daysUntil
 
 const val MAX_TRIP_DAYS = 60
 
+/** A date range already taken by another of the user's trips. */
+data class BusyRange(
+    val tripName: String,
+    val start: LocalDate,
+    val end: LocalDate,
+)
+
 data class CreateTripUiState(
     val name: String = "",
     val startDate: LocalDate? = null,
@@ -19,6 +26,10 @@ data class CreateTripUiState(
     @StringRes val dateErrorResId: Int? = null,
     /** Name of the trip the selected range collides with, for the error message. */
     val dateErrorArg: String = "",
+    /** Every day already booked by another trip — greyed out and unselectable in the picker. */
+    val busyDates: Set<LocalDate> = emptySet(),
+    /** The busy ranges as spans, for the legend under the date field. */
+    val busyRanges: List<BusyRange> = emptyList(),
 ) {
     val dayCount: Int?
         get() =

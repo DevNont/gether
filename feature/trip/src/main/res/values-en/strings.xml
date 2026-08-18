@@ -23,6 +23,7 @@
     <string name="create_trip_error">Could not create the trip. Please try again.</string>
     <string name="create_trip_date_in_past">Dates in the past cannot be selected</string>
     <string name="create_trip_date_overlap">The dates overlap with the trip "%1$s"</string>
+    <string name="create_trip_busy_title">Dates already booked (unavailable)</string>
     <string name="edit_trip_title">Edit trip</string>
     <string name="edit_trip_save">Save changes</string>
     <string name="edit_trip_shrink_title">Shorten the date range?</string>

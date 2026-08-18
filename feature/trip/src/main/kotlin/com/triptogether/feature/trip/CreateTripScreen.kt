@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -180,6 +179,9 @@ private fun CreateTripContent(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            if (uiState.busyRanges.isNotEmpty()) {
+                BusyRangesLegend(ranges = uiState.busyRanges)
+            }
             Button(
                 onClick = onSave,
                 enabled = uiState.canSave,
@@ -200,6 +202,7 @@ private fun CreateTripContent(
         TripDateRangePickerDialog(
             // Past dates are only pickable when editing an already-started trip.
             allowPastDates = uiState.isExisting,
+            busyDates = uiState.busyDates,
             onConfirm = { start, end ->
                 onDatesSelected(start, end)
                 showDatePicker = false
@@ -209,21 +212,42 @@ private fun CreateTripContent(
     }
 }
 
+/** Lists the ranges already taken by other trips — the greyed-out days in the picker. */
+@Composable
+private fun BusyRangesLegend(
+    ranges: List<BusyRange>,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+            text = stringResource(R.string.create_trip_busy_title),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        val formatter = DateTimeFormatter.ofPattern("d MMM")
+        ranges.forEach { range ->
+            Text(
+                text =
+                    "• ${range.tripName}: ${formatter.format(range.start.toJavaLocalDate())} – " +
+                        formatter.format(range.end.toJavaLocalDate()),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TripDateRangePickerDialog(
     allowPastDates: Boolean,
+    busyDates: Set<LocalDate>,
     onConfirm: (LocalDate, LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val pickerState =
         rememberDateRangePickerState(
-            selectableDates =
-                if (allowPastDates) {
-                    DatePickerDefaults.AllDates
-                } else {
-                    remember { futureOnlyDates() }
-                },
+            selectableDates = remember(allowPastDates, busyDates) { tripSelectableDates(allowPastDates, busyDates) },
         )
     DatePickerDialog(
         onDismissRequest = onDismiss,
@@ -252,14 +276,24 @@ private fun TripDateRangePickerDialog(
 /** The Material picker reports UTC-midnight millis, so convert back in UTC. */
 private fun Long.toUtcLocalDate(): LocalDate = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC).date
 
-/** Greys out days before today in the range picker (new trips only). */
+/**
+ * Greys out days that cannot start/end a trip: those before today (new trips only)
+ * and any day already booked by another trip.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
-private fun futureOnlyDates(): SelectableDates {
+private fun tripSelectableDates(
+    allowPastDates: Boolean,
+    busyDates: Set<LocalDate>,
+): SelectableDates {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     return object : SelectableDates {
-        override fun isSelectableDate(utcTimeMillis: Long): Boolean = utcTimeMillis.toUtcLocalDate() >= today
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+            val date = utcTimeMillis.toUtcLocalDate()
+            if (!allowPastDates && date < today) return false
+            return date !in busyDates
+        }
 
-        override fun isSelectableYear(year: Int): Boolean = year >= today.year
+        override fun isSelectableYear(year: Int): Boolean = allowPastDates || year >= today.year
     }
 }
 
