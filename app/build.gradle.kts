@@ -4,7 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    // google-services + crashlytics applied in M1.5 once google-services.json exists
+    alias(libs.plugins.google.services)
+    // crashlytics applied in M7.6
 }
 
 android {
