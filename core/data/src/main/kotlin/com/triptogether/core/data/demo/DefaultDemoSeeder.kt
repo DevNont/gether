@@ -61,6 +61,8 @@ class DefaultDemoSeeder
                 val uid = authRepository.observeAuthState().filterNotNull().first().id
                 android.util.Log.i(TAG, "seeding for uid=$uid")
                 val start = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                // A flight booked a month ahead — lands in the "paid in advance" group.
+                val prepaidDate = start.plus(-30, DateTimeUnit.DAY).toString()
                 val d1 = start.toString()
                 val d2 = start.plus(1, DateTimeUnit.DAY).toString()
                 val d3 = start.plus(2, DateTimeUnit.DAY).toString()
@@ -85,7 +87,7 @@ class DefaultDemoSeeder
                 seedDay1(tripId, ownerId, d1)
                 seedDay2(tripId, ownerId, d2)
                 seedDay3(tripId, ownerId, d3)
-                seedExpenses(tripId, ownerId, friendId, catId, everyone, d1, d2, d3)
+                seedExpenses(tripId, ownerId, friendId, catId, everyone, prepaidDate, d1, d2, d3)
                 seedChecklist(tripId, ownerId, friendId)
                 seedPoll(tripId, ownerId)
                 seedSettlement(tripId, friendId, ownerId)
@@ -165,10 +167,26 @@ class DefaultDemoSeeder
             friend: String,
             cat: String,
             everyone: List<String>,
+            prepaidDate: String,
             d1: String,
             d2: String,
             d3: String,
         ) {
+            // PREPAID — flight booked a month before the trip; shows in "paid in advance".
+            expenseRepository.upsert(
+                tripId,
+                Expense(
+                    id = "",
+                    title = "ตั๋วเครื่องบิน ไป-กลับ",
+                    category = ExpenseCategory.TRANSPORT,
+                    totalAmount = Money.fromBaht(45_000),
+                    paidByMemberId = owner,
+                    date = parseDate(prepaidDate),
+                    splitMode = SplitMode.EQUAL,
+                    shares = ExpenseSplitter.splitEqually(Money.fromBaht(45_000), everyone),
+                    createdBy = owner,
+                ),
+            )
             // EQUAL — dinner split three ways.
             expenseRepository.upsert(
                 tripId,
