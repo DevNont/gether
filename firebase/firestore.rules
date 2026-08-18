@@ -25,6 +25,14 @@ service cloud.firestore {
       return signedIn() && uid() in tripData(tripId).memberIds;
     }
 
+    // Post-batch view: needed when the trip doc and its subdocs (member, days)
+    // are created in ONE batched write — get() would still see "no trip" and
+    // deny everything. getAfter() equals get() outside a batch, so this is safe.
+    function isMemberAfter(tripId) {
+      return signedIn()
+        && uid() in getAfter(/databases/$(database)/documents/trips/$(tripId)).data.memberIds;
+    }
+
     function isOwner(tripId) {
       return signedIn() && uid() == tripData(tripId).ownerId;
     }
@@ -66,13 +74,17 @@ service cloud.firestore {
 
       match /members/{memberId} {
         allow read: if isMember(tripId);
-        allow create: if isMember(tripId) || isOwner(tripId);
+        // isMemberAfter covers create-trip and join-by-code batches, where the
+        // caller only becomes a member inside this very batch.
+        allow create: if isMember(tripId) || isMemberAfter(tripId);
         allow update: if isMember(tripId);
         allow delete: if isOwner(tripId);
       }
 
       match /days/{dayId} {
-        allow read, write: if isMember(tripId);
+        allow read: if isMember(tripId);
+        // isMemberAfter: day docs are created in the same batch as the trip itself.
+        allow write: if isMember(tripId) || isMemberAfter(tripId);
 
         match /activities/{activityId} {
           allow read, write: if isMember(tripId);
