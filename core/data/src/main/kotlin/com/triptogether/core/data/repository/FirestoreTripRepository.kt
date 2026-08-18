@@ -1,5 +1,6 @@
 package com.triptogether.core.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -37,11 +38,16 @@ class FirestoreTripRepository
     ) : TripRepository {
         override fun observeTrips(userId: String): Flow<List<Trip>> =
             callbackFlow {
+                // archived filter must stay: the deployed composite index is
+                // memberIds CONTAINS + archived ASC + startDate DESC; dropping it
+                // makes Firestore reject the query with FAILED_PRECONDITION.
                 val registration =
                     firestore.collection(TRIPS)
                         .whereArrayContains(FIELD_MEMBER_IDS, userId)
+                        .whereEqualTo(FIELD_ARCHIVED, false)
                         .orderBy(FIELD_START_DATE, Query.Direction.DESCENDING)
-                        .addSnapshotListener { snapshot, _ ->
+                        .addSnapshotListener { snapshot, error ->
+                            error?.let { Log.e(TAG, "observeTrips listen failed", it) }
                             trySend(snapshot?.documents?.mapNotNull { it.toTrip() } ?: emptyList())
                         }
                 awaitClose { registration.remove() }
@@ -256,6 +262,7 @@ class FirestoreTripRepository
         }
 
         private companion object {
+            const val TAG = "FirestoreTripRepo"
             const val TRIPS = "trips"
             const val MEMBERS = "members"
             const val DAYS = "days"
