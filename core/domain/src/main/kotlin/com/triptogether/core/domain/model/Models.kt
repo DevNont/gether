@@ -127,6 +127,22 @@ data class ChecklistItem(
     val sortOrder: Int = 0,
 )
 
+/** Profile stored at users/{userId}; id is the auth UID. */
+data class User(
+    val id: String,
+    val displayName: String,
+    val photoUrl: String? = null,
+    val promptpayId: String? = null,
+)
+
+/** Input for creating a trip; server assigns id and invite code. */
+data class TripDraft(
+    val name: String,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val coverUrl: String? = null,
+)
+
 data class Poll(
     val id: String,
     val question: String,
