@@ -14,4 +14,25 @@
     <string name="expense_category_other">Other</string>
     <string name="expense_paid_by">Paid by %1$s</string>
     <string name="expense_my_share">Mine %1$s</string>
+
+    <string name="expense_editor_title_new">Add bill</string>
+    <string name="expense_editor_title_edit">Edit bill</string>
+    <string name="expense_editor_name">Bill name</string>
+    <string name="expense_editor_total">Total (baht)</string>
+    <string name="expense_editor_paid_by">Paid by</string>
+    <string name="expense_editor_date">Date</string>
+    <string name="expense_editor_date_ok">OK</string>
+    <string name="expense_mode_equal">Equal</string>
+    <string name="expense_mode_exact">Exact</string>
+    <string name="expense_mode_shares">By shares</string>
+    <string name="expense_editor_weight_up">Increase share</string>
+    <string name="expense_editor_weight_down">Decrease share</string>
+    <string name="expense_delta_enter_total">Enter the total first</string>
+    <string name="expense_delta_ok">All set</string>
+    <string name="expense_delta_missing">%1$s missing</string>
+    <string name="expense_delta_over">%1$s over</string>
+    <string name="expense_distribute_remainder">Distribute the rest</string>
+    <string name="expense_service_charge">+ 10%% service charge</string>
+    <string name="expense_editor_save">Save bill</string>
+    <string name="expense_editor_error">Could not save. Please try again.</string>
 </resources>

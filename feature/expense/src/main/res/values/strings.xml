@@ -14,4 +14,25 @@
     <string name="expense_category_other">อื่นๆ</string>
     <string name="expense_paid_by">จ่ายโดย %1$s</string>
     <string name="expense_my_share">ของฉัน %1$s</string>
+
+    <string name="expense_editor_title_new">เพิ่มบิล</string>
+    <string name="expense_editor_title_edit">แก้ไขบิล</string>
+    <string name="expense_editor_name">ชื่อบิล</string>
+    <string name="expense_editor_total">ยอดรวม (บาท)</string>
+    <string name="expense_editor_paid_by">คนจ่าย</string>
+    <string name="expense_editor_date">วันที่</string>
+    <string name="expense_editor_date_ok">ตกลง</string>
+    <string name="expense_mode_equal">หารเท่า</string>
+    <string name="expense_mode_exact">ใส่เอง</string>
+    <string name="expense_mode_shares">ตามสัดส่วน</string>
+    <string name="expense_editor_weight_up">เพิ่มสัดส่วน</string>
+    <string name="expense_editor_weight_down">ลดสัดส่วน</string>
+    <string name="expense_delta_enter_total">กรอกยอดรวมก่อน</string>
+    <string name="expense_delta_ok">ครบแล้ว</string>
+    <string name="expense_delta_missing">ขาดอีก %1$s</string>
+    <string name="expense_delta_over">เกินไป %1$s</string>
+    <string name="expense_distribute_remainder">เกลี่ยส่วนที่เหลือ</string>
+    <string name="expense_service_charge">+ ค่าบริการ 10%%</string>
+    <string name="expense_editor_save">บันทึกบิล</string>
+    <string name="expense_editor_error">บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง</string>
 </resources>

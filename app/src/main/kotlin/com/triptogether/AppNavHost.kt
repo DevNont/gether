@@ -5,7 +5,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.triptogether.feature.expense.navigation.ExpenseEditorRoute
 import com.triptogether.feature.expense.navigation.ExpenseListRoute
+import com.triptogether.feature.expense.navigation.expenseEditorScreen
 import com.triptogether.feature.expense.navigation.expenseListScreen
 import com.triptogether.feature.plan.navigation.DayPlanRoute
 import com.triptogether.feature.plan.navigation.activityEditorScreen
@@ -66,9 +68,13 @@ fun AppNavHost(
             onBack = { navController.popBackStack() },
         )
         expenseListScreen(
-            // S09 editor and S10 detail hook in with M4.3/M4.7.
-            onAddExpense = {},
+            onAddExpense = { tripId -> navController.navigate(ExpenseEditorRoute(tripId)) },
+            // S10 detail hooks in with M4.7.
             onExpenseClick = { _, _ -> },
+            onBack = { navController.popBackStack() },
+        )
+        expenseEditorScreen(
+            onDone = { navController.popBackStack() },
             onBack = { navController.popBackStack() },
         )
         dayPlanScreen(
