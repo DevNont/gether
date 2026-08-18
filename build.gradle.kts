@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.crashlytics) apply false
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.junit5.android) apply false
 }
 
 subprojects {

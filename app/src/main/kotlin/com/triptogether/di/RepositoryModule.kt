@@ -1,8 +1,10 @@
 package com.triptogether.di
 
 import com.triptogether.core.data.repository.FirebaseAuthRepository
+import com.triptogether.core.data.repository.FirestoreTripRepository
 import com.triptogether.core.data.repository.FirestoreUserRepository
 import com.triptogether.core.domain.repository.AuthRepository
+import com.triptogether.core.domain.repository.TripRepository
 import com.triptogether.core.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -21,4 +23,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindUserRepository(impl: FirestoreUserRepository): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTripRepository(impl: FirestoreTripRepository): TripRepository
 }
