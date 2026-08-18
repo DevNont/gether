@@ -11,6 +11,10 @@ data class CreateTripUiState(
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val isSaving: Boolean = false,
+    val isExisting: Boolean = false,
+    val isLoading: Boolean = false,
+    /** Editing shrank the date range — confirm that dropped days lose their activities. */
+    val showShrinkConfirm: Boolean = false,
 ) {
     val dayCount: Int?
         get() =

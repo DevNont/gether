@@ -19,6 +19,15 @@
     <string name="create_trip_range_too_long">ช่วงทริปยาวได้ไม่เกิน %1$d วัน</string>
     <string name="create_trip_save">สร้างทริป</string>
     <string name="create_trip_error">สร้างทริปไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="edit_trip_title">แก้ไขทริป</string>
+    <string name="edit_trip_save">บันทึกการแก้ไข</string>
+    <string name="edit_trip_shrink_title">ย่นช่วงวันที่?</string>
+    <string name="edit_trip_shrink_text">กิจกรรมในวันที่ถูกตัดออกจะถูกลบถาวร</string>
+    <string name="edit_trip_shrink_confirm">ยืนยันและลบ</string>
+    <string name="overview_edit_trip">แก้ไขทริป</string>
+    <string name="overview_delete_trip">ลบทริป</string>
+    <string name="overview_delete_confirm_title">ลบทริปนี้?</string>
+    <string name="overview_delete_confirm_text">ข้อมูลทั้งหมดของทริป — แผน บิล และสรุปยอด — จะถูกลบถาวรสำหรับทุกคน</string>
 
     <string name="join_trip_title">เข้าร่วมทริป</string>
     <string name="join_trip_hint">กรอกรหัสเชิญ 6 หลัก</string>

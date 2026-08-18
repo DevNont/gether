@@ -19,4 +19,6 @@ sealed interface TripOverviewEvent {
     data class Message(
         @StringRes val messageResId: Int,
     ) : TripOverviewEvent
+
+    data object Deleted : TripOverviewEvent
 }

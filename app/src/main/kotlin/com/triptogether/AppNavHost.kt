@@ -52,7 +52,7 @@ fun AppNavHost(
         modifier = modifier,
     ) {
         tripListScreen(
-            onCreateTrip = { navController.navigate(CreateTripRoute) },
+            onCreateTrip = { navController.navigate(CreateTripRoute()) },
             onJoinTrip = { navController.navigate(JoinTripRoute()) },
             onTripClick = { tripId -> navController.navigate(TripOverviewRoute(tripId)) },
             onOpenSettings = { navController.navigate(SettingsRoute) },
@@ -80,6 +80,8 @@ fun AppNavHost(
             onOpenSettlement = { tripId -> navController.navigate(SettlementRoute(tripId)) },
             onOpenChecklist = { tripId -> navController.navigate(ChecklistRoute(tripId)) },
             onOpenPolls = { tripId -> navController.navigate(PollsRoute(tripId)) },
+            onEditTrip = { tripId -> navController.navigate(CreateTripRoute(tripId)) },
+            onDeleted = { navController.popBackStack(TripListRoute, inclusive = false) },
             onBack = { navController.popBackStack() },
         )
         settlementScreen(onBack = { navController.popBackStack() })

@@ -12,8 +12,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object TripListRoute
 
+/** tripId null = create; non-null = edit that trip (S05 owner menu). */
 @Serializable
-data object CreateTripRoute
+data class CreateTripRoute(val tripId: String? = null)
 
 @Serializable
 data class JoinTripRoute(val code: String? = null)
@@ -52,6 +53,8 @@ fun NavGraphBuilder.tripOverviewScreen(
     onOpenSettlement: (String) -> Unit,
     onOpenChecklist: (String) -> Unit,
     onOpenPolls: (String) -> Unit,
+    onEditTrip: (String) -> Unit,
+    onDeleted: () -> Unit,
     onBack: () -> Unit,
 ) {
     composable<TripOverviewRoute> {
@@ -61,6 +64,8 @@ fun NavGraphBuilder.tripOverviewScreen(
             onOpenSettlement = onOpenSettlement,
             onOpenChecklist = onOpenChecklist,
             onOpenPolls = onOpenPolls,
+            onEditTrip = onEditTrip,
+            onDeleted = onDeleted,
             onBack = onBack,
         )
     }

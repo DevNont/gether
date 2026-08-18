@@ -11,7 +11,7 @@ complexity:
     # Hilt ViewModels aggregate repositories/use cases via constructor injection.
     constructorThreshold: 10
     # NavGraphBuilder extensions take one callback per destination exit.
-    functionThreshold: 8
+    functionThreshold: 10
   LongMethod:
     ignoreAnnotated: ['Composable']
 

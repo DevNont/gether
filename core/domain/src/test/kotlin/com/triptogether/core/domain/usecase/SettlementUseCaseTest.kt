@@ -138,6 +138,8 @@ private class FakeTripRepo(private val members: MutableStateFlow<List<Member>>) 
 
     override suspend fun updateTrip(trip: Trip): Result<Unit> = Result.success(Unit)
 
+    override suspend fun deleteTrip(tripId: String): Result<Unit> = Result.success(Unit)
+
     override suspend fun setArchived(
         tripId: String,
         archived: Boolean,

@@ -64,6 +64,8 @@ fun TripOverviewScreen(
     onOpenSettlement: (String) -> Unit,
     onOpenChecklist: (String) -> Unit,
     onOpenPolls: (String) -> Unit,
+    onEditTrip: (String) -> Unit,
+    onDeleted: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TripOverviewViewModel = hiltViewModel(),
@@ -77,6 +79,7 @@ fun TripOverviewScreen(
             when (event) {
                 is TripOverviewEvent.Message ->
                     snackbarHostState.showSnackbar(context.getString(event.messageResId))
+                TripOverviewEvent.Deleted -> onDeleted()
             }
         }
     }
@@ -89,6 +92,8 @@ fun TripOverviewScreen(
         onArchive = viewModel::archiveTrip,
         onCloseInvite = viewModel::closeInvite,
         onAddGuest = viewModel::addGuestMember,
+        onEditTrip = onEditTrip,
+        onDeleteTrip = viewModel::deleteTrip,
         onShareInvite = { trip -> shareInvite(context, trip) },
         onOpenPlan = onOpenPlan,
         onOpenExpenses = onOpenExpenses,
@@ -110,6 +115,8 @@ private fun TripOverviewContent(
     onArchive: () -> Unit,
     onCloseInvite: () -> Unit,
     onAddGuest: (String) -> Unit,
+    onEditTrip: (String) -> Unit,
+    onDeleteTrip: () -> Unit,
     onShareInvite: (Trip) -> Unit,
     onOpenPlan: (String) -> Unit,
     onOpenExpenses: (String) -> Unit,
@@ -135,7 +142,12 @@ private fun TripOverviewContent(
                 },
                 actions = {
                     if (uiState.isOwner) {
-                        OwnerMenu(onArchive = onArchive, onCloseInvite = onCloseInvite)
+                        OwnerMenu(
+                            onEdit = { uiState.trip?.let { onEditTrip(it.id) } },
+                            onArchive = onArchive,
+                            onCloseInvite = onCloseInvite,
+                            onDelete = onDeleteTrip,
+                        )
                     }
                 },
             )
@@ -194,10 +206,13 @@ private fun TripOverviewContent(
 
 @Composable
 private fun OwnerMenu(
+    onEdit: () -> Unit,
     onArchive: () -> Unit,
     onCloseInvite: () -> Unit,
+    onDelete: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
     IconButton(onClick = { expanded = true }) {
         Icon(
             imageVector = Icons.Default.MoreVert,
@@ -205,7 +220,13 @@ private fun OwnerMenu(
         )
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-        // Edit-trip (date reconciliation) and member removal land with S14/M6.
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.overview_edit_trip)) },
+            onClick = {
+                expanded = false
+                onEdit()
+            },
+        )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.overview_close_invite)) },
             onClick = {
@@ -218,6 +239,43 @@ private fun OwnerMenu(
             onClick = {
                 expanded = false
                 onArchive()
+            },
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(R.string.overview_delete_trip),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            },
+            onClick = {
+                expanded = false
+                showDeleteConfirm = true
+            },
+        )
+    }
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text(stringResource(R.string.overview_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.overview_delete_confirm_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirm = false
+                        onDelete()
+                    },
+                ) {
+                    Text(
+                        text = stringResource(R.string.overview_delete_trip),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text(stringResource(R.string.overview_guest_cancel))
+                }
             },
         )
     }
@@ -473,6 +531,8 @@ private fun TripOverviewContentPreview() {
             onArchive = {},
             onCloseInvite = {},
             onAddGuest = {},
+            onEditTrip = {},
+            onDeleteTrip = {},
             onShareInvite = {},
             onOpenPlan = {},
             onOpenExpenses = {},

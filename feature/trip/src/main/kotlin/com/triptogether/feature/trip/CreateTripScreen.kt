@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePickerDialog
@@ -72,10 +73,31 @@ fun CreateTripScreen(
         snackbarHostState = snackbarHostState,
         onNameChange = viewModel::onNameChange,
         onDatesSelected = viewModel::onDatesSelected,
-        onSave = viewModel::createTrip,
+        onSave = viewModel::save,
         onBack = onBack,
         modifier = modifier,
     )
+
+    if (uiState.showShrinkConfirm) {
+        AlertDialog(
+            onDismissRequest = viewModel::dismissShrinkConfirm,
+            title = { Text(stringResource(R.string.edit_trip_shrink_title)) },
+            text = { Text(stringResource(R.string.edit_trip_shrink_text)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::save) {
+                    Text(
+                        text = stringResource(R.string.edit_trip_shrink_confirm),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::dismissShrinkConfirm) {
+                    Text(stringResource(R.string.create_trip_dates_cancel))
+                }
+            },
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +118,11 @@ private fun CreateTripContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.create_trip_title)) },
+                title = {
+                    val titleRes =
+                        if (uiState.isExisting) R.string.edit_trip_title else R.string.create_trip_title
+                    Text(stringResource(titleRes))
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -108,6 +134,10 @@ private fun CreateTripContent(
             )
         },
     ) { innerPadding ->
+        if (uiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.padding(innerPadding).padding(32.dp))
+            return@Scaffold
+        }
         Column(
             modifier =
                 Modifier
@@ -147,7 +177,9 @@ private fun CreateTripContent(
                 if (uiState.isSaving) {
                     CircularProgressIndicator(modifier = Modifier.padding(4.dp))
                 } else {
-                    Text(stringResource(R.string.create_trip_save))
+                    val saveRes =
+                        if (uiState.isExisting) R.string.edit_trip_save else R.string.create_trip_save
+                    Text(stringResource(saveRes))
                 }
             }
         }

@@ -98,6 +98,15 @@ class TripOverviewViewModel
             }
         }
 
+        /** Owner-only; client-side cascade delete. Emits [TripOverviewEvent.Deleted] to leave the screen. */
+        fun deleteTrip() {
+            viewModelScope.launch {
+                tripRepository.deleteTrip(route.tripId)
+                    .onSuccess { _events.send(TripOverviewEvent.Deleted) }
+                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_action_error)) }
+            }
+        }
+
         fun closeInvite() {
             val code = uiState.value.trip?.inviteCode ?: return
             viewModelScope.launch {

@@ -19,6 +19,15 @@
     <string name="create_trip_range_too_long">A trip can be at most %1$d days long</string>
     <string name="create_trip_save">Create trip</string>
     <string name="create_trip_error">Could not create the trip. Please try again.</string>
+    <string name="edit_trip_title">Edit trip</string>
+    <string name="edit_trip_save">Save changes</string>
+    <string name="edit_trip_shrink_title">Shorten the date range?</string>
+    <string name="edit_trip_shrink_text">Activities on the removed days will be deleted permanently</string>
+    <string name="edit_trip_shrink_confirm">Confirm and delete</string>
+    <string name="overview_edit_trip">Edit trip</string>
+    <string name="overview_delete_trip">Delete trip</string>
+    <string name="overview_delete_confirm_title">Delete this trip?</string>
+    <string name="overview_delete_confirm_text">Everything in this trip — plans, bills, and settlements — will be permanently deleted for everyone</string>
 
     <string name="join_trip_title">Join a trip</string>
     <string name="join_trip_hint">Enter the 6-character invite code</string>

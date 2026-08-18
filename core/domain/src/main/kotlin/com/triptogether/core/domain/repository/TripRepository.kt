@@ -16,7 +16,15 @@ interface TripRepository {
     /** Creates the trip, its member doc for the owner, and one day doc per date. Returns the new tripId. */
     suspend fun createTrip(draft: TripDraft): Result<String>
 
+    /**
+     * Updates trip fields and reconciles day docs (S05 spec): dates added to the
+     * range get new day docs, dates removed lose their day docs AND activities —
+     * callers must confirm with the user before shrinking the range.
+     */
     suspend fun updateTrip(trip: Trip): Result<Unit>
+
+    /** Owner-only. Cascades over subcollections client-side until Cloud Functions deploy. */
+    suspend fun deleteTrip(tripId: String): Result<Unit>
 
     suspend fun setArchived(
         tripId: String,

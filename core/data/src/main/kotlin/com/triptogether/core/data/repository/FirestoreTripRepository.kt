@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
 import javax.inject.Inject
@@ -123,8 +124,29 @@ class FirestoreTripRepository
 
         override suspend fun updateTrip(trip: Trip): Result<Unit> =
             runCatching {
-                // Day-doc reconciliation on date change arrives with S03 edit-trip (M2.4).
-                firestore.collection(TRIPS).document(trip.id).update(
+                val ref = firestore.collection(TRIPS).document(trip.id)
+                val old = ref.get().await()
+                val oldDates =
+                    datesBetween(
+                        LocalDate.parse(checkNotNull(old.getString(FIELD_START_DATE))),
+                        LocalDate.parse(checkNotNull(old.getString("endDate"))),
+                    )
+                val newDates = datesBetween(trip.startDate, trip.endDate)
+
+                // Shrinking the range deletes those days together with their activities;
+                // the UI has already confirmed this with the user (S05 spec).
+                for (date in oldDates - newDates) {
+                    val dayRef = ref.collection(DAYS).document(date.toString())
+                    val activities = dayRef.collection(ACTIVITIES).get().await()
+                    val batch = firestore.batch()
+                    activities.documents.forEach { batch.delete(it.reference) }
+                    batch.delete(dayRef)
+                    batch.commit().await()
+                }
+
+                val batch = firestore.batch()
+                batch.update(
+                    ref,
                     mapOf(
                         "name" to trip.name,
                         "coverUrl" to trip.coverUrl,
@@ -133,9 +155,51 @@ class FirestoreTripRepository
                         FIELD_ARCHIVED to trip.archived,
                         FIELD_UPDATED_AT to FieldValue.serverTimestamp(),
                     ),
-                ).await()
+                )
+                // Growing the range only adds fresh day docs; existing ones stay untouched.
+                (newDates - oldDates).forEach { date ->
+                    batch.set(
+                        ref.collection(DAYS).document(date.toString()),
+                        mapOf("date" to date.toString(), "note" to null),
+                    )
+                }
+                batch.commit().await()
                 Unit
             }
+
+        /** Client-side cascade; replaced by the onTripDelete Cloud Function once Blaze is on. */
+        override suspend fun deleteTrip(tripId: String): Result<Unit> =
+            runCatching {
+                val ref = firestore.collection(TRIPS).document(tripId)
+                val inviteCode = ref.get().await().getString("inviteCode")
+
+                val days = ref.collection(DAYS).get().await()
+                for (day in days.documents) {
+                    val activities = day.reference.collection(ACTIVITIES).get().await()
+                    val batch = firestore.batch()
+                    activities.documents.forEach { batch.delete(it.reference) }
+                    batch.delete(day.reference)
+                    batch.commit().await()
+                }
+                for (collection in listOf(MEMBERS, "expenses", "settlements", "checklist", "polls")) {
+                    val docs = ref.collection(collection).get().await()
+                    if (docs.isEmpty) continue
+                    val batch = firestore.batch()
+                    docs.documents.forEach { batch.delete(it.reference) }
+                    batch.commit().await()
+                }
+                inviteCode?.let {
+                    firestore.collection(INVITE_CODES).document(it).delete().await()
+                }
+                // The trip doc goes last — subcollection rules need it alive to prove membership.
+                ref.delete().await()
+                Unit
+            }
+
+        private fun datesBetween(
+            start: LocalDate,
+            end: LocalDate,
+        ): Set<LocalDate> = (0..start.daysUntil(end)).map { start.plus(it, DateTimeUnit.DAY) }.toSet()
 
         override suspend fun setArchived(
             tripId: String,
@@ -266,6 +330,7 @@ class FirestoreTripRepository
             const val TRIPS = "trips"
             const val MEMBERS = "members"
             const val DAYS = "days"
+            const val ACTIVITIES = "activities"
             const val USERS = "users"
             const val INVITE_CODES = "inviteCodes"
             const val FIELD_MEMBER_IDS = "memberIds"
