@@ -16,6 +16,8 @@
     <string name="settings_error">บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง</string>
     <string name="settings_sign_out">ออกจากระบบ</string>
     <string name="settings_language">ภาษา</string>
+    <string name="settings_section_profile">โปรไฟล์</string>
+    <string name="settings_section_money">การเงิน</string>
     <string name="settings_language_th">ไทย</string>
     <string name="settings_language_en">English</string>
 </resources>

@@ -16,6 +16,8 @@
     <string name="settings_error">Could not save. Please try again.</string>
     <string name="settings_sign_out">Sign out</string>
     <string name="settings_language">Language</string>
+    <string name="settings_section_profile">Profile</string>
+    <string name="settings_section_money">Money</string>
     <string name="settings_language_th">ไทย</string>
     <string name="settings_language_en">English</string>
 </resources>
