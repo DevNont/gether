@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.model.User
 import com.triptogether.core.domain.repository.AuthRepository
+import com.triptogether.core.domain.repository.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +26,15 @@ class MainViewModel
     @Inject
     constructor(
         private val authRepository: AuthRepository,
+        networkMonitor: NetworkMonitor,
     ) : ViewModel() {
+        val isOnline: StateFlow<Boolean> =
+            networkMonitor.isOnline.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+                initialValue = true,
+            )
+
         val authState: StateFlow<AuthUiState> =
             authRepository.observeAuthState()
                 .map { user -> if (user == null) AuthUiState.SignedOut else AuthUiState.SignedIn(user) }

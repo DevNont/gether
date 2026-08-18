@@ -5,15 +5,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import com.triptogether.feature.auth.SignInScreen
@@ -32,14 +41,21 @@ class MainActivity : ComponentActivity() {
         setContent {
             TripTogetherTheme {
                 val authState by viewModel.authState.collectAsStateWithLifecycle()
-                when (authState) {
-                    AuthUiState.Loading -> LoadingScreen()
-                    AuthUiState.SignedOut -> SignInScreen()
-                    is AuthUiState.SignedIn ->
-                        AppNavHost(
-                            pendingInviteCode = pendingInviteCode,
-                            onInviteConsumed = { pendingInviteCode = null },
-                        )
+                val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
+                Column {
+                    // Thin non-blocking banner per docs/03 cross-cutting; Firestore keeps syncing later.
+                    if (!isOnline) {
+                        OfflineBanner()
+                    }
+                    when (authState) {
+                        AuthUiState.Loading -> LoadingScreen()
+                        AuthUiState.SignedOut -> SignInScreen()
+                        is AuthUiState.SignedIn ->
+                            AppNavHost(
+                                pendingInviteCode = pendingInviteCode,
+                                onInviteConsumed = { pendingInviteCode = null },
+                            )
+                    }
                 }
             }
         }
@@ -69,4 +85,19 @@ private fun LoadingScreen(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
+}
+
+@Composable
+private fun OfflineBanner(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.offline_banner),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onErrorContainer,
+        textAlign = TextAlign.Center,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .padding(vertical = 4.dp),
+    )
 }

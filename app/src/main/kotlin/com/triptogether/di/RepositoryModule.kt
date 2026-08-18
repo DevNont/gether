@@ -1,5 +1,6 @@
 package com.triptogether.di
 
+import com.triptogether.core.data.network.ConnectivityNetworkMonitor
 import com.triptogether.core.data.repository.FirebaseAuthRepository
 import com.triptogether.core.data.repository.FirestoreChecklistRepository
 import com.triptogether.core.data.repository.FirestoreExpenseRepository
@@ -11,6 +12,7 @@ import com.triptogether.core.data.repository.FirestoreUserRepository
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.ChecklistRepository
 import com.triptogether.core.domain.repository.ExpenseRepository
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.PlanRepository
 import com.triptogether.core.domain.repository.PollRepository
 import com.triptogether.core.domain.repository.SettlementRepository
@@ -57,4 +59,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPollRepository(impl: FirestorePollRepository): PollRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNetworkMonitor(impl: ConnectivityNetworkMonitor): NetworkMonitor
 }
