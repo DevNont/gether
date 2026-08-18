@@ -48,6 +48,11 @@
     <string name="overview_countdown_finished">จบแล้ว</string>
     <string name="overview_members">สมาชิก (%1$d)</string>
     <string name="overview_invite">ชวนเพื่อน</string>
+    <string name="overview_invite_qr">QR สำหรับเข้าร่วมทริป</string>
+    <string name="overview_invite_code_hint">แตะรหัสเพื่อคัดลอก หรือให้เพื่อนสแกน QR</string>
+    <string name="overview_invite_copy_link">คัดลอกลิงก์</string>
+    <string name="overview_invite_share">แชร์…</string>
+    <string name="overview_invite_close">ปิด</string>
     <string name="overview_share_message">มาเที่ยว "%1$s" ด้วยกัน! กรอกรหัส %2$s ในแอป TripTogether หรือแตะลิงก์ %3$s</string>
     <string name="overview_money_title">สรุปเงิน</string>
     <string name="overview_money_pending">จะแสดงเมื่อเริ่มบันทึกค่าใช้จ่าย</string>

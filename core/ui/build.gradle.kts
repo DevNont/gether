@@ -29,5 +29,6 @@ android {
 dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
+    api(libs.zxing.core)
     debugImplementation(libs.compose.ui.tooling)
 }

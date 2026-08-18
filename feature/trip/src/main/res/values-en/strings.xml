@@ -48,6 +48,11 @@
     <string name="overview_countdown_finished">Finished</string>
     <string name="overview_members">Members (%1$d)</string>
     <string name="overview_invite">Invite friends</string>
+    <string name="overview_invite_qr">QR to join the trip</string>
+    <string name="overview_invite_code_hint">Tap the code to copy, or let friends scan the QR</string>
+    <string name="overview_invite_copy_link">Copy link</string>
+    <string name="overview_invite_share">Share…</string>
+    <string name="overview_invite_close">Close</string>
     <string name="overview_share_message">Join my trip "%1$s"! Enter code %2$s in the TripTogether app or tap %3$s</string>
     <string name="overview_money_title">Money summary</string>
     <string name="overview_money_pending">Shown once expenses are recorded</string>

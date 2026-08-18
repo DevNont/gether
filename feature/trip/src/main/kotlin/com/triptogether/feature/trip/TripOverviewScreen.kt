@@ -2,11 +2,14 @@ package com.triptogether.feature.trip
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -41,14 +45,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Trip
+import com.triptogether.core.ui.qr.rememberQrBitmap
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -73,6 +81,7 @@ fun TripOverviewScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var inviteTrip by remember { mutableStateOf<Trip?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -94,7 +103,7 @@ fun TripOverviewScreen(
         onAddGuest = viewModel::addGuestMember,
         onEditTrip = onEditTrip,
         onDeleteTrip = viewModel::deleteTrip,
-        onShareInvite = { trip -> shareInvite(context, trip) },
+        onShareInvite = { trip -> inviteTrip = trip },
         onOpenPlan = onOpenPlan,
         onOpenExpenses = onOpenExpenses,
         onOpenSettlement = onOpenSettlement,
@@ -102,6 +111,74 @@ fun TripOverviewScreen(
         onOpenPolls = onOpenPolls,
         onBack = onBack,
         modifier = modifier,
+    )
+
+    inviteTrip?.let { trip ->
+        InviteDialog(
+            trip = trip,
+            onShare = { shareInvite(context, trip) },
+            onDismiss = { inviteTrip = null },
+        )
+    }
+}
+
+/** Invite friends three ways: scan the QR, copy the 6-char code, or share/copy the link. */
+@Composable
+private fun InviteDialog(
+    trip: Trip,
+    onShare: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val clipboard = LocalClipboardManager.current
+    val joinLink = "https://triptogether.app/join/${trip.inviteCode}"
+    // The QR carries the app deep link so a camera scan opens the app directly;
+    // switch to the https link once the domain hosts assetlinks.json.
+    val qr = rememberQrBitmap("triptogether://join/${trip.inviteCode}")
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.overview_invite)) },
+        text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Image(
+                    bitmap = qr.asImageBitmap(),
+                    contentDescription = stringResource(R.string.overview_invite_qr),
+                    modifier = Modifier.size(200.dp),
+                )
+                Text(
+                    text = trip.inviteCode.toCharArray().joinToString(" "),
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier =
+                        Modifier.clickable {
+                            clipboard.setText(AnnotatedString(trip.inviteCode))
+                        },
+                )
+                Text(
+                    text = stringResource(R.string.overview_invite_code_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = { clipboard.setText(AnnotatedString(joinLink)) },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(stringResource(R.string.overview_invite_copy_link))
+                    }
+                    OutlinedButton(onClick = onShare, modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.overview_invite_share))
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.overview_invite_close))
+            }
+        },
     )
 }
 
