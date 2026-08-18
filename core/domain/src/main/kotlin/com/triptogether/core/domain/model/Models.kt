@@ -135,6 +135,14 @@ data class User(
     val promptpayId: String? = null,
 )
 
+const val INVITE_CODE_LENGTH = 6
+
+/** What a prospective member sees before confirming a join (from inviteCodes/{code}). */
+data class InvitePreview(
+    val tripId: String,
+    val tripName: String,
+)
+
 /** Input for creating a trip; server assigns id and invite code. */
 data class TripDraft(
     val name: String,

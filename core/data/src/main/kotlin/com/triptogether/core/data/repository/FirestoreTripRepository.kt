@@ -13,6 +13,7 @@ import com.triptogether.core.data.dto.TripDto
 import com.triptogether.core.data.dto.toDomain
 import com.triptogether.core.data.dto.toDto
 import com.triptogether.core.data.util.InviteCodes
+import com.triptogether.core.domain.model.InvitePreview
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.domain.model.TripDraft
@@ -139,6 +140,17 @@ class FirestoreTripRepository
                     .update(FIELD_ARCHIVED, archived, FIELD_UPDATED_AT, FieldValue.serverTimestamp())
                     .await()
                 Unit
+            }
+
+        override suspend fun getInvitePreview(code: String): Result<InvitePreview> =
+            runCatching {
+                val snapshot =
+                    firestore.collection(INVITE_CODES).document(code.uppercase()).get().await()
+                check(snapshot.exists() && snapshot.getBoolean("active") == true) { "Invalid invite code" }
+                InvitePreview(
+                    tripId = checkNotNull(snapshot.getString("tripId")) { "Corrupt invite code" },
+                    tripName = snapshot.getString("tripName") ?: "",
+                )
             }
 
         override suspend fun joinByCode(

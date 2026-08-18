@@ -1,5 +1,6 @@
 package com.triptogether.core.domain.repository
 
+import com.triptogether.core.domain.model.InvitePreview
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.domain.model.TripDraft
@@ -21,6 +22,9 @@ interface TripRepository {
         tripId: String,
         archived: Boolean,
     ): Result<Unit>
+
+    /** Looks up an invite code for the confirm-before-join preview. Fails when unknown or inactive. */
+    suspend fun getInvitePreview(code: String): Result<InvitePreview>
 
     /** Joins via invite code. Returns the tripId on success. */
     suspend fun joinByCode(

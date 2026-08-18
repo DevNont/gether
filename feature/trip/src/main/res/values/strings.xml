@@ -18,4 +18,10 @@
     <string name="create_trip_range_too_long">ช่วงทริปยาวได้ไม่เกิน %1$d วัน</string>
     <string name="create_trip_save">สร้างทริป</string>
     <string name="create_trip_error">สร้างทริปไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+
+    <string name="join_trip_title">เข้าร่วมทริป</string>
+    <string name="join_trip_hint">กรอกรหัสเชิญ 6 หลัก</string>
+    <string name="join_trip_not_found">ไม่พบรหัสนี้</string>
+    <string name="join_trip_confirm">เข้าร่วมทริปนี้</string>
+    <string name="join_trip_error">เข้าร่วมไม่สำเร็จ ลองใหม่อีกครั้ง</string>
 </resources>
