@@ -6,6 +6,7 @@ import androidx.navigation.toRoute
 import com.triptogether.feature.trip.CreateTripScreen
 import com.triptogether.feature.trip.JoinTripScreen
 import com.triptogether.feature.trip.TripListScreen
+import com.triptogether.feature.trip.TripOverviewScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,6 +17,9 @@ data object CreateTripRoute
 
 @Serializable
 data class JoinTripRoute(val code: String? = null)
+
+@Serializable
+data class TripOverviewRoute(val tripId: String)
 
 fun NavGraphBuilder.tripListScreen(
     onCreateTrip: () -> Unit,
@@ -37,6 +41,12 @@ fun NavGraphBuilder.createTripScreen(
 ) {
     composable<CreateTripRoute> {
         CreateTripScreen(onCreated = onCreated, onBack = onBack)
+    }
+}
+
+fun NavGraphBuilder.tripOverviewScreen(onBack: () -> Unit) {
+    composable<TripOverviewRoute> {
+        TripOverviewScreen(onBack = onBack)
     }
 }
 

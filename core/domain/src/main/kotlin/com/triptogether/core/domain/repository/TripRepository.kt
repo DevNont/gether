@@ -23,6 +23,18 @@ interface TripRepository {
         archived: Boolean,
     ): Result<Unit>
 
+    /** Shared trip note on S05, editable by every member. */
+    suspend fun updateTripNote(
+        tripId: String,
+        note: String?,
+    ): Result<Unit>
+
+    /** Owner can deactivate the invite code so new members cannot join. */
+    suspend fun setInviteActive(
+        code: String,
+        active: Boolean,
+    ): Result<Unit>
+
     /** Looks up an invite code for the confirm-before-join preview. Fails when unknown or inactive. */
     suspend fun getInvitePreview(code: String): Result<InvitePreview>
 

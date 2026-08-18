@@ -3,8 +3,9 @@ complexity:
   # parameter count and body length rules fit poorly there.
   TooManyFunctions:
     ignoreAnnotatedFunctions: ['Composable']
-    # Repository implementations mirror their domain interfaces (10+ methods by design).
+    # Repository interfaces/implementations legitimately expose 10+ methods per aggregate.
     thresholdInClasses: 20
+    thresholdInInterfaces: 20
   LongParameterList:
     ignoreAnnotated: ['Composable']
   LongMethod:

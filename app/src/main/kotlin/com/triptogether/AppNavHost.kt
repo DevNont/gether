@@ -8,9 +8,11 @@ import androidx.navigation.compose.rememberNavController
 import com.triptogether.feature.trip.navigation.CreateTripRoute
 import com.triptogether.feature.trip.navigation.JoinTripRoute
 import com.triptogether.feature.trip.navigation.TripListRoute
+import com.triptogether.feature.trip.navigation.TripOverviewRoute
 import com.triptogether.feature.trip.navigation.createTripScreen
 import com.triptogether.feature.trip.navigation.joinTripScreen
 import com.triptogether.feature.trip.navigation.tripListScreen
+import com.triptogether.feature.trip.navigation.tripOverviewScreen
 
 @Composable
 fun AppNavHost(
@@ -35,18 +37,24 @@ fun AppNavHost(
         tripListScreen(
             onCreateTrip = { navController.navigate(CreateTripRoute) },
             onJoinTrip = { navController.navigate(JoinTripRoute()) },
-            // S05 Overview (M2.6) hooks in here.
-            onTripClick = {},
+            onTripClick = { tripId -> navController.navigate(TripOverviewRoute(tripId)) },
         )
         createTripScreen(
-            // Lands on S05 Overview once M2.6 exists; back to the list for now.
-            onCreated = { navController.popBackStack() },
+            onCreated = { tripId ->
+                navController.navigate(TripOverviewRoute(tripId)) {
+                    popUpTo(TripListRoute)
+                }
+            },
             onBack = { navController.popBackStack() },
         )
         joinTripScreen(
-            // Lands on S05 Overview once M2.6 exists; back to the list for now.
-            onJoined = { navController.popBackStack(TripListRoute, inclusive = false) },
+            onJoined = { tripId ->
+                navController.navigate(TripOverviewRoute(tripId)) {
+                    popUpTo(TripListRoute)
+                }
+            },
             onBack = { navController.popBackStack() },
         )
+        tripOverviewScreen(onBack = { navController.popBackStack() })
     }
 }

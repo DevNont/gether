@@ -24,4 +24,23 @@
     <string name="join_trip_not_found">ไม่พบรหัสนี้</string>
     <string name="join_trip_confirm">เข้าร่วมทริปนี้</string>
     <string name="join_trip_error">เข้าร่วมไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+
+    <string name="overview_menu">เมนู</string>
+    <string name="overview_archive">เก็บเข้าคลัง</string>
+    <string name="overview_archived">เก็บทริปเข้าคลังแล้ว</string>
+    <string name="overview_close_invite">ปิดรหัสเชิญ</string>
+    <string name="overview_invite_closed">ปิดรหัสเชิญแล้ว</string>
+    <string name="overview_action_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="overview_countdown_days">อีก %1$d วัน</string>
+    <string name="overview_countdown_day_of_trip">วันที่ %1$d ของทริป</string>
+    <string name="overview_countdown_finished">จบแล้ว</string>
+    <string name="overview_members">สมาชิก (%1$d)</string>
+    <string name="overview_invite">ชวนเพื่อน</string>
+    <string name="overview_share_message">มาเที่ยว "%1$s" ด้วยกัน! กรอกรหัส %2$s ในแอป TripTogether หรือแตะลิงก์ %3$s</string>
+    <string name="overview_money_title">สรุปเงิน</string>
+    <string name="overview_money_pending">จะแสดงเมื่อเริ่มบันทึกค่าใช้จ่าย</string>
+    <string name="overview_note_title">โน้ตของทริป</string>
+    <string name="overview_note_placeholder">จดอะไรก็ได้ให้ทั้งกลุ่มเห็น…</string>
+    <string name="overview_note_save">บันทึกโน้ต</string>
+    <string name="overview_note_error">บันทึกโน้ตไม่สำเร็จ</string>
 </resources>

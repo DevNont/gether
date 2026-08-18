@@ -37,13 +37,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.toJavaLocalDate
-import java.time.format.DateTimeFormatter
 
 /** S02 — trips in two groups (upcoming / finished) with empty state, FAB to create, join via header. */
 @Composable
@@ -235,42 +232,6 @@ private fun AvatarStack(
             }
         }
     }
-}
-
-@Composable
-private fun MemberAvatar(
-    member: Member,
-    modifier: Modifier = Modifier,
-) {
-    if (member.photoUrl != null) {
-        AsyncImage(
-            model = member.photoUrl,
-            contentDescription = member.displayName,
-            modifier = modifier.size(28.dp).clip(CircleShape),
-        )
-    } else {
-        Box(
-            modifier =
-                modifier
-                    .size(28.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = member.displayName.take(1),
-                style = MaterialTheme.typography.labelSmall,
-            )
-        }
-    }
-}
-
-private fun formatDateRange(
-    start: LocalDate,
-    end: LocalDate,
-): String {
-    val formatter = DateTimeFormatter.ofPattern("d MMM yy")
-    return "${formatter.format(start.toJavaLocalDate())} – ${formatter.format(end.toJavaLocalDate())}"
 }
 
 @Preview(showBackground = true)

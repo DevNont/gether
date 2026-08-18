@@ -20,6 +20,7 @@ data class Trip(
     val ownerId: String,
     val inviteCode: String,
     val archived: Boolean = false,
+    val note: String? = null,
 ) {
     /** Inclusive of both the start and the end date, so a same-day trip is 1. */
     val dayCount: Int get() = startDate.daysUntil(endDate) + 1

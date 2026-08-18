@@ -14,6 +14,7 @@ data class TripDto(
     val currency: String = "THB",
     val inviteCode: String = "",
     val archived: Boolean = false,
+    val note: String? = null,
 )
 
 fun TripDto.toDomain(id: String): Trip =
@@ -26,4 +27,5 @@ fun TripDto.toDomain(id: String): Trip =
         ownerId = ownerId,
         inviteCode = inviteCode,
         archived = archived,
+        note = note,
     )

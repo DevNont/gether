@@ -24,4 +24,23 @@
     <string name="join_trip_not_found">Code not found</string>
     <string name="join_trip_confirm">Join this trip</string>
     <string name="join_trip_error">Could not join. Please try again.</string>
+
+    <string name="overview_menu">Menu</string>
+    <string name="overview_archive">Archive trip</string>
+    <string name="overview_archived">Trip archived</string>
+    <string name="overview_close_invite">Close invite code</string>
+    <string name="overview_invite_closed">Invite code closed</string>
+    <string name="overview_action_error">Action failed. Please try again.</string>
+    <string name="overview_countdown_days">%1$d days to go</string>
+    <string name="overview_countdown_day_of_trip">Day %1$d of the trip</string>
+    <string name="overview_countdown_finished">Finished</string>
+    <string name="overview_members">Members (%1$d)</string>
+    <string name="overview_invite">Invite friends</string>
+    <string name="overview_share_message">Join my trip "%1$s"! Enter code %2$s in the TripTogether app or tap %3$s</string>
+    <string name="overview_money_title">Money summary</string>
+    <string name="overview_money_pending">Shown once expenses are recorded</string>
+    <string name="overview_note_title">Trip note</string>
+    <string name="overview_note_placeholder">Write anything for the whole group…</string>
+    <string name="overview_note_save">Save note</string>
+    <string name="overview_note_error">Could not save the note</string>
 </resources>

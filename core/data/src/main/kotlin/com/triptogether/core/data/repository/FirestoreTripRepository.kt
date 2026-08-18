@@ -142,6 +142,27 @@ class FirestoreTripRepository
                 Unit
             }
 
+        override suspend fun updateTripNote(
+            tripId: String,
+            note: String?,
+        ): Result<Unit> =
+            runCatching {
+                firestore.collection(TRIPS).document(tripId)
+                    .update("note", note, FIELD_UPDATED_AT, FieldValue.serverTimestamp())
+                    .await()
+                Unit
+            }
+
+        override suspend fun setInviteActive(
+            code: String,
+            active: Boolean,
+        ): Result<Unit> =
+            runCatching {
+                firestore.collection(INVITE_CODES).document(code.uppercase())
+                    .update("active", active).await()
+                Unit
+            }
+
         override suspend fun getInvitePreview(code: String): Result<InvitePreview> =
             runCatching {
                 val snapshot =
