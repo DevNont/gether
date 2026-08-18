@@ -25,12 +25,14 @@ fun NavGraphBuilder.tripListScreen(
     onCreateTrip: () -> Unit,
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     composable<TripListRoute> {
         TripListScreen(
             onCreateTrip = onCreateTrip,
             onJoinTrip = onJoinTrip,
             onTripClick = onTripClick,
+            onOpenSettings = onOpenSettings,
         )
     }
 }

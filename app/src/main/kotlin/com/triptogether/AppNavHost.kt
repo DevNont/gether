@@ -5,6 +5,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.triptogether.feature.auth.navigation.SettingsRoute
+import com.triptogether.feature.auth.navigation.settingsScreen
 import com.triptogether.feature.expense.navigation.ExpenseDetailRoute
 import com.triptogether.feature.expense.navigation.ExpenseEditorRoute
 import com.triptogether.feature.expense.navigation.ExpenseListRoute
@@ -53,7 +55,9 @@ fun AppNavHost(
             onCreateTrip = { navController.navigate(CreateTripRoute) },
             onJoinTrip = { navController.navigate(JoinTripRoute()) },
             onTripClick = { tripId -> navController.navigate(TripOverviewRoute(tripId)) },
+            onOpenSettings = { navController.navigate(SettingsRoute) },
         )
+        settingsScreen(onBack = { navController.popBackStack() })
         createTripScreen(
             onCreated = { tripId ->
                 navController.navigate(TripOverviewRoute(tripId)) {

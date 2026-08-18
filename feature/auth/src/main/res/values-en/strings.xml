@@ -3,4 +3,15 @@
     <string name="auth_app_title">TripTogether</string>
     <string name="auth_sign_in_with_google">Sign in with Google</string>
     <string name="auth_sign_in_error">Sign-in failed. Please try again.</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_display_name">Display name</string>
+    <string name="settings_promptpay">PromptPay (phone or citizen id)</string>
+    <string name="settings_promptpay_hint">10-digit phone number or 13-digit citizen id</string>
+    <string name="settings_promptpay_invalid">Must be a 10-digit phone or 13-digit citizen id</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_saved">Saved</string>
+    <string name="settings_error">Could not save. Please try again.</string>
+    <string name="settings_sign_out">Sign out</string>
 </resources>

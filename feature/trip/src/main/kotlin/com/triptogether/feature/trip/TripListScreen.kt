@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +49,7 @@ fun TripListScreen(
     onCreateTrip: () -> Unit,
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TripListViewModel = hiltViewModel(),
 ) {
@@ -57,6 +59,7 @@ fun TripListScreen(
         onCreateTrip = onCreateTrip,
         onJoinTrip = onJoinTrip,
         onTripClick = onTripClick,
+        onOpenSettings = onOpenSettings,
         modifier = modifier,
     )
 }
@@ -68,6 +71,7 @@ private fun TripListContent(
     onCreateTrip: () -> Unit,
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -80,6 +84,12 @@ private fun TripListContent(
                         Icon(
                             imageVector = Icons.Default.GroupAdd,
                             contentDescription = stringResource(R.string.trip_list_join),
+                        )
+                    }
+                    IconButton(onClick = onOpenSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.trip_list_settings),
                         )
                     }
                 },
@@ -266,6 +276,7 @@ private fun TripListContentPreview() {
             onCreateTrip = {},
             onJoinTrip = {},
             onTripClick = {},
+            onOpenSettings = {},
         )
     }
 }
@@ -279,6 +290,7 @@ private fun TripListEmptyPreview() {
             onCreateTrip = {},
             onJoinTrip = {},
             onTripClick = {},
+            onOpenSettings = {},
         )
     }
 }
