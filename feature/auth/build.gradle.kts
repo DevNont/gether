@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.google.id)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.appcompat)
 
     debugImplementation(libs.compose.ui.tooling)
 }

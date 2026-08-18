@@ -1,7 +1,9 @@
 package com.triptogether.feature.auth
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -153,6 +157,7 @@ private fun SettingsContent(
             ) {
                 Text(stringResource(R.string.settings_save))
             }
+            LanguageSelector()
             // Notification toggles and account deletion arrive with FCM (M6.1) / account tooling.
             OutlinedButton(onClick = onSignOut, modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -160,6 +165,34 @@ private fun SettingsContent(
                     color = MaterialTheme.colorScheme.error,
                 )
             }
+        }
+    }
+}
+
+/** App language — Thai is the default set at startup; the choice persists via AppCompat. */
+@Composable
+private fun LanguageSelector(modifier: Modifier = Modifier) {
+    val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+        Text(
+            text = stringResource(R.string.settings_language),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = current.startsWith("th") || current.isEmpty(),
+                onClick = {
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("th"))
+                },
+                label = { Text(stringResource(R.string.settings_language_th)) },
+            )
+            FilterChip(
+                selected = current.startsWith("en"),
+                onClick = {
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
+                },
+                label = { Text(stringResource(R.string.settings_language_en)) },
+            )
         }
     }
 }

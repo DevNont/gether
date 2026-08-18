@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.triptogether.core.domain.repository.AuthUiHost
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.coroutines.launch
 
@@ -70,15 +73,30 @@ fun SignInScreen(
                     )
                 }
             },
+            onLineSignInClick = {
+                val host = context.findAuthUiHost()
+                if (host != null) viewModel.onLineSignIn(host) else viewModel.onCredentialFlowFailed()
+            },
             modifier = Modifier.padding(innerPadding),
         )
     }
+}
+
+/** Walks the context chain to the activity, which implements AuthUiHost. */
+private fun Context.findAuthUiHost(): AuthUiHost? {
+    var current: Context? = this
+    while (current != null) {
+        if (current is AuthUiHost) return current
+        current = (current as? android.content.ContextWrapper)?.baseContext
+    }
+    return null
 }
 
 @Composable
 private fun SignInContent(
     isLoading: Boolean,
     onSignInClick: () -> Unit,
+    onLineSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -96,9 +114,18 @@ private fun SignInContent(
             Button(onClick = onSignInClick) {
                 Text(text = stringResource(R.string.auth_sign_in_with_google))
             }
+            Button(
+                onClick = onLineSignInClick,
+                colors = ButtonDefaults.buttonColors(containerColor = LineGreen),
+            ) {
+                Text(text = stringResource(R.string.auth_sign_in_with_line))
+            }
         }
     }
 }
+
+/** LINE brand green. */
+private val LineGreen = Color(0xFF06C755)
 
 private suspend fun requestGoogleIdToken(
     context: Context,
@@ -130,6 +157,6 @@ private suspend fun requestGoogleIdToken(
 @Composable
 private fun SignInContentPreview() {
     TripTogetherTheme {
-        SignInContent(isLoading = false, onSignInClick = {})
+        SignInContent(isLoading = false, onSignInClick = {}, onLineSignInClick = {})
     }
 }

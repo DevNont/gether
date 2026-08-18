@@ -3,6 +3,7 @@ package com.triptogether.feature.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.repository.AuthRepository
+import com.triptogether.core.domain.repository.AuthUiHost
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -40,5 +41,14 @@ class SignInViewModel
 
         fun onCredentialFlowFailed() {
             viewModelScope.launch { _events.send(SignInEvent.Error(R.string.auth_sign_in_error)) }
+        }
+
+        fun onLineSignIn(host: AuthUiHost) {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true) }
+                authRepository.signInWithLine(host)
+                    .onFailure { _events.send(SignInEvent.Error(R.string.auth_sign_in_error)) }
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }

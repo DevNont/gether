@@ -2,6 +2,7 @@
 <resources>
     <string name="auth_app_title">TripTogether</string>
     <string name="auth_sign_in_with_google">Sign in with Google</string>
+    <string name="auth_sign_in_with_line">Sign in with LINE</string>
     <string name="auth_sign_in_error">Sign-in failed. Please try again.</string>
 
     <string name="settings_title">Settings</string>
@@ -14,4 +15,7 @@
     <string name="settings_saved">Saved</string>
     <string name="settings_error">Could not save. Please try again.</string>
     <string name="settings_sign_out">Sign out</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_th">ไทย</string>
+    <string name="settings_language_en">English</string>
 </resources>

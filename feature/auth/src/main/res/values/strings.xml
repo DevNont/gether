@@ -2,6 +2,7 @@
 <resources>
     <string name="auth_app_title">TripTogether</string>
     <string name="auth_sign_in_with_google">เข้าสู่ระบบด้วย Google</string>
+    <string name="auth_sign_in_with_line">เข้าสู่ระบบด้วย LINE</string>
     <string name="auth_sign_in_error">เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง</string>
 
     <string name="settings_title">ตั้งค่า</string>
@@ -14,4 +15,7 @@
     <string name="settings_saved">บันทึกแล้ว</string>
     <string name="settings_error">บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง</string>
     <string name="settings_sign_out">ออกจากระบบ</string>
+    <string name="settings_language">ภาษา</string>
+    <string name="settings_language_th">ไทย</string>
+    <string name="settings_language_en">English</string>
 </resources>
