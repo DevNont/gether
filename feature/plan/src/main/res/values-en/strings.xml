@@ -6,4 +6,21 @@
     <string name="day_plan_empty">Nothing planned for this day</string>
     <string name="day_plan_empty_hint">Tap + to add the first activity</string>
     <string name="day_plan_has_attachments">Has attachments</string>
+
+    <string name="activity_editor_title_new">Add activity</string>
+    <string name="activity_editor_title_edit">Edit activity</string>
+    <string name="activity_editor_name">Activity name</string>
+    <string name="activity_editor_start">Start time</string>
+    <string name="activity_editor_end">End time</string>
+    <string name="activity_editor_time_invalid">End time must not be before start time</string>
+    <string name="activity_editor_place">Place</string>
+    <string name="activity_editor_note">Note</string>
+    <string name="activity_editor_save">Save</string>
+    <string name="activity_editor_delete">Delete activity</string>
+    <string name="activity_editor_delete_confirm_title">Delete this activity?</string>
+    <string name="activity_editor_delete_confirm_text">This cannot be undone. Everyone on the trip will lose it.</string>
+    <string name="activity_editor_cancel">Cancel</string>
+    <string name="activity_editor_time_ok">OK</string>
+    <string name="activity_editor_time_clear">No time</string>
+    <string name="activity_editor_error">Could not save. Please try again.</string>
 </resources>

@@ -5,22 +5,47 @@ package com.triptogether.feature.plan.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import com.triptogether.feature.plan.ActivityEditorScreen
 import com.triptogether.feature.plan.DayPlanScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class DayPlanRoute(val tripId: String)
 
+@Serializable
+data class ActivityEditorRoute(
+    val tripId: String,
+    val dayId: String,
+    val activityId: String? = null,
+)
+
 fun NavGraphBuilder.dayPlanScreen(
-    onAddActivity: (String) -> Unit,
-    onEditActivity: (String, String) -> Unit,
+    onAddActivity: (ActivityEditorRoute) -> Unit,
+    onEditActivity: (ActivityEditorRoute) -> Unit,
     onBack: () -> Unit,
 ) {
-    composable<DayPlanRoute> {
+    composable<DayPlanRoute> { backStackEntry ->
+        val route = backStackEntry.toRoute<DayPlanRoute>()
         DayPlanScreen(
-            onAddActivity = onAddActivity,
-            onEditActivity = onEditActivity,
+            onAddActivity = { dayId ->
+                onAddActivity(ActivityEditorRoute(tripId = route.tripId, dayId = dayId))
+            },
+            onEditActivity = { dayId, activityId ->
+                onEditActivity(
+                    ActivityEditorRoute(tripId = route.tripId, dayId = dayId, activityId = activityId),
+                )
+            },
             onBack = onBack,
         )
+    }
+}
+
+fun NavGraphBuilder.activityEditorScreen(
+    onDone: () -> Unit,
+    onBack: () -> Unit,
+) {
+    composable<ActivityEditorRoute> {
+        ActivityEditorScreen(onDone = onDone, onBack = onBack)
     }
 }

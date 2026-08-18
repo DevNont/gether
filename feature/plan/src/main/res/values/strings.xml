@@ -6,4 +6,21 @@
     <string name="day_plan_empty">ยังไม่มีแผนวันนี้</string>
     <string name="day_plan_empty_hint">กดปุ่ม + เพื่อเพิ่มกิจกรรมแรก</string>
     <string name="day_plan_has_attachments">มีไฟล์แนบ</string>
+
+    <string name="activity_editor_title_new">เพิ่มกิจกรรม</string>
+    <string name="activity_editor_title_edit">แก้ไขกิจกรรม</string>
+    <string name="activity_editor_name">ชื่อกิจกรรม</string>
+    <string name="activity_editor_start">เวลาเริ่ม</string>
+    <string name="activity_editor_end">เวลาจบ</string>
+    <string name="activity_editor_time_invalid">เวลาจบต้องไม่ก่อนเวลาเริ่ม</string>
+    <string name="activity_editor_place">สถานที่</string>
+    <string name="activity_editor_note">โน้ต</string>
+    <string name="activity_editor_save">บันทึก</string>
+    <string name="activity_editor_delete">ลบกิจกรรม</string>
+    <string name="activity_editor_delete_confirm_title">ลบกิจกรรมนี้?</string>
+    <string name="activity_editor_delete_confirm_text">ลบแล้วกู้คืนไม่ได้ ทุกคนในทริปจะไม่เห็นกิจกรรมนี้อีก</string>
+    <string name="activity_editor_cancel">ยกเลิก</string>
+    <string name="activity_editor_time_ok">ตกลง</string>
+    <string name="activity_editor_time_clear">ไม่ระบุเวลา</string>
+    <string name="activity_editor_error">บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง</string>
 </resources>
