@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="expense_list_title">Expenses</string>
+    <string name="expense_back">Back</string>
+    <string name="expense_list_add">Add bill</string>
+    <string name="expense_list_empty">No bills in this trip yet</string>
+    <string name="expense_list_trip_total">Trip total</string>
+    <string name="expense_list_my_total">My total</string>
+    <string name="expense_filter_all">All</string>
+    <string name="expense_category_food">Food</string>
+    <string name="expense_category_stay">Stay</string>
+    <string name="expense_category_transport">Transport</string>
+    <string name="expense_category_activity">Activity</string>
+    <string name="expense_category_other">Other</string>
+    <string name="expense_paid_by">Paid by %1$s</string>
+    <string name="expense_my_share">Mine %1$s</string>
+</resources>

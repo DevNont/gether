@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="expense_list_title">ค่าใช้จ่าย</string>
+    <string name="expense_back">ย้อนกลับ</string>
+    <string name="expense_list_add">เพิ่มบิล</string>
+    <string name="expense_list_empty">ยังไม่มีบิลในทริปนี้</string>
+    <string name="expense_list_trip_total">ยอดรวมทริป</string>
+    <string name="expense_list_my_total">ยอดของฉัน</string>
+    <string name="expense_filter_all">ทั้งหมด</string>
+    <string name="expense_category_food">อาหาร</string>
+    <string name="expense_category_stay">ที่พัก</string>
+    <string name="expense_category_transport">เดินทาง</string>
+    <string name="expense_category_activity">กิจกรรม</string>
+    <string name="expense_category_other">อื่นๆ</string>
+    <string name="expense_paid_by">จ่ายโดย %1$s</string>
+    <string name="expense_my_share">ของฉัน %1$s</string>
+</resources>

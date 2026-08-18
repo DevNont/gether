@@ -56,6 +56,7 @@ import kotlinx.datetime.todayIn
 @Composable
 fun TripOverviewScreen(
     onOpenPlan: (String) -> Unit,
+    onOpenExpenses: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TripOverviewViewModel = hiltViewModel(),
@@ -82,6 +83,7 @@ fun TripOverviewScreen(
         onCloseInvite = viewModel::closeInvite,
         onShareInvite = { trip -> shareInvite(context, trip) },
         onOpenPlan = onOpenPlan,
+        onOpenExpenses = onOpenExpenses,
         onBack = onBack,
         modifier = modifier,
     )
@@ -98,6 +100,7 @@ private fun TripOverviewContent(
     onCloseInvite: () -> Unit,
     onShareInvite: (Trip) -> Unit,
     onOpenPlan: (String) -> Unit,
+    onOpenExpenses: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -138,7 +141,7 @@ private fun TripOverviewContent(
                 HeaderCard(trip = trip)
                 PlanLinkCard(onClick = { onOpenPlan(trip.id) })
                 MembersCard(members = uiState.members, onShareInvite = { onShareInvite(trip) })
-                MoneySummaryCard()
+                MoneySummaryCard(onClick = { onOpenExpenses(trip.id) })
                 NoteCard(
                     note = uiState.noteDraft,
                     changed = uiState.noteChanged,
@@ -283,10 +286,13 @@ private fun PlanLinkCard(
     }
 }
 
-/** Placeholder amounts until expense/settlement logic lands in M4/M5. */
+/** Placeholder amounts until settlement logic lands in M5; tap opens the expense list. */
 @Composable
-private fun MoneySummaryCard(modifier: Modifier = Modifier) {
-    Card(modifier = modifier.fillMaxWidth()) {
+private fun MoneySummaryCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = stringResource(R.string.overview_money_title),
@@ -380,6 +386,7 @@ private fun TripOverviewContentPreview() {
             onCloseInvite = {},
             onShareInvite = {},
             onOpenPlan = {},
+            onOpenExpenses = {},
             onBack = {},
         )
     }
