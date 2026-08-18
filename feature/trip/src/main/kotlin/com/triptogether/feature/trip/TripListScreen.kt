@@ -26,13 +26,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,8 +61,16 @@ fun TripListScreen(
     viewModel: TripListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.seedError.collect {
+            snackbarHostState.showSnackbar(context.getString(R.string.trip_list_seed_error))
+        }
+    }
     TripListContent(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onCreateTrip = onCreateTrip,
         onJoinTrip = onJoinTrip,
         onTripClick = onTripClick,
@@ -71,6 +84,7 @@ fun TripListScreen(
 @Composable
 private fun TripListContent(
     uiState: TripListUiState,
+    snackbarHostState: SnackbarHostState,
     onCreateTrip: () -> Unit,
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
@@ -80,6 +94,7 @@ private fun TripListContent(
 ) {
     Scaffold(
         modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.trip_list_title)) },
@@ -285,6 +300,7 @@ private fun TripListContentPreview() {
                             ),
                         ),
                 ),
+            snackbarHostState = SnackbarHostState(),
             onCreateTrip = {},
             onJoinTrip = {},
             onTripClick = {},
@@ -300,6 +316,7 @@ private fun TripListEmptyPreview() {
     TripTogetherTheme {
         TripListContent(
             uiState = TripListUiState(isLoading = false),
+            snackbarHostState = SnackbarHostState(),
             onCreateTrip = {},
             onJoinTrip = {},
             onTripClick = {},

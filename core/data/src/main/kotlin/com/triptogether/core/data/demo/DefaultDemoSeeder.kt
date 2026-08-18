@@ -52,9 +52,14 @@ class DefaultDemoSeeder
         private val checklistRepository: ChecklistRepository,
         private val pollRepository: PollRepository,
     ) : DemoSeeder {
+        private companion object {
+            const val TAG = "DemoSeeder"
+        }
+
         override suspend fun seedJapanTrip(): Result<String> =
             runCatching {
                 val uid = authRepository.observeAuthState().filterNotNull().first().id
+                android.util.Log.i(TAG, "seeding for uid=$uid")
                 val start = Clock.System.todayIn(TimeZone.currentSystemDefault())
                 val d1 = start.toString()
                 val d2 = start.plus(1, DateTimeUnit.DAY).toString()
@@ -65,8 +70,12 @@ class DefaultDemoSeeder
                         TripDraft(name = "ทริปญี่ปุ่น", startDate = start, endDate = start.plus(2, DateTimeUnit.DAY)),
                     ).getOrThrow()
 
+                // The members listener emits an empty snapshot before the owner doc lands;
+                // wait for the emission that actually contains us.
                 val ownerId =
-                    tripRepository.observeMembers(tripId).first().first { it.userId == uid }.id
+                    tripRepository.observeMembers(tripId)
+                        .first { members -> members.any { it.userId == uid } }
+                        .first { it.userId == uid }.id
                 val friendId = tripRepository.addGuestMember(tripId, "สมหญิง").getOrThrow()
                 val catId = tripRepository.addGuestMember(tripId, "น้องแมว").getOrThrow()
                 val everyone = listOf(ownerId, friendId, catId)
@@ -81,8 +90,9 @@ class DefaultDemoSeeder
                 seedPoll(tripId, ownerId)
                 seedSettlement(tripId, friendId, ownerId)
 
+                android.util.Log.i(TAG, "seeded trip=$tripId")
                 tripId
-            }
+            }.onFailure { android.util.Log.e(TAG, "seed failed", it) }
 
         private suspend fun seedDay1(
             tripId: String,

@@ -10,6 +10,7 @@
     <string name="trip_list_avatar_overflow">+%1$d</string>
     <string name="trip_list_settings">ตั้งค่า</string>
     <string name="trip_list_seed_demo">สร้างทริปตัวอย่าง</string>
+    <string name="trip_list_seed_error">สร้างทริปตัวอย่างไม่สำเร็จ</string>
 
     <string name="create_trip_title">สร้างทริปใหม่</string>
     <string name="create_trip_back">ย้อนกลับ</string>

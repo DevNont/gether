@@ -8,6 +8,8 @@ import com.triptogether.core.domain.repository.DemoSeeder
 import com.triptogether.core.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -31,9 +34,14 @@ class TripListViewModel
         private val tripRepository: TripRepository,
         private val demoSeeder: DemoSeeder,
     ) : ViewModel() {
+        private val _seedError = Channel<Unit>(Channel.BUFFERED)
+        val seedError: Flow<Unit> = _seedError.receiveAsFlow()
+
         /** Debug builds only — populate a demo trip to browse every screen. */
         fun seedDemoTrip() {
-            viewModelScope.launch { demoSeeder.seedJapanTrip() }
+            viewModelScope.launch {
+                demoSeeder.seedJapanTrip().onFailure { _seedError.send(Unit) }
+            }
         }
 
         val uiState: StateFlow<TripListUiState> =
