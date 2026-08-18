@@ -7,4 +7,17 @@
     <string name="checklist_add_hint">พิมพ์รายการแล้วกด enter…</string>
     <string name="checklist_empty">ยังไม่มีรายการ พิมพ์ด้านบนเพื่อเพิ่ม</string>
     <string name="checklist_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+
+    <string name="polls_title">โหวต</string>
+    <string name="polls_create">สร้างโพล</string>
+    <string name="polls_empty">ยังไม่มีโพล กด + เพื่อสร้าง</string>
+    <string name="polls_question">คำถาม</string>
+    <string name="polls_option_n">ตัวเลือก %1$d</string>
+    <string name="polls_add_option">+ เพิ่มตัวเลือก</string>
+    <string name="polls_multi_choice">โหวตได้หลายข้อ</string>
+    <string name="polls_create_confirm">สร้าง</string>
+    <string name="polls_cancel">ยกเลิก</string>
+    <string name="polls_close">ปิดโหวต</string>
+    <string name="polls_closed">ปิดแล้ว</string>
+    <string name="polls_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
 </resources>

@@ -49,6 +49,7 @@ fun NavGraphBuilder.tripOverviewScreen(
     onOpenExpenses: (String) -> Unit,
     onOpenSettlement: (String) -> Unit,
     onOpenChecklist: (String) -> Unit,
+    onOpenPolls: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     composable<TripOverviewRoute> {
@@ -57,6 +58,7 @@ fun NavGraphBuilder.tripOverviewScreen(
             onOpenExpenses = onOpenExpenses,
             onOpenSettlement = onOpenSettlement,
             onOpenChecklist = onOpenChecklist,
+            onOpenPolls = onOpenPolls,
             onBack = onBack,
         )
     }

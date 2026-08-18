@@ -158,6 +158,9 @@ data class Poll(
     val options: List<PollOption>,
     val multiChoice: Boolean = false,
     val closed: Boolean = false,
+    /** Optional link to an itinerary activity (S13). */
+    val activityId: String? = null,
+    val createdBy: String = "",
 )
 
 data class PollOption(

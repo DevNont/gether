@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.HowToVote
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -61,6 +62,7 @@ fun TripOverviewScreen(
     onOpenExpenses: (String) -> Unit,
     onOpenSettlement: (String) -> Unit,
     onOpenChecklist: (String) -> Unit,
+    onOpenPolls: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TripOverviewViewModel = hiltViewModel(),
@@ -90,6 +92,7 @@ fun TripOverviewScreen(
         onOpenExpenses = onOpenExpenses,
         onOpenSettlement = onOpenSettlement,
         onOpenChecklist = onOpenChecklist,
+        onOpenPolls = onOpenPolls,
         onBack = onBack,
         modifier = modifier,
     )
@@ -109,6 +112,7 @@ private fun TripOverviewContent(
     onOpenExpenses: (String) -> Unit,
     onOpenSettlement: (String) -> Unit,
     onOpenChecklist: (String) -> Unit,
+    onOpenPolls: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -161,6 +165,11 @@ private fun TripOverviewContent(
                     icon = Icons.Default.Checklist,
                     label = stringResource(R.string.overview_open_checklist),
                     onClick = { onOpenChecklist(trip.id) },
+                )
+                LinkCard(
+                    icon = Icons.Default.HowToVote,
+                    label = stringResource(R.string.overview_open_polls),
+                    onClick = { onOpenPolls(trip.id) },
                 )
                 MembersCard(members = uiState.members, onShareInvite = { onShareInvite(trip) })
                 MoneySummaryCard(onClick = { onOpenSettlement(trip.id) })
@@ -410,6 +419,7 @@ private fun TripOverviewContentPreview() {
             onOpenExpenses = {},
             onOpenSettlement = {},
             onOpenChecklist = {},
+            onOpenPolls = {},
             onBack = {},
         )
     }

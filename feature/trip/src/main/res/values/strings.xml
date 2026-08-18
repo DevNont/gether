@@ -46,4 +46,5 @@
     <string name="overview_open_plan">แผนการเดินทาง</string>
     <string name="overview_open_expenses">ค่าใช้จ่าย</string>
     <string name="overview_open_checklist">เช็คลิสต์</string>
+    <string name="overview_open_polls">โหวต</string>
 </resources>

@@ -46,4 +46,5 @@
     <string name="overview_open_plan">Itinerary</string>
     <string name="overview_open_expenses">Expenses</string>
     <string name="overview_open_checklist">Checklist</string>
+    <string name="overview_open_polls">Polls</string>
 </resources>

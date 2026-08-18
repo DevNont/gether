@@ -4,6 +4,7 @@ import com.triptogether.core.data.repository.FirebaseAuthRepository
 import com.triptogether.core.data.repository.FirestoreChecklistRepository
 import com.triptogether.core.data.repository.FirestoreExpenseRepository
 import com.triptogether.core.data.repository.FirestorePlanRepository
+import com.triptogether.core.data.repository.FirestorePollRepository
 import com.triptogether.core.data.repository.FirestoreSettlementRepository
 import com.triptogether.core.data.repository.FirestoreTripRepository
 import com.triptogether.core.data.repository.FirestoreUserRepository
@@ -11,6 +12,7 @@ import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.ChecklistRepository
 import com.triptogether.core.domain.repository.ExpenseRepository
 import com.triptogether.core.domain.repository.PlanRepository
+import com.triptogether.core.domain.repository.PollRepository
 import com.triptogether.core.domain.repository.SettlementRepository
 import com.triptogether.core.domain.repository.TripRepository
 import com.triptogether.core.domain.repository.UserRepository
@@ -51,4 +53,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindChecklistRepository(impl: FirestoreChecklistRepository): ChecklistRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPollRepository(impl: FirestorePollRepository): PollRepository
 }

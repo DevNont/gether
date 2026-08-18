@@ -7,4 +7,17 @@
     <string name="checklist_add_hint">Type an item and press enter…</string>
     <string name="checklist_empty">No items yet — type above to add one</string>
     <string name="checklist_error">Action failed. Please try again.</string>
+
+    <string name="polls_title">Polls</string>
+    <string name="polls_create">New poll</string>
+    <string name="polls_empty">No polls yet — tap + to create one</string>
+    <string name="polls_question">Question</string>
+    <string name="polls_option_n">Option %1$d</string>
+    <string name="polls_add_option">+ Add option</string>
+    <string name="polls_multi_choice">Allow multiple votes</string>
+    <string name="polls_create_confirm">Create</string>
+    <string name="polls_cancel">Cancel</string>
+    <string name="polls_close">Close poll</string>
+    <string name="polls_closed">Closed</string>
+    <string name="polls_error">Action failed. Please try again.</string>
 </resources>
