@@ -11,6 +11,10 @@ local.properties
 *.keystore
 *.jks
 
+# Cloud Functions
+firebase/functions/node_modules/
+firebase/functions/lib/
+
 # IDE
 .idea/
 *.iml
