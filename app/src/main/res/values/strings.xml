@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TripTogether</string>
+    <string name="placeholder_under_construction">กำลังพัฒนา — เริ่มจาก M2 ตาม roadmap</string>
+</resources>
