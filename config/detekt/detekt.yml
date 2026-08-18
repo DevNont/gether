@@ -1,3 +1,8 @@
+complexity:
+  # Screen files legitimately hold many small @Composable functions.
+  TooManyFunctions:
+    ignoreAnnotatedFunctions: ['Composable']
+
 naming:
   FunctionNaming:
     ignoreAnnotated: ['Composable']

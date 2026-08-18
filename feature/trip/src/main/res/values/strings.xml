@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="trip_list_title">ทริปของฉัน</string>
+    <string name="trip_list_group_upcoming">กำลังจะถึง</string>
+    <string name="trip_list_group_past">จบแล้ว</string>
+    <string name="trip_list_empty">ยังไม่มีทริป</string>
+    <string name="trip_list_empty_hint">กดปุ่ม + เพื่อสร้างทริป หรือเข้าร่วมด้วยรหัสเชิญ</string>
+    <string name="trip_list_create">สร้างทริป</string>
+    <string name="trip_list_join">เข้าร่วมด้วยรหัส</string>
+    <string name="trip_list_avatar_overflow">+%1$d</string>
+</resources>

@@ -42,5 +42,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.coil.compose)
+
     debugImplementation(libs.compose.ui.tooling)
 }

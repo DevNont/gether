@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="trip_list_title">My trips</string>
+    <string name="trip_list_group_upcoming">Upcoming</string>
+    <string name="trip_list_group_past">Finished</string>
+    <string name="trip_list_empty">No trips yet</string>
+    <string name="trip_list_empty_hint">Tap + to create a trip, or join with an invite code</string>
+    <string name="trip_list_create">Create trip</string>
+    <string name="trip_list_join">Join with code</string>
+    <string name="trip_list_avatar_overflow">+%1$d</string>
+</resources>
