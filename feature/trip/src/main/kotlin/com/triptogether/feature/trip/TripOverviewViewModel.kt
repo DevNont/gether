@@ -87,6 +87,17 @@ class TripOverviewViewModel
             }
         }
 
+        /** M6.4 — a member without an account, added by name; money maths treats them like anyone else. */
+        fun addGuestMember(displayName: String) {
+            val trimmed = displayName.trim()
+            if (trimmed.isEmpty()) return
+            viewModelScope.launch {
+                tripRepository.addGuestMember(route.tripId, trimmed)
+                    .onSuccess { _events.send(TripOverviewEvent.Message(R.string.overview_guest_added)) }
+                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_action_error)) }
+            }
+        }
+
         fun closeInvite() {
             val code = uiState.value.trip?.inviteCode ?: return
             viewModelScope.launch {

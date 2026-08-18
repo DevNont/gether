@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.HowToVote
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -87,6 +88,7 @@ fun TripOverviewScreen(
         onSaveNote = viewModel::saveNote,
         onArchive = viewModel::archiveTrip,
         onCloseInvite = viewModel::closeInvite,
+        onAddGuest = viewModel::addGuestMember,
         onShareInvite = { trip -> shareInvite(context, trip) },
         onOpenPlan = onOpenPlan,
         onOpenExpenses = onOpenExpenses,
@@ -107,6 +109,7 @@ private fun TripOverviewContent(
     onSaveNote: () -> Unit,
     onArchive: () -> Unit,
     onCloseInvite: () -> Unit,
+    onAddGuest: (String) -> Unit,
     onShareInvite: (Trip) -> Unit,
     onOpenPlan: (String) -> Unit,
     onOpenExpenses: (String) -> Unit,
@@ -171,7 +174,11 @@ private fun TripOverviewContent(
                     label = stringResource(R.string.overview_open_polls),
                     onClick = { onOpenPolls(trip.id) },
                 )
-                MembersCard(members = uiState.members, onShareInvite = { onShareInvite(trip) })
+                MembersCard(
+                    members = uiState.members,
+                    onShareInvite = { onShareInvite(trip) },
+                    onAddGuest = onAddGuest,
+                )
                 MoneySummaryCard(onClick = { onOpenSettlement(trip.id) })
                 NoteCard(
                     note = uiState.noteDraft,
@@ -263,8 +270,10 @@ private fun CountdownText(
 private fun MembersCard(
     members: List<Member>,
     onShareInvite: () -> Unit,
+    onAddGuest: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showGuestDialog by remember { mutableStateOf(false) }
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(
@@ -291,10 +300,59 @@ private fun MembersCard(
                 ) {
                     MemberAvatar(member = member)
                     Text(text = member.displayName, style = MaterialTheme.typography.bodyMedium)
+                    if (member.isGuest) {
+                        Text(
+                            text = stringResource(R.string.overview_guest_tag),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
+            }
+            TextButton(onClick = { showGuestDialog = true }) {
+                Text(stringResource(R.string.overview_add_guest))
             }
         }
     }
+    if (showGuestDialog) {
+        AddGuestDialog(
+            onAdd = {
+                onAddGuest(it)
+                showGuestDialog = false
+            },
+            onDismiss = { showGuestDialog = false },
+        )
+    }
+}
+
+@Composable
+private fun AddGuestDialog(
+    onAdd: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.overview_add_guest)) },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text(stringResource(R.string.overview_guest_name)) },
+                singleLine = true,
+            )
+        },
+        confirmButton = {
+            TextButton(enabled = name.isNotBlank(), onClick = { onAdd(name) }) {
+                Text(stringResource(R.string.overview_add_guest_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.overview_guest_cancel))
+            }
+        },
+    )
 }
 
 @Composable
@@ -414,6 +472,7 @@ private fun TripOverviewContentPreview() {
             onSaveNote = {},
             onArchive = {},
             onCloseInvite = {},
+            onAddGuest = {},
             onShareInvite = {},
             onOpenPlan = {},
             onOpenExpenses = {},

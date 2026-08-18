@@ -47,4 +47,10 @@
     <string name="overview_open_expenses">ค่าใช้จ่าย</string>
     <string name="overview_open_checklist">เช็คลิสต์</string>
     <string name="overview_open_polls">โหวต</string>
+    <string name="overview_add_guest">+ เพิ่มสมาชิกไม่มีบัญชี</string>
+    <string name="overview_guest_name">ชื่อสมาชิก</string>
+    <string name="overview_add_guest_confirm">เพิ่ม</string>
+    <string name="overview_guest_cancel">ยกเลิก</string>
+    <string name="overview_guest_added">เพิ่มสมาชิกแล้ว</string>
+    <string name="overview_guest_tag">(guest)</string>
 </resources>
