@@ -59,7 +59,11 @@ service cloud.firestore {
     }
 
     match /trips/{tripId} {
-      allow read: if isMember(tripId);
+      // List queries can only be proven from resource.data + the query's own
+      // constraints — isMember()'s get() of the same doc breaks them with
+      // PERMISSION_DENIED. The client query filters memberIds array-contains uid,
+      // which satisfies this rule.
+      allow read: if signedIn() && uid() in resource.data.memberIds;
       allow create: if signedIn()
         && request.resource.data.ownerId == uid()
         && uid() in request.resource.data.memberIds;
