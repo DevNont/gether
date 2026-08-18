@@ -9,6 +9,7 @@ import com.triptogether.core.domain.model.ExpenseCategory
 import com.triptogether.core.domain.model.Share
 import com.triptogether.core.domain.model.SplitMode
 import com.triptogether.core.domain.money.ExpenseSplitter
+import com.triptogether.core.domain.repository.AnalyticsLogger
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.ExpenseRepository
 import com.triptogether.core.domain.repository.TripRepository
@@ -37,6 +38,7 @@ class ExpenseEditorViewModel
         private val expenseRepository: ExpenseRepository,
         private val tripRepository: TripRepository,
         private val authRepository: AuthRepository,
+        private val analytics: AnalyticsLogger,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
         private val route = savedStateHandle.toRoute<ExpenseEditorRoute>()
@@ -221,7 +223,13 @@ class ExpenseEditorViewModel
                         createdBy = existing?.createdBy ?: myMemberId.orEmpty(),
                     )
                 expenseRepository.upsert(route.tripId, expense)
-                    .onSuccess { _events.send(ExpenseEditorEvent.Saved) }
+                    .onSuccess {
+                        analytics.log(
+                            AnalyticsLogger.EXPENSE_SAVED,
+                            mapOf("split_mode" to expense.splitMode.name),
+                        )
+                        _events.send(ExpenseEditorEvent.Saved)
+                    }
                     .onFailure { _events.send(ExpenseEditorEvent.Error(R.string.expense_editor_error)) }
                 _uiState.update { it.copy(isSaving = false) }
             }

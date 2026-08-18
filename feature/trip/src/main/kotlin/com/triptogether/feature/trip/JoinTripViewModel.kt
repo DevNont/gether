@@ -3,6 +3,7 @@ package com.triptogether.feature.trip
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.model.INVITE_CODE_LENGTH
+import com.triptogether.core.domain.repository.AnalyticsLogger
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ class JoinTripViewModel
     constructor(
         private val tripRepository: TripRepository,
         private val authRepository: AuthRepository,
+        private val analytics: AnalyticsLogger,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(JoinTripUiState())
         val uiState: StateFlow<JoinTripUiState> = _uiState.asStateFlow()
@@ -64,7 +66,10 @@ class JoinTripViewModel
                 _uiState.update { it.copy(isJoining = true) }
                 val userId = authRepository.observeAuthState().filterNotNull().first().id
                 tripRepository.joinByCode(state.code, userId)
-                    .onSuccess { tripId -> _events.send(JoinTripEvent.Joined(tripId)) }
+                    .onSuccess { tripId ->
+                        analytics.log(AnalyticsLogger.TRIP_JOINED)
+                        _events.send(JoinTripEvent.Joined(tripId))
+                    }
                     .onFailure { _events.send(JoinTripEvent.Error(R.string.join_trip_error)) }
                 _uiState.update { it.copy(isJoining = false) }
             }

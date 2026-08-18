@@ -3,6 +3,7 @@ package com.triptogether.feature.trip
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.model.TripDraft
+import com.triptogether.core.domain.repository.AnalyticsLogger
 import com.triptogether.core.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -21,6 +22,7 @@ class CreateTripViewModel
     @Inject
     constructor(
         private val tripRepository: TripRepository,
+        private val analytics: AnalyticsLogger,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(CreateTripUiState())
         val uiState: StateFlow<CreateTripUiState> = _uiState.asStateFlow()
@@ -49,7 +51,10 @@ class CreateTripViewModel
                 tripRepository.createTrip(
                     TripDraft(name = state.name.trim(), startDate = start, endDate = end),
                 )
-                    .onSuccess { tripId -> _events.send(CreateTripEvent.Created(tripId)) }
+                    .onSuccess { tripId ->
+                        analytics.log(AnalyticsLogger.TRIP_CREATED)
+                        _events.send(CreateTripEvent.Created(tripId))
+                    }
                     .onFailure { _events.send(CreateTripEvent.Error(R.string.create_trip_error)) }
                 _uiState.update { it.copy(isSaving = false) }
             }

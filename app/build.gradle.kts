@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.services)
-    // crashlytics applied in M7.6
+    alias(libs.plugins.crashlytics)
 }
 
 android {
@@ -63,6 +63,10 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 
     debugImplementation(libs.compose.ui.tooling)
 }

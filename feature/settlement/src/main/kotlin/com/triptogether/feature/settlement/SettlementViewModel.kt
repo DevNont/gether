@@ -9,6 +9,7 @@ import com.triptogether.core.domain.model.Money
 import com.triptogether.core.domain.model.Settlement
 import com.triptogether.core.domain.model.SettlementStatus
 import com.triptogether.core.domain.model.Transfer
+import com.triptogether.core.domain.repository.AnalyticsLogger
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.ExpenseRepository
 import com.triptogether.core.domain.repository.SettlementRepository
@@ -37,6 +38,7 @@ class SettlementViewModel
         tripRepository: TripRepository,
         expenseRepository: ExpenseRepository,
         authRepository: AuthRepository,
+        private val analytics: AnalyticsLogger,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
         private val route = savedStateHandle.toRoute<SettlementRoute>()
@@ -107,7 +109,10 @@ class SettlementViewModel
             val me = uiState.value.myMemberId ?: return
             viewModelScope.launch {
                 settlementRepository.confirm(route.tripId, settlementId, me)
-                    .onSuccess { _events.send(SettlementEvent.Message(R.string.settlement_confirmed)) }
+                    .onSuccess {
+                        analytics.log(AnalyticsLogger.SETTLEMENT_CONFIRMED)
+                        _events.send(SettlementEvent.Message(R.string.settlement_confirmed))
+                    }
                     .onFailure { _events.send(SettlementEvent.Message(R.string.settlement_error)) }
             }
         }

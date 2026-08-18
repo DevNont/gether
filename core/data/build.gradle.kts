@@ -29,6 +29,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
+    implementation(libs.firebase.analytics)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.kotlinx.datetime)
