@@ -33,10 +33,14 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,8 +70,20 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is SettingsEvent.Message ->
+                    snackbarHostState.showSnackbar(context.getString(event.messageResId))
+            }
+        }
+    }
+
     SettingsMenuContent(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onOpenProfile = onOpenProfile,
         onOpenPromptpay = onOpenPromptpay,
         onOpenLanguage = onOpenLanguage,
@@ -83,6 +99,7 @@ fun SettingsScreen(
 @Composable
 private fun SettingsMenuContent(
     uiState: SettingsUiState,
+    snackbarHostState: SnackbarHostState,
     onOpenProfile: () -> Unit,
     onOpenPromptpay: () -> Unit,
     onOpenLanguage: () -> Unit,
@@ -94,6 +111,7 @@ private fun SettingsMenuContent(
 ) {
     Scaffold(
         modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.settings_title)) },
@@ -310,6 +328,7 @@ private fun SettingsMenuContentPreview() {
                     isLoading = false,
                     user = User(id = "u1", displayName = "สมชาย", promptpayId = "0812345678"),
                 ),
+            snackbarHostState = SnackbarHostState(),
             onOpenProfile = {},
             onOpenPromptpay = {},
             onOpenLanguage = {},

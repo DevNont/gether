@@ -3,7 +3,7 @@
 รวมทุกอย่างที่ต้องทำก่อนปล่อยแอปบน Google Play — ยังไม่ได้ลงมือ เก็บไว้เป็น checklist
 สถานะปัจจุบัน: แอปปล่อยเป็น **debug-signed APK บน GitHub Releases** (beta ให้เพื่อน test) เท่านั้น
 
-> หมายเหตุ: ตั้งแต่เปลี่ยนเป็น LINE login (OIDC browser flow) + Anonymous — **SHA-1 ไม่กระทบ login อีกต่อไป** ข้อ SHA-1 ด้านล่างเหลือไว้เผื่อกลับมาใช้ Google/Play Integrity ในอนาคต
+> ⚠️ LINE login (OIDC browser flow) **ยังต้องลงทะเบียน SHA-1** — Firebase เช็ค cert hash (`INVALID_CERT_HASH`) ตอนเริ่ม flow. Play เซ็นใหม่ = SHA-1 ใหม่ ต้องเพิ่มใน Firebase ทั้ง upload key และ app signing key (ดู `docs/09`)
 
 ---
 
