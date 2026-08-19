@@ -1,5 +1,6 @@
 package com.triptogether.core.ui.theme
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -8,8 +9,11 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 // Fallback palette for Android 11 and below (dynamic color needs 12+). Teal travel tone.
 private val LightColors =
@@ -53,6 +57,17 @@ fun TripTogetherTheme(
             darkTheme -> DarkColors
             else -> LightColors
         }
+    // Flip the system bar icons to match the theme; without this they stay light and
+    // vanish against the light-mode status bar (the app is not edge-to-edge).
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            val controller = WindowCompat.getInsetsController(window, view)
+            controller.isAppearanceLightStatusBars = !darkTheme
+            controller.isAppearanceLightNavigationBars = !darkTheme
+        }
+    }
     MaterialTheme(
         colorScheme = colorScheme,
         content = content,
