@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -7,12 +9,22 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+// Google Maps Places API key. Read from the MAPS_API_KEY env var (CI) or local.properties (dev);
+// empty when unset, in which case the place field falls back to a plain Google Maps search intent.
+val mapsApiKey: String =
+    System.getenv("MAPS_API_KEY")
+        ?: rootProject.file("local.properties").takeIf { it.exists() }?.let {
+            Properties().apply { it.inputStream().use(::load) }.getProperty("MAPS_API_KEY")
+        }
+        ?: ""
+
 android {
     namespace = "com.triptogether.feature.plan"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 26
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
     }
 
     compileOptions {
@@ -26,6 +38,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -45,6 +58,8 @@ dependencies {
 
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.places)
 
     debugImplementation(libs.compose.ui.tooling)
 }

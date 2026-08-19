@@ -64,6 +64,8 @@ class ActivityEditorViewModel
                             startTime = activity.startTime,
                             endTime = activity.endTime,
                             placeName = activity.placeName.orEmpty(),
+                            lat = activity.lat,
+                            lng = activity.lng,
                             note = activity.note.orEmpty(),
                             isExisting = true,
                             isLoading = false,
@@ -77,7 +79,15 @@ class ActivityEditorViewModel
 
         fun onTypeChange(value: ActivityType) = _uiState.update { it.copy(type = value) }
 
-        fun onPlaceChange(value: String) = _uiState.update { it.copy(placeName = value) }
+        // Typing clears any prior coordinates; only a Places pick sets them.
+        fun onPlaceChange(value: String) = _uiState.update { it.copy(placeName = value, lat = null, lng = null) }
+
+        /** A place chosen from the Places Autocomplete picker — carries precise coordinates. */
+        fun onPlaceSelected(
+            name: String,
+            lat: Double?,
+            lng: Double?,
+        ) = _uiState.update { it.copy(placeName = name, lat = lat, lng = lng) }
 
         fun onNoteChange(value: String) = _uiState.update { it.copy(note = value) }
 
@@ -98,9 +108,8 @@ class ActivityEditorViewModel
                         startTime = state.startTime,
                         endTime = state.endTime,
                         placeName = state.placeName.trim().ifBlank { null },
-                        // Preserve coordinates from an existing activity; the editor doesn't capture them.
-                        lat = existing?.lat,
-                        lng = existing?.lng,
+                        lat = state.lat,
+                        lng = state.lng,
                         note = state.note.trim().ifBlank { null },
                         attachments = existing?.attachments ?: emptyList(),
                         sortOrder = existing?.sortOrder ?: nextSortOrder(),

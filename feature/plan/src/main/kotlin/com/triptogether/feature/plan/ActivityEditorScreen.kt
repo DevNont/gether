@@ -1,8 +1,11 @@
 package com.triptogether.feature.plan
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,6 +49,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.triptogether.core.domain.model.ActivityType
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.LocalTime
@@ -78,6 +85,7 @@ fun ActivityEditorScreen(
         onTitleChange = viewModel::onTitleChange,
         onTypeChange = viewModel::onTypeChange,
         onPlaceChange = viewModel::onPlaceChange,
+        onPlaceSelected = viewModel::onPlaceSelected,
         onNoteChange = viewModel::onNoteChange,
         onStartTimeChange = viewModel::onStartTimeChange,
         onEndTimeChange = viewModel::onEndTimeChange,
@@ -96,6 +104,7 @@ private fun ActivityEditorContent(
     onTitleChange: (String) -> Unit,
     onTypeChange: (ActivityType) -> Unit,
     onPlaceChange: (String) -> Unit,
+    onPlaceSelected: (String, Double?, Double?) -> Unit,
     onNoteChange: (String) -> Unit,
     onStartTimeChange: (LocalTime?) -> Unit,
     onEndTimeChange: (LocalTime?) -> Unit,
@@ -105,6 +114,17 @@ private fun ActivityEditorContent(
     modifier: Modifier = Modifier,
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val placesKey = BuildConfig.MAPS_API_KEY
+    val autocompleteLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let { data ->
+                    val place = Autocomplete.getPlaceFromIntent(data)
+                    onPlaceSelected(place.name.orEmpty(), place.latLng?.latitude, place.latLng?.longitude)
+                }
+            }
+        }
 
     Scaffold(
         modifier = modifier,
@@ -172,7 +192,6 @@ private fun ActivityEditorContent(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            val context = LocalContext.current
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
@@ -185,8 +204,22 @@ private fun ActivityEditorContent(
                     modifier = Modifier.weight(1f),
                 )
                 IconButton(
-                    onClick = { searchPlaceInMaps(context, uiState.placeName) },
-                    enabled = uiState.placeName.isNotBlank(),
+                    onClick = {
+                        if (placesKey.isBlank()) {
+                            // No Places key configured — fall back to a plain Google Maps search.
+                            searchPlaceInMaps(context, uiState.placeName)
+                        } else {
+                            if (!Places.isInitialized()) {
+                                Places.initialize(context.applicationContext, placesKey)
+                            }
+                            val fields =
+                                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
+                            autocompleteLauncher.launch(
+                                Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(context),
+                            )
+                        }
+                    },
+                    enabled = placesKey.isNotBlank() || uiState.placeName.isNotBlank(),
                 ) {
                     Icon(
                         imageVector = Icons.Default.TravelExplore,
@@ -357,6 +390,7 @@ private fun ActivityEditorContentPreview() {
             onTitleChange = {},
             onTypeChange = {},
             onPlaceChange = {},
+            onPlaceSelected = { _, _, _ -> },
             onNoteChange = {},
             onStartTimeChange = {},
             onEndTimeChange = {},

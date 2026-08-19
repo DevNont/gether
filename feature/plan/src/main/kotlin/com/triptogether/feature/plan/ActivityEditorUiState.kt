@@ -10,6 +10,9 @@ data class ActivityEditorUiState(
     val startTime: LocalTime? = null,
     val endTime: LocalTime? = null,
     val placeName: String = "",
+    /** Coordinates from a Places pick; null when the place was only typed. */
+    val lat: Double? = null,
+    val lng: Double? = null,
     val note: String = "",
     val isExisting: Boolean = false,
     val isSaving: Boolean = false,

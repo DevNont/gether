@@ -40,6 +40,10 @@ jobs:
           echo "SIGNING_KEYSTORE=$RUNNER_TEMP/signing.keystore" >> "$GITHUB_ENV"
 
       - name: Assemble release
+        env:
+          # Optional — enables in-app Places Autocomplete when the secret is set; empty falls back
+          # to a plain Google Maps search intent.
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: ./gradlew assembleRelease
 
       # Guard against a mis-signed APK: sign-in only works with the registered SHA-1.
