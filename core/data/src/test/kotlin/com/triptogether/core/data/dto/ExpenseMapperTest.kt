@@ -7,6 +7,7 @@ import com.triptogether.core.domain.model.Share
 import com.triptogether.core.domain.model.SplitMode
 import kotlinx.datetime.LocalDate
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -38,7 +39,7 @@ class ExpenseMapperTest {
         assertEquals(185_000L, dto.totalAmount)
         assertEquals(100_000L, dto.shares[0].amount)
 
-        val back = dto.toDomain("e1")
+        val back = checkNotNull(dto.toDomain("e1"))
         assertEquals(expense, back)
         assertTrue(back.isBalanced)
     }
@@ -50,11 +51,11 @@ class ExpenseMapperTest {
         assertEquals("stay", ExpenseCategory.STAY.toWireName())
         assertEquals(
             ExpenseCategory.TRANSPORT,
-            ExpenseDto(category = "transport", date = "2026-01-01").toDomain(id = "x").category,
+            checkNotNull(ExpenseDto(category = "transport", date = "2026-01-01").toDomain(id = "x")).category,
         )
         assertEquals(
             ExpenseCategory.OTHER,
-            ExpenseDto(category = "???", date = "2026-01-01").toDomain(id = "x").category,
+            checkNotNull(ExpenseDto(category = "???", date = "2026-01-01").toDomain(id = "x")).category,
         )
     }
 
@@ -63,7 +64,7 @@ class ExpenseMapperTest {
     fun splitModeMapping() {
         assertEquals(
             SplitMode.EQUAL,
-            ExpenseDto(splitMode = "junk", date = "2026-01-01").toDomain("x").splitMode,
+            checkNotNull(ExpenseDto(splitMode = "junk", date = "2026-01-01").toDomain("x")).splitMode,
         )
 
         val weighted =
@@ -75,7 +76,7 @@ class ExpenseMapperTest {
                         Share(memberId = "m2", amount = Money(61_600), weight = 1),
                     ),
             )
-        val back = weighted.toDto().toDomain("e1")
+        val back = checkNotNull(weighted.toDto().toDomain("e1"))
         assertEquals(2, back.shares[0].weight)
         assertEquals(SplitMode.SHARES, back.splitMode)
     }
@@ -87,6 +88,13 @@ class ExpenseMapperTest {
             expense.toDto().copy(
                 shares = listOf(ShareDto(memberId = "m1", amount = 1)),
             )
-        assertEquals(false, unbalanced.toDomain("e1").isBalanced)
+        assertEquals(false, checkNotNull(unbalanced.toDomain("e1")).isBalanced)
+    }
+
+    @Test
+    @DisplayName("Corrupt date string maps to null instead of throwing")
+    fun corruptDateMapsToNull() {
+        assertNull(ExpenseDto(date = "").toDomain("x"))
+        assertNull(ExpenseDto(date = "not-a-date").toDomain("x"))
     }
 }

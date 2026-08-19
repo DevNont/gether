@@ -54,7 +54,13 @@ class ExpenseEditorViewModel
         private var myMemberId: String? = null
 
         init {
-            viewModelScope.launch { load() }
+            viewModelScope.launch {
+                // A failed listener (e.g. PERMISSION_DENIED) must not crash the scope or spin forever.
+                runCatching { load() }.onFailure {
+                    _uiState.update { state -> state.copy(isLoading = false) }
+                    _events.send(ExpenseEditorEvent.Error(R.string.expense_editor_error))
+                }
+            }
         }
 
         private suspend fun load() {

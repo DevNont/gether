@@ -19,6 +19,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -80,6 +81,10 @@ class ExpenseDetailViewModel
                     canEdit = canEdit,
                     myMemberId = myMember?.id,
                 )
+            }.catch {
+                // A failed listener (e.g. PERMISSION_DENIED) must surface, not spin forever.
+                _events.send(ExpenseDetailEvent.Error(R.string.expense_editor_error))
+                emit(ExpenseDetailUiState(isLoading = false))
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),

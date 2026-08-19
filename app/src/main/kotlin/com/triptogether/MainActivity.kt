@@ -44,8 +44,12 @@ class MainActivity : AppCompatActivity(), AuthUiHost {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pendingInviteCode = intent?.extractInviteCode()
-        pendingTripId = intent?.getStringExtra(Notifications.EXTRA_TRIP_ID)
+        // Only on a fresh launch — after a config change the same intent comes back
+        // and would replay the deep link / notification navigation on every rotation.
+        if (savedInstanceState == null) {
+            pendingInviteCode = intent?.extractInviteCode()
+            pendingTripId = intent?.getStringExtra(Notifications.EXTRA_TRIP_ID)
+        }
         setContent {
             TripTogetherTheme {
                 val authState by viewModel.authState.collectAsStateWithLifecycle()
@@ -73,6 +77,7 @@ class MainActivity : AppCompatActivity(), AuthUiHost {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         intent.extractInviteCode()?.let { pendingInviteCode = it }
         intent.getStringExtra(Notifications.EXTRA_TRIP_ID)?.let { pendingTripId = it }
     }

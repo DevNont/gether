@@ -32,14 +32,16 @@ data class ShareDto(
     val weight: Int? = null,
 )
 
-fun ExpenseDto.toDomain(id: String): Expense =
-    Expense(
+/** Returns null when the stored date is corrupt — a bad doc must be skipped, not crash a listener. */
+fun ExpenseDto.toDomain(id: String): Expense? {
+    val parsedDate = runCatching { LocalDate.parse(this.date) }.getOrNull() ?: return null
+    return Expense(
         id = id,
         title = title,
         category = category.toCategory(),
         totalAmount = Money(totalAmount),
         paidByMemberId = paidByMemberId,
-        date = LocalDate.parse(date),
+        date = parsedDate,
         time = time?.let { runCatching { LocalTime.parse(it) }.getOrNull() },
         splitMode = runCatching { SplitMode.valueOf(splitMode) }.getOrDefault(SplitMode.EQUAL),
         shares = shares.map { Share(memberId = it.memberId, amount = Money(it.amount), weight = it.weight) },
@@ -47,6 +49,7 @@ fun ExpenseDto.toDomain(id: String): Expense =
         note = note,
         createdBy = createdBy,
     )
+}
 
 fun Expense.toDto(): ExpenseDto =
     ExpenseDto(

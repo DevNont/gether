@@ -22,6 +22,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -78,6 +79,10 @@ class SettlementViewModel
                     perPersonAverage =
                         if (members.isEmpty()) Money.ZERO else Money(tripTotal.satang / members.size),
                 )
+            }.catch {
+                // A failed listener (e.g. PERMISSION_DENIED) must surface, not render as an empty screen.
+                _events.send(SettlementEvent.Message(R.string.settlement_error))
+                emit(SettlementUiState(isLoading = false))
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),

@@ -24,7 +24,7 @@ class MapperTest {
                 archived = false,
             )
 
-        val trip = dto.toDomain("trip-1")
+        val trip = checkNotNull(dto.toDomain("trip-1"))
 
         assertEquals("trip-1", trip.id)
         assertEquals(LocalDate(2026, 12, 5), trip.startDate)
@@ -32,6 +32,13 @@ class MapperTest {
         assertEquals(3, trip.dayCount)
         assertEquals("AB23CD", trip.inviteCode)
         assertEquals("uid-1", trip.ownerId)
+    }
+
+    @Test
+    @DisplayName("TripDto with corrupt dates maps to null instead of throwing")
+    fun tripDtoCorruptDates() {
+        assertNull(TripDto(startDate = "", endDate = "2026-12-07").toDomain("trip-1"))
+        assertNull(TripDto(startDate = "2026-12-05", endDate = "junk").toDomain("trip-1"))
     }
 
     @Test

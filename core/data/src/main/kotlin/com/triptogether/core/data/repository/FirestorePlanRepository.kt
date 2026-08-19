@@ -5,11 +5,13 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.triptogether.core.data.awaitWrite
 import com.triptogether.core.data.dto.ActivityDto
 import com.triptogether.core.data.dto.toDomain
 import com.triptogether.core.data.dto.toDto
 import com.triptogether.core.domain.model.Activity
 import com.triptogether.core.domain.model.DayPlan
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.PlanRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +28,7 @@ class FirestorePlanRepository
     constructor(
         private val firestore: FirebaseFirestore,
         private val storage: FirebaseStorage,
+        private val networkMonitor: NetworkMonitor,
     ) : PlanRepository {
         /** Day metadata only (date + note); activities stream per day via [observeDayPlan]. */
         override fun observeDayPlans(tripId: String): Flow<List<DayPlan>> =
@@ -33,7 +36,11 @@ class FirestorePlanRepository
                 val registration =
                     daysRef(tripId)
                         .orderBy(FieldPath.documentId())
-                        .addSnapshotListener { snapshot, _ ->
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
                             trySend(snapshot?.documents?.mapNotNull { it.toDayPlanShell() } ?: emptyList())
                         }
                 awaitClose { registration.remove() }
@@ -53,7 +60,7 @@ class FirestorePlanRepository
             note: String?,
         ): Result<Unit> =
             runCatching {
-                daysRef(tripId).document(dayId).update("note", note).await()
+                daysRef(tripId).document(dayId).update("note", note).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -65,7 +72,7 @@ class FirestorePlanRepository
             runCatching {
                 val activities = daysRef(tripId).document(dayId).collection(ACTIVITIES)
                 val ref = if (activity.id.isBlank()) activities.document() else activities.document(activity.id)
-                ref.set(activity.toDto()).await()
+                ref.set(activity.toDto()).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -75,7 +82,8 @@ class FirestorePlanRepository
             activityId: String,
         ): Result<Unit> =
             runCatching {
-                daysRef(tripId).document(dayId).collection(ACTIVITIES).document(activityId).delete().await()
+                daysRef(tripId).document(dayId).collection(ACTIVITIES).document(activityId).delete()
+                    .awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -101,7 +109,11 @@ class FirestorePlanRepository
         ): Flow<DayPlan?> =
             callbackFlow {
                 val registration =
-                    daysRef(tripId).document(dayId).addSnapshotListener { snapshot, _ ->
+                    daysRef(tripId).document(dayId).addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            close(error)
+                            return@addSnapshotListener
+                        }
                         trySend(snapshot?.toDayPlanShell())
                     }
                 awaitClose { registration.remove() }
@@ -115,7 +127,11 @@ class FirestorePlanRepository
                 val registration =
                     daysRef(tripId).document(dayId).collection(ACTIVITIES)
                         .orderBy(FIELD_SORT_ORDER)
-                        .addSnapshotListener { snapshot, _ ->
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
                             trySend(
                                 snapshot?.documents?.mapNotNull { doc ->
                                     doc.toObject(ActivityDto::class.java)?.toDomain(doc.id)
@@ -135,9 +151,11 @@ class FirestorePlanRepository
 
 private fun DocumentSnapshot.toDayPlanShell(): DayPlan? {
     if (!exists()) return null
+    // Defensive: a corrupt date string must skip the doc, not crash the listener.
+    val date = runCatching { LocalDate.parse(getString("date") ?: id) }.getOrNull() ?: return null
     return DayPlan(
         id = id,
-        date = LocalDate.parse(getString("date") ?: id),
+        date = date,
         note = getString("note"),
     )
 }

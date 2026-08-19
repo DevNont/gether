@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.triptogether.core.domain.model.Meetup
 import com.triptogether.core.domain.repository.AuthRepository
+import com.triptogether.core.domain.repository.MeetupReminderScheduler
 import com.triptogether.core.domain.repository.MeetupRepository
 import com.triptogether.feature.extras.navigation.MeetupEditorRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,6 +55,7 @@ class MeetupEditorViewModel
     constructor(
         private val meetupRepository: MeetupRepository,
         private val authRepository: AuthRepository,
+        private val reminderScheduler: MeetupReminderScheduler,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
         private val route = savedStateHandle.toRoute<MeetupEditorRoute>()
@@ -73,7 +75,10 @@ class MeetupEditorViewModel
         private fun load(meetupId: String) {
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
-                val meetup = meetupRepository.observeMeetups(route.tripId).first().firstOrNull { it.id == meetupId }
+                // A failed listener (e.g. PERMISSION_DENIED) must not crash the scope or spin forever.
+                val meetup =
+                    runCatching { meetupRepository.observeMeetups(route.tripId).first() }
+                        .getOrNull()?.firstOrNull { it.id == meetupId }
                 existing = meetup
                 _uiState.update {
                     if (meetup == null) {
@@ -136,7 +141,11 @@ class MeetupEditorViewModel
             val id = existing?.id ?: return
             viewModelScope.launch {
                 meetupRepository.delete(route.tripId, id)
-                    .onSuccess { _events.send(MeetupEditorEvent.Deleted) }
+                    .onSuccess {
+                        // The alarm must die with the meetup, or a ghost reminder fires.
+                        reminderScheduler.cancel(id)
+                        _events.send(MeetupEditorEvent.Deleted)
+                    }
                     .onFailure { _events.send(MeetupEditorEvent.Error(R.string.meetup_error)) }
             }
         }

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -21,30 +23,38 @@ android {
         versionName = "0.1.5"
     }
 
+    // Dedicated release keystore. Credentials come from env vars (CI) or
+    // local.properties (dev machine) — never from the repo. LINE login uses a
+    // browser OIDC flow, so the signing SHA-1 no longer affects sign-in.
+    val localProps = Properties()
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { localProps.load(it) }
+
+    fun releaseProp(name: String): String? = System.getenv(name) ?: localProps.getProperty(name)
+
     signingConfigs {
-        // CI signs with the exact keystore whose SHA-1 is registered in Firebase, restored to a
-        // known path via the SIGNING_KEYSTORE env var. Relying on AGP's default debug-keystore
-        // location failed on the runner (it generated a fresh random key), breaking sign-in.
-        create("ci") {
-            System.getenv("SIGNING_KEYSTORE")?.let { path ->
+        create("release") {
+            releaseProp("RELEASE_STORE_FILE")?.let { path ->
                 storeFile = file(path)
-                storePassword = "android"
-                keyAlias = "androiddebugkey"
-                keyPassword = "android"
+                storePassword = releaseProp("RELEASE_STORE_PASSWORD")
+                keyAlias = releaseProp("RELEASE_KEY_ALIAS")
+                keyPassword = releaseProp("RELEASE_KEY_PASSWORD")
             }
         }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            // Beta APK signed with the debug key (SHA-1 registered in Firebase) so Google/LINE
-            // sign-in works for testers. On CI use the explicit restored keystore; locally fall
-            // back to the machine debug keystore. Swap to a real release key before Play Store.
+            // R8 on, with keep rules for the reflection-mapped Firestore DTOs.
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             signingConfig =
-                if (System.getenv("SIGNING_KEYSTORE") != null) {
-                    signingConfigs.getByName("ci")
+                if (releaseProp("RELEASE_STORE_FILE") != null) {
+                    signingConfigs.getByName("release")
                 } else {
+                    // No keystore configured (e.g. a fresh checkout): debug-signed build.
                     signingConfigs.getByName("debug")
                 }
         }

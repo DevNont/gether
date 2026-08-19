@@ -50,8 +50,10 @@ class ActivityEditorViewModel
 
         private fun loadExisting(activityId: String) {
             viewModelScope.launch {
+                // A failed listener (e.g. PERMISSION_DENIED) must not crash the scope or spin forever.
                 val activity =
-                    planRepository.observeDayPlan(route.tripId, route.dayId).first()
+                    runCatching { planRepository.observeDayPlan(route.tripId, route.dayId).first() }
+                        .getOrNull()
                         ?.activities?.firstOrNull { it.id == activityId }
                 existing = activity
                 _uiState.update {
@@ -100,21 +102,28 @@ class ActivityEditorViewModel
             if (!state.canSave) return
             viewModelScope.launch {
                 _uiState.update { it.copy(isSaving = true) }
+                // nextSortOrder/currentMemberId collect Firestore flows that fail when a listener errors.
                 val activity =
-                    Activity(
-                        id = existing?.id ?: "",
-                        title = state.title.trim(),
-                        type = state.type,
-                        startTime = state.startTime,
-                        endTime = state.endTime,
-                        placeName = state.placeName.trim().ifBlank { null },
-                        lat = state.lat,
-                        lng = state.lng,
-                        note = state.note.trim().ifBlank { null },
-                        attachments = existing?.attachments ?: emptyList(),
-                        sortOrder = existing?.sortOrder ?: nextSortOrder(),
-                        createdBy = existing?.createdBy ?: currentMemberId(),
-                    )
+                    runCatching {
+                        Activity(
+                            id = existing?.id ?: "",
+                            title = state.title.trim(),
+                            type = state.type,
+                            startTime = state.startTime,
+                            endTime = state.endTime,
+                            placeName = state.placeName.trim().ifBlank { null },
+                            lat = state.lat,
+                            lng = state.lng,
+                            note = state.note.trim().ifBlank { null },
+                            attachments = existing?.attachments ?: emptyList(),
+                            sortOrder = existing?.sortOrder ?: nextSortOrder(),
+                            createdBy = existing?.createdBy ?: currentMemberId(),
+                        )
+                    }.getOrElse {
+                        _events.send(ActivityEditorEvent.Error(R.string.activity_editor_error))
+                        _uiState.update { state -> state.copy(isSaving = false) }
+                        return@launch
+                    }
                 planRepository.upsertActivity(route.tripId, route.dayId, activity)
                     .onSuccess { _events.send(ActivityEditorEvent.Saved) }
                     .onFailure { _events.send(ActivityEditorEvent.Error(R.string.activity_editor_error)) }

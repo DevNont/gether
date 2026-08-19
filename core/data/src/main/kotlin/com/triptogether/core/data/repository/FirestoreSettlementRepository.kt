@@ -4,11 +4,13 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.triptogether.core.data.awaitWrite
 import com.triptogether.core.data.dto.SettlementDto
 import com.triptogether.core.data.dto.toDomain
 import com.triptogether.core.data.dto.toDto
 import com.triptogether.core.domain.model.Settlement
 import com.triptogether.core.domain.model.SettlementStatus
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.SettlementRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -24,11 +26,16 @@ class FirestoreSettlementRepository
     constructor(
         private val firestore: FirebaseFirestore,
         private val storage: FirebaseStorage,
+        private val networkMonitor: NetworkMonitor,
     ) : SettlementRepository {
         override fun observeSettlements(tripId: String): Flow<List<Settlement>> =
             callbackFlow {
                 val registration =
-                    settlementsRef(tripId).addSnapshotListener { snapshot, _ ->
+                    settlementsRef(tripId).addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            close(error)
+                            return@addSnapshotListener
+                        }
                         trySend(
                             snapshot?.documents?.mapNotNull { doc ->
                                 doc.toObject(SettlementDto::class.java)?.toDomain(doc.id)
@@ -46,8 +53,8 @@ class FirestoreSettlementRepository
                 val ref = settlementsRef(tripId).document()
                 ref.set(
                     settlement.toDto().copy(status = SettlementStatus.PENDING.name),
-                ).await()
-                ref.update("createdAt", FieldValue.serverTimestamp()).await()
+                ).awaitWrite(networkMonitor)
+                ref.update("createdAt", FieldValue.serverTimestamp()).awaitWrite(networkMonitor)
                 ref.id
             }
 
@@ -63,7 +70,7 @@ class FirestoreSettlementRepository
                         "confirmedBy" to confirmedByMemberId,
                         "confirmedAt" to FieldValue.serverTimestamp(),
                     ),
-                ).await()
+                ).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -72,7 +79,7 @@ class FirestoreSettlementRepository
             settlementId: String,
         ): Result<Unit> =
             runCatching {
-                settlementsRef(tripId).document(settlementId).delete().await()
+                settlementsRef(tripId).document(settlementId).delete().awaitWrite(networkMonitor)
                 Unit
             }
 

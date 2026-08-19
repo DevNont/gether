@@ -25,6 +25,8 @@ class AndroidMeetupReminderScheduler
         @ApplicationContext private val context: Context,
     ) : MeetupReminderScheduler {
         private val alarmManager = context.getSystemService(AlarmManager::class.java)
+        private val scheduledStore =
+            context.getSharedPreferences("meetup_alarms", Context.MODE_PRIVATE)
 
         override fun scheduleAll(
             tripId: String,
@@ -32,6 +34,14 @@ class AndroidMeetupReminderScheduler
             meetups: List<Meetup>,
         ) {
             val now = System.currentTimeMillis()
+            // Take ownership of the whole set for this trip: cancel alarms whose
+            // meetup was deleted elsewhere or has moved into the past.
+            val storeKey = "trip_$tripId"
+            val previous = scheduledStore.getStringSet(storeKey, emptySet()).orEmpty()
+            val active =
+                meetups.filter { triggerAtMillis(it) > now }.map { it.id }.toSet()
+            (previous - active).forEach(::cancel)
+            scheduledStore.edit().putStringSet(storeKey, active).apply()
             meetups.forEach { meetup ->
                 val triggerAt = triggerAtMillis(meetup)
                 if (triggerAt <= now) return@forEach

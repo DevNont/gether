@@ -55,32 +55,37 @@ class CreateTripViewModel
 
         init {
             viewModelScope.launch {
-                route.tripId?.let { tripId ->
-                    val trip = tripRepository.observeTrip(tripId).filterNotNull().first()
-                    existing = trip
+                // A failed listener (e.g. PERMISSION_DENIED) must not crash the scope or spin forever.
+                runCatching {
+                    route.tripId?.let { tripId ->
+                        val trip = tripRepository.observeTrip(tripId).filterNotNull().first()
+                        existing = trip
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isExisting = true,
+                                name = trip.name,
+                                startDate = trip.startDate,
+                                endDate = trip.endDate,
+                            )
+                        }
+                    }
+                    val userId = authRepository.observeAuthState().filterNotNull().first().id
+                    otherTrips =
+                        tripRepository.observeTrips(userId).first().filter { it.id != route.tripId }
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
-                            isExisting = true,
-                            name = trip.name,
-                            startDate = trip.startDate,
-                            endDate = trip.endDate,
+                            busyDates = otherTrips.flatMap { trip -> datesOf(trip) }.toSet(),
+                            busyRanges =
+                                otherTrips
+                                    .sortedBy { trip -> trip.startDate }
+                                    .map { trip -> BusyRange(trip.name, trip.startDate, trip.endDate) },
                         )
                     }
+                    revalidateDates()
+                }.onFailure {
+                    _uiState.update { state -> state.copy(isLoading = false) }
                 }
-                val userId = authRepository.observeAuthState().filterNotNull().first().id
-                otherTrips =
-                    tripRepository.observeTrips(userId).first().filter { it.id != route.tripId }
-                _uiState.update {
-                    it.copy(
-                        busyDates = otherTrips.flatMap { trip -> datesOf(trip) }.toSet(),
-                        busyRanges =
-                            otherTrips
-                                .sortedBy { trip -> trip.startDate }
-                                .map { trip -> BusyRange(trip.name, trip.startDate, trip.endDate) },
-                    )
-                }
-                revalidateDates()
             }
         }
 

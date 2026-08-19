@@ -31,8 +31,9 @@ fun ActivityDto.toDomain(id: String): Activity =
         id = id,
         title = title,
         type = runCatching { ActivityType.valueOf(type) }.getOrDefault(ActivityType.PLACE),
-        startTime = startTime?.let(LocalTime::parse),
-        endTime = endTime?.let(LocalTime::parse),
+        // Times are optional; a corrupt value degrades to "no time" instead of crashing the listener.
+        startTime = startTime?.let { runCatching { LocalTime.parse(it) }.getOrNull() },
+        endTime = endTime?.let { runCatching { LocalTime.parse(it) }.getOrNull() },
         placeName = placeName,
         lat = lat,
         lng = lng,

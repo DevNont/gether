@@ -2,10 +2,12 @@ package com.triptogether.core.data.repository
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.triptogether.core.data.awaitWrite
 import com.triptogether.core.data.dto.PollDto
 import com.triptogether.core.data.dto.toDomain
 import com.triptogether.core.data.dto.toDto
 import com.triptogether.core.domain.model.Poll
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.PollRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -19,11 +21,16 @@ class FirestorePollRepository
     @Inject
     constructor(
         private val firestore: FirebaseFirestore,
+        private val networkMonitor: NetworkMonitor,
     ) : PollRepository {
         override fun observePolls(tripId: String): Flow<List<Poll>> =
             callbackFlow {
                 val registration =
-                    pollsRef(tripId).addSnapshotListener { snapshot, _ ->
+                    pollsRef(tripId).addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            close(error)
+                            return@addSnapshotListener
+                        }
                         trySend(
                             snapshot?.documents?.mapNotNull { doc ->
                                 doc.toObject(PollDto::class.java)?.toDomain(doc.id)
@@ -39,7 +46,7 @@ class FirestorePollRepository
         ): Result<String> =
             runCatching {
                 val ref = pollsRef(tripId).document()
-                ref.set(poll.toDto()).await()
+                ref.set(poll.toDto()).awaitWrite(networkMonitor)
                 ref.id
             }
 
@@ -81,7 +88,7 @@ class FirestorePollRepository
             pollId: String,
         ): Result<Unit> =
             runCatching {
-                pollsRef(tripId).document(pollId).update("closed", true).await()
+                pollsRef(tripId).document(pollId).update("closed", true).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -90,7 +97,7 @@ class FirestorePollRepository
             pollId: String,
         ): Result<Unit> =
             runCatching {
-                pollsRef(tripId).document(pollId).delete().await()
+                pollsRef(tripId).document(pollId).delete().awaitWrite(networkMonitor)
                 Unit
             }
 

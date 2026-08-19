@@ -3,15 +3,16 @@ package com.triptogether.core.data.repository
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.triptogether.core.data.awaitWrite
 import com.triptogether.core.data.dto.ChecklistItemDto
 import com.triptogether.core.data.dto.toDomain
 import com.triptogether.core.data.dto.toDto
 import com.triptogether.core.domain.model.ChecklistItem
 import com.triptogether.core.domain.repository.ChecklistRepository
+import com.triptogether.core.domain.repository.NetworkMonitor
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,11 +21,16 @@ class FirestoreChecklistRepository
     @Inject
     constructor(
         private val firestore: FirebaseFirestore,
+        private val networkMonitor: NetworkMonitor,
     ) : ChecklistRepository {
         override fun observeItems(tripId: String): Flow<List<ChecklistItem>> =
             callbackFlow {
                 val registration =
-                    itemsRef(tripId).orderBy(FIELD_SORT_ORDER).addSnapshotListener { snapshot, _ ->
+                    itemsRef(tripId).orderBy(FIELD_SORT_ORDER).addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            close(error)
+                            return@addSnapshotListener
+                        }
                         trySend(
                             snapshot?.documents?.mapNotNull { doc ->
                                 doc.toObject(ChecklistItemDto::class.java)?.toDomain(doc.id)
@@ -41,7 +47,7 @@ class FirestoreChecklistRepository
             runCatching {
                 val items = itemsRef(tripId)
                 val ref = if (item.id.isBlank()) items.document() else items.document(item.id)
-                ref.set(item.toDto()).await()
+                ref.set(item.toDto()).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -50,7 +56,7 @@ class FirestoreChecklistRepository
             itemId: String,
         ): Result<Unit> =
             runCatching {
-                itemsRef(tripId).document(itemId).delete().await()
+                itemsRef(tripId).document(itemId).delete().awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -62,7 +68,7 @@ class FirestoreChecklistRepository
         ): Result<Unit> =
             runCatching {
                 val op = if (checked) FieldValue.arrayUnion(memberId) else FieldValue.arrayRemove(memberId)
-                itemsRef(tripId).document(itemId).update("checkedBy", op).await()
+                itemsRef(tripId).document(itemId).update("checkedBy", op).awaitWrite(networkMonitor)
                 Unit
             }
 

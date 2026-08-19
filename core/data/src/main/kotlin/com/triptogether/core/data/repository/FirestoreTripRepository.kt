@@ -1,12 +1,12 @@
 package com.triptogether.core.data.repository
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
+import com.triptogether.core.data.awaitWrite
 import com.triptogether.core.data.dto.MemberDto
 import com.triptogether.core.data.dto.ROLE_MEMBER
 import com.triptogether.core.data.dto.ROLE_OWNER
@@ -18,6 +18,7 @@ import com.triptogether.core.domain.model.InvitePreview
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.domain.model.TripDraft
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.TripRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,7 @@ class FirestoreTripRepository
     constructor(
         private val firestore: FirebaseFirestore,
         private val auth: FirebaseAuth,
+        private val networkMonitor: NetworkMonitor,
     ) : TripRepository {
         override fun observeTrips(userId: String): Flow<List<Trip>> =
             callbackFlow {
@@ -48,7 +50,10 @@ class FirestoreTripRepository
                         .whereEqualTo(FIELD_ARCHIVED, false)
                         .orderBy(FIELD_START_DATE, Query.Direction.DESCENDING)
                         .addSnapshotListener { snapshot, error ->
-                            error?.let { Log.e(TAG, "observeTrips listen failed", it) }
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
                             trySend(snapshot?.documents?.mapNotNull { it.toTrip() } ?: emptyList())
                         }
                 awaitClose { registration.remove() }
@@ -58,7 +63,13 @@ class FirestoreTripRepository
             callbackFlow {
                 val registration =
                     firestore.collection(TRIPS).document(tripId)
-                        .addSnapshotListener { snapshot, _ -> trySend(snapshot?.toTrip()) }
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            trySend(snapshot?.toTrip())
+                        }
                 awaitClose { registration.remove() }
             }
 
@@ -66,7 +77,11 @@ class FirestoreTripRepository
             callbackFlow {
                 val registration =
                     firestore.collection(TRIPS).document(tripId).collection(MEMBERS)
-                        .addSnapshotListener { snapshot, _ ->
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
                             trySend(
                                 snapshot?.documents?.mapNotNull { doc ->
                                     doc.toObject(MemberDto::class.java)?.toDomain(doc.id)
@@ -130,7 +145,7 @@ class FirestoreTripRepository
                         mapOf("date" to date, "note" to null),
                     )
                 }
-                batch.commit().await()
+                batch.commit().awaitWrite(networkMonitor)
                 tripRef.id
             }
 
@@ -153,7 +168,7 @@ class FirestoreTripRepository
                     val batch = firestore.batch()
                     activities.documents.forEach { batch.delete(it.reference) }
                     batch.delete(dayRef)
-                    batch.commit().await()
+                    batch.commit().awaitWrite(networkMonitor)
                 }
 
                 val batch = firestore.batch()
@@ -175,7 +190,7 @@ class FirestoreTripRepository
                         mapOf("date" to date.toString(), "note" to null),
                     )
                 }
-                batch.commit().await()
+                batch.commit().awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -191,20 +206,20 @@ class FirestoreTripRepository
                     val batch = firestore.batch()
                     activities.documents.forEach { batch.delete(it.reference) }
                     batch.delete(day.reference)
-                    batch.commit().await()
+                    batch.commit().awaitWrite(networkMonitor)
                 }
-                for (collection in listOf(MEMBERS, "expenses", "settlements", "checklist", "polls")) {
+                for (collection in listOf(MEMBERS, "expenses", "settlements", "checklist", "polls", "meetups")) {
                     val docs = ref.collection(collection).get().await()
                     if (docs.isEmpty) continue
                     val batch = firestore.batch()
                     docs.documents.forEach { batch.delete(it.reference) }
-                    batch.commit().await()
+                    batch.commit().awaitWrite(networkMonitor)
                 }
                 inviteCode?.let {
-                    firestore.collection(INVITE_CODES).document(it).delete().await()
+                    firestore.collection(INVITE_CODES).document(it).delete().awaitWrite(networkMonitor)
                 }
                 // The trip doc goes last — subcollection rules need it alive to prove membership.
-                ref.delete().await()
+                ref.delete().awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -220,7 +235,7 @@ class FirestoreTripRepository
             runCatching {
                 firestore.collection(TRIPS).document(tripId)
                     .update(FIELD_ARCHIVED, archived, FIELD_UPDATED_AT, FieldValue.serverTimestamp())
-                    .await()
+                    .awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -231,7 +246,7 @@ class FirestoreTripRepository
             runCatching {
                 firestore.collection(TRIPS).document(tripId)
                     .update("note", note, FIELD_UPDATED_AT, FieldValue.serverTimestamp())
-                    .await()
+                    .awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -241,7 +256,7 @@ class FirestoreTripRepository
         ): Result<Unit> =
             runCatching {
                 firestore.collection(INVITE_CODES).document(code.uppercase())
-                    .update("active", active).await()
+                    .update("active", active).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -287,7 +302,7 @@ class FirestoreTripRepository
                     ).withJoinedAt(),
                     SetOptions.merge(),
                 )
-                batch.commit().await()
+                batch.commit().awaitWrite(networkMonitor)
                 tripId
             }
 
@@ -299,7 +314,7 @@ class FirestoreTripRepository
                 val memberRef = firestore.collection(TRIPS).document(tripId).collection(MEMBERS).document()
                 memberRef.set(
                     MemberDto(userId = null, displayName = displayName, role = ROLE_MEMBER).withJoinedAt(),
-                ).await()
+                ).awaitWrite(networkMonitor)
                 memberRef.id
             }
 
@@ -309,7 +324,7 @@ class FirestoreTripRepository
         ): Result<Unit> =
             runCatching {
                 firestore.collection(TRIPS).document(tripId).collection(MEMBERS).document(member.id)
-                    .set(member.toDto(), SetOptions.merge()).await()
+                    .set(member.toDto(), SetOptions.merge()).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -328,7 +343,6 @@ class FirestoreTripRepository
         }
 
         private companion object {
-            const val TAG = "FirestoreTripRepo"
             const val TRIPS = "trips"
             const val MEMBERS = "members"
             const val DAYS = "days"

@@ -17,15 +17,19 @@ data class TripDto(
     val note: String? = null,
 )
 
-fun TripDto.toDomain(id: String): Trip =
-    Trip(
+/** Returns null when the stored dates are corrupt — a bad doc must be skipped, not crash a listener. */
+fun TripDto.toDomain(id: String): Trip? {
+    val start = runCatching { LocalDate.parse(startDate) }.getOrNull() ?: return null
+    val end = runCatching { LocalDate.parse(endDate) }.getOrNull() ?: return null
+    return Trip(
         id = id,
         name = name,
         coverUrl = coverUrl,
-        startDate = LocalDate.parse(startDate),
-        endDate = LocalDate.parse(endDate),
+        startDate = start,
+        endDate = end,
         ownerId = ownerId,
         inviteCode = inviteCode,
         archived = archived,
         note = note,
     )
+}

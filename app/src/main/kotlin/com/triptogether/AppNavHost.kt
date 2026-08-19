@@ -51,14 +51,14 @@ fun AppNavHost(
 
     LaunchedEffect(pendingInviteCode) {
         if (pendingInviteCode != null) {
-            navController.navigate(JoinTripRoute(code = pendingInviteCode))
+            navController.navigate(JoinTripRoute(code = pendingInviteCode)) { launchSingleTop = true }
             onInviteConsumed()
         }
     }
 
     LaunchedEffect(pendingTripId) {
         if (pendingTripId != null) {
-            navController.navigate(TripOverviewRoute(pendingTripId))
+            navController.navigate(TripOverviewRoute(pendingTripId)) { launchSingleTop = true }
             onTripConsumed()
         }
     }

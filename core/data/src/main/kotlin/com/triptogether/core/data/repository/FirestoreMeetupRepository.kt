@@ -3,15 +3,16 @@ package com.triptogether.core.data.repository
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.triptogether.core.data.awaitWrite
 import com.triptogether.core.data.dto.MeetupDto
 import com.triptogether.core.data.dto.toDomain
 import com.triptogether.core.data.dto.toDto
 import com.triptogether.core.domain.model.Meetup
 import com.triptogether.core.domain.repository.MeetupRepository
+import com.triptogether.core.domain.repository.NetworkMonitor
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,6 +21,7 @@ class FirestoreMeetupRepository
     @Inject
     constructor(
         private val firestore: FirebaseFirestore,
+        private val networkMonitor: NetworkMonitor,
     ) : MeetupRepository {
         override fun observeMeetups(tripId: String): Flow<List<Meetup>> =
             callbackFlow {
@@ -28,7 +30,11 @@ class FirestoreMeetupRepository
                     // client-side sort below.
                     meetupsRef(tripId)
                         .orderBy(FIELD_DATE, Query.Direction.ASCENDING)
-                        .addSnapshotListener { snapshot, _ ->
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
                             trySend(
                                 snapshot?.documents
                                     ?.mapNotNull { doc -> doc.toObject(MeetupDto::class.java)?.toDomain(doc.id) }
@@ -46,7 +52,7 @@ class FirestoreMeetupRepository
             runCatching {
                 val meetups = meetupsRef(tripId)
                 val ref = if (meetup.id.isBlank()) meetups.document() else meetups.document(meetup.id)
-                ref.set(meetup.toDto()).await()
+                ref.set(meetup.toDto()).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -55,7 +61,7 @@ class FirestoreMeetupRepository
             meetupId: String,
         ): Result<Unit> =
             runCatching {
-                meetupsRef(tripId).document(meetupId).delete().await()
+                meetupsRef(tripId).document(meetupId).delete().awaitWrite(networkMonitor)
                 Unit
             }
 

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -94,6 +95,10 @@ class SettingsViewModel
                         isSaving = draft.saving,
                         isAnonymous = authUser.isAnonymous,
                     )
+                }.catch {
+                    // A failed profile listener (e.g. PERMISSION_DENIED) must surface, not spin forever.
+                    _events.send(SettingsEvent.Message(R.string.settings_error))
+                    emit(SettingsUiState(isLoading = false))
                 }.stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),

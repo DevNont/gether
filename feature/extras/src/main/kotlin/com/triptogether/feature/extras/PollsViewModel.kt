@@ -17,6 +17,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -70,6 +71,10 @@ class PollsViewModel
                     members = members,
                     myMemberId = members.firstOrNull { it.userId == user?.id }?.id,
                 )
+            }.catch {
+                // A failed listener (e.g. PERMISSION_DENIED) must surface, not render as an empty list.
+                _events.send(PollsEvent.Error(R.string.polls_error))
+                emit(PollsUiState(isLoading = false))
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),

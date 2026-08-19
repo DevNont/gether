@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -68,6 +69,10 @@ class TripListViewModel
                     .flatMapLatest { trips -> withMembers(trips) },
                 deletingIds,
             ) { cards, deleting -> buildState(cards, deleting) }
+                .catch {
+                    // A failed listener (e.g. FAILED_PRECONDITION) must not render as "no trips" forever.
+                    emit(TripListUiState(isLoading = false))
+                }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),

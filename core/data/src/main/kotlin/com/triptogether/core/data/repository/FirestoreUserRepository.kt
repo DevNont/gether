@@ -4,12 +4,13 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.triptogether.core.data.awaitWrite
 import com.triptogether.core.domain.model.User
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.UserRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,11 +19,16 @@ class FirestoreUserRepository
     @Inject
     constructor(
         private val firestore: FirebaseFirestore,
+        private val networkMonitor: NetworkMonitor,
     ) : UserRepository {
         override fun observeUser(userId: String): Flow<User?> =
             callbackFlow {
                 val registration =
-                    firestore.collection(USERS).document(userId).addSnapshotListener { snapshot, _ ->
+                    firestore.collection(USERS).document(userId).addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            close(error)
+                            return@addSnapshotListener
+                        }
                         trySend(snapshot?.takeIf { it.exists() }?.toDomainUser(userId))
                     }
                 awaitClose { registration.remove() }
@@ -37,7 +43,7 @@ class FirestoreUserRepository
                         "promptpayId" to user.promptpayId,
                     ),
                     SetOptions.merge(),
-                ).await()
+                ).awaitWrite(networkMonitor)
                 Unit
             }
 
@@ -47,7 +53,7 @@ class FirestoreUserRepository
         ): Result<Unit> =
             runCatching {
                 firestore.collection(USERS).document(userId)
-                    .update("fcmTokens", FieldValue.arrayUnion(token)).await()
+                    .update("fcmTokens", FieldValue.arrayUnion(token)).awaitWrite(networkMonitor)
                 Unit
             }
 

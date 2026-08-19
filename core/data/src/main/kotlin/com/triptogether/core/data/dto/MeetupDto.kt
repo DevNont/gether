@@ -15,17 +15,21 @@ data class MeetupDto(
     val createdBy: String = "",
 )
 
-fun MeetupDto.toDomain(id: String): Meetup =
-    Meetup(
+/** Returns null when the stored date/time is corrupt — a bad doc must be skipped, not crash a listener. */
+fun MeetupDto.toDomain(id: String): Meetup? {
+    val parsedDate = runCatching { LocalDate.parse(date) }.getOrNull() ?: return null
+    val parsedTime = runCatching { LocalTime.parse(time) }.getOrNull() ?: return null
+    return Meetup(
         id = id,
         title = title,
         place = place,
-        date = LocalDate.parse(date),
-        time = LocalTime.parse(time),
+        date = parsedDate,
+        time = parsedTime,
         reminderMinutesBefore = reminderMinutesBefore,
         note = note,
         createdBy = createdBy,
     )
+}
 
 fun Meetup.toDto(): MeetupDto =
     MeetupDto(

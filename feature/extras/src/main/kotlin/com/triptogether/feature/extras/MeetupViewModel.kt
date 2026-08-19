@@ -12,6 +12,7 @@ import com.triptogether.feature.extras.navigation.MeetupRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -40,6 +41,8 @@ class MeetupViewModel
         val uiState: StateFlow<MeetupUiState> =
             meetupRepository.observeMeetups(route.tripId)
                 .map { MeetupUiState(isLoading = false, meetups = it) }
+                // No event channel on this screen yet — degrade to an empty state instead of crashing.
+                .catch { emit(MeetupUiState(isLoading = false)) }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -53,6 +56,8 @@ class MeetupViewModel
                 tripRepository.observeTrip(route.tripId),
             ) { meetups, trip -> meetups to (trip?.name ?: "") }
                 .onEach { (meetups, tripName) -> scheduler.scheduleAll(route.tripId, tripName, meetups) }
+                // Reminders are best-effort: a failed listener stops scheduling but must not crash.
+                .catch { }
                 .launchIn(viewModelScope)
         }
 
