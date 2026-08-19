@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +57,7 @@ fun SettingsScreen(
     onOpenProfile: () -> Unit,
     onOpenPromptpay: () -> Unit,
     onOpenLanguage: () -> Unit,
+    onOpenTheme: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -66,6 +69,7 @@ fun SettingsScreen(
         onOpenProfile = onOpenProfile,
         onOpenPromptpay = onOpenPromptpay,
         onOpenLanguage = onOpenLanguage,
+        onOpenTheme = onOpenTheme,
         onSignOut = viewModel::signOut,
         onBack = onBack,
         modifier = modifier,
@@ -79,6 +83,7 @@ private fun SettingsMenuContent(
     onOpenProfile: () -> Unit,
     onOpenPromptpay: () -> Unit,
     onOpenLanguage: () -> Unit,
+    onOpenTheme: () -> Unit,
     onSignOut: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -119,6 +124,13 @@ private fun SettingsMenuContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             val currentLanguage = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            val context = LocalContext.current
+            val themeValue =
+                when (ThemePreference.read(context)) {
+                    AppCompatDelegate.MODE_NIGHT_NO -> stringResource(R.string.settings_theme_light)
+                    AppCompatDelegate.MODE_NIGHT_YES -> stringResource(R.string.settings_theme_dark)
+                    else -> stringResource(R.string.settings_theme_system)
+                }
             Card(modifier = Modifier.fillMaxWidth()) {
                 SettingsMenuRow(
                     icon = Icons.Default.Person,
@@ -146,6 +158,13 @@ private fun SettingsMenuContent(
                             stringResource(R.string.settings_language_th)
                         },
                     onClick = onOpenLanguage,
+                )
+                HorizontalDivider()
+                SettingsMenuRow(
+                    icon = Icons.Default.DarkMode,
+                    label = stringResource(R.string.settings_theme),
+                    value = themeValue,
+                    onClick = onOpenTheme,
                 )
                 HorizontalDivider()
                 // FCM notification preferences arrive with M6.1 (Blaze).
@@ -278,6 +297,7 @@ private fun SettingsMenuContentPreview() {
             onOpenProfile = {},
             onOpenPromptpay = {},
             onOpenLanguage = {},
+            onOpenTheme = {},
             onSignOut = {},
             onBack = {},
         )

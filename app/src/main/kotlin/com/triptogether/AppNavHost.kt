@@ -9,6 +9,7 @@ import com.triptogether.feature.auth.navigation.SettingsLanguageRoute
 import com.triptogether.feature.auth.navigation.SettingsProfileRoute
 import com.triptogether.feature.auth.navigation.SettingsPromptpayRoute
 import com.triptogether.feature.auth.navigation.SettingsRoute
+import com.triptogether.feature.auth.navigation.SettingsThemeRoute
 import com.triptogether.feature.auth.navigation.settingsScreen
 import com.triptogether.feature.expense.navigation.ExpenseDetailRoute
 import com.triptogether.feature.expense.navigation.ExpenseEditorRoute
@@ -65,6 +66,7 @@ fun AppNavHost(
             onOpenProfile = { navController.navigate(SettingsProfileRoute) },
             onOpenPromptpay = { navController.navigate(SettingsPromptpayRoute) },
             onOpenLanguage = { navController.navigate(SettingsLanguageRoute) },
+            onOpenTheme = { navController.navigate(SettingsThemeRoute) },
             onBack = { navController.popBackStack() },
         )
         createTripScreen(

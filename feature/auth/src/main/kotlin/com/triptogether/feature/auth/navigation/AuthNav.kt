@@ -9,6 +9,7 @@ import com.triptogether.feature.auth.SettingsLanguageScreen
 import com.triptogether.feature.auth.SettingsProfileScreen
 import com.triptogether.feature.auth.SettingsPromptpayScreen
 import com.triptogether.feature.auth.SettingsScreen
+import com.triptogether.feature.auth.SettingsThemeScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,10 +24,14 @@ data object SettingsPromptpayRoute
 @Serializable
 data object SettingsLanguageRoute
 
+@Serializable
+data object SettingsThemeRoute
+
 fun NavGraphBuilder.settingsScreen(
     onOpenProfile: () -> Unit,
     onOpenPromptpay: () -> Unit,
     onOpenLanguage: () -> Unit,
+    onOpenTheme: () -> Unit,
     onBack: () -> Unit,
 ) {
     composable<SettingsRoute> {
@@ -34,6 +39,7 @@ fun NavGraphBuilder.settingsScreen(
             onOpenProfile = onOpenProfile,
             onOpenPromptpay = onOpenPromptpay,
             onOpenLanguage = onOpenLanguage,
+            onOpenTheme = onOpenTheme,
             onBack = onBack,
         )
     }
@@ -45,5 +51,8 @@ fun NavGraphBuilder.settingsScreen(
     }
     composable<SettingsLanguageRoute> {
         SettingsLanguageScreen(onBack = onBack)
+    }
+    composable<SettingsThemeRoute> {
+        SettingsThemeScreen(onBack = onBack)
     }
 }

@@ -3,6 +3,7 @@ package com.triptogether
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.triptogether.feature.auth.ThemePreference
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -14,5 +15,7 @@ class TripTogetherApp : Application() {
         if (AppCompatDelegate.getApplicationLocales().isEmpty) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("th"))
         }
+        // Re-apply the saved Light/Dark/System choice so it survives a cold start.
+        ThemePreference.apply(this)
     }
 }
