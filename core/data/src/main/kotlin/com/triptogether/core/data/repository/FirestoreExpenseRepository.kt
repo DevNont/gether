@@ -7,9 +7,11 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.triptogether.core.data.dto.ExpenseDto
+import com.triptogether.core.data.dto.ShareDto
 import com.triptogether.core.data.dto.toDomain
 import com.triptogether.core.data.dto.toDto
 import com.triptogether.core.domain.model.Expense
+import com.triptogether.core.domain.model.Money
 import com.triptogether.core.domain.repository.ExpenseRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -68,6 +70,49 @@ class FirestoreExpenseRepository
                 Unit
             }
 
+        /**
+         * ITEMIZED self-edit: replace only [memberId]'s share and recompute the total inside a
+         * transaction, so two members editing their own amounts at once cannot clobber each other.
+         */
+        override suspend fun updateOwnShare(
+            tripId: String,
+            expenseId: String,
+            memberId: String,
+            amount: Money,
+        ): Result<Unit> =
+            runCatching {
+                val ref = expensesRef(tripId).document(expenseId)
+                firestore.runTransaction { transaction ->
+                    val dto =
+                        transaction.get(ref).toObject(ExpenseDto::class.java)
+                            ?: error("Expense $expenseId not found")
+                    val others = dto.shares.filterNot { it.memberId == memberId }
+                    val mine = dto.shares.firstOrNull { it.memberId == memberId }
+                    val newShares =
+                        others + ShareDto(memberId = memberId, amount = amount.satang, weight = mine?.weight)
+                    val newTotal = newShares.sumOf { it.amount }
+                    val sharesMap =
+                        newShares.map {
+                            mapOf(
+                                "memberId" to it.memberId,
+                                "amount" to it.amount,
+                                "weight" to it.weight,
+                            )
+                        }
+                    transaction.set(
+                        ref,
+                        mapOf(
+                            FIELD_SHARES to sharesMap,
+                            FIELD_TOTAL_AMOUNT to newTotal,
+                            FIELD_UPDATED_AT to FieldValue.serverTimestamp(),
+                        ),
+                        SetOptions.merge(),
+                    )
+                    null
+                }.await()
+                Unit
+            }
+
         override suspend fun delete(
             tripId: String,
             expenseId: String,
@@ -101,5 +146,7 @@ class FirestoreExpenseRepository
             const val FIELD_DATE = "date"
             const val FIELD_CREATED_AT = "createdAt"
             const val FIELD_UPDATED_AT = "updatedAt"
+            const val FIELD_SHARES = "shares"
+            const val FIELD_TOTAL_AMOUNT = "totalAmount"
         }
     }

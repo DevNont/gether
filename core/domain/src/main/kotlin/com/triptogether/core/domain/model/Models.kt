@@ -71,7 +71,7 @@ data class Attachment(val name: String, val url: String, val mimeType: String)
 
 enum class ExpenseCategory { FOOD, STAY, TRANSPORT, ACTIVITY, OTHER }
 
-enum class SplitMode { EQUAL, EXACT, SHARES }
+enum class SplitMode { EQUAL, EXACT, SHARES, ITEMIZED }
 
 data class Share(
     val memberId: String,

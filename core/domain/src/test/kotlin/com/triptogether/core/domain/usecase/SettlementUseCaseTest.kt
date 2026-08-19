@@ -182,6 +182,13 @@ private class FakeExpenseRepo(private val expenses: MutableStateFlow<List<Expens
         expense: Expense,
     ): Result<Unit> = Result.success(Unit)
 
+    override suspend fun updateOwnShare(
+        tripId: String,
+        expenseId: String,
+        memberId: String,
+        amount: com.triptogether.core.domain.model.Money,
+    ): Result<Unit> = Result.success(Unit)
+
     override suspend fun delete(
         tripId: String,
         expenseId: String,

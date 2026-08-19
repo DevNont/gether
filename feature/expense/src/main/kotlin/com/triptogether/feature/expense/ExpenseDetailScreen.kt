@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -45,7 +47,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -89,6 +93,7 @@ fun ExpenseDetailScreen(
         snackbarHostState = snackbarHostState,
         onEdit = onEdit,
         onDelete = viewModel::delete,
+        onUpdateMyShare = viewModel::updateOwnShare,
         onBack = onBack,
         modifier = modifier,
     )
@@ -101,6 +106,7 @@ private fun ExpenseDetailContent(
     snackbarHostState: SnackbarHostState,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onUpdateMyShare: (Money) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -159,7 +165,7 @@ private fun ExpenseDetailContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     SummaryCard(expense = expense, uiState = uiState)
-                    SharesCard(expense = expense, uiState = uiState)
+                    SharesCard(expense = expense, uiState = uiState, onUpdateMyShare = onUpdateMyShare)
                     if (expense.slipUrls.isNotEmpty()) {
                         SlipsCard(urls = expense.slipUrls, onOpen = { viewerUrl = it })
                     }
@@ -243,8 +249,11 @@ private fun SummaryCard(
 private fun SharesCard(
     expense: Expense,
     uiState: ExpenseDetailUiState,
+    onUpdateMyShare: (Money) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var editingShare by remember { mutableStateOf<Money?>(null) }
+
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
@@ -257,9 +266,11 @@ private fun SharesCard(
             )
             HorizontalDivider()
             expense.shares.forEach { share ->
+                val isMine = uiState.canEditOwnShare && share.memberId == uiState.myMemberId
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text =
@@ -268,15 +279,75 @@ private fun SharesCard(
                                 share.weight?.let { append(" ×$it") }
                             },
                         style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f),
                     )
                     Text(
                         text = share.amount.formatWithSymbol(),
                         style = MaterialTheme.typography.bodyMedium,
                     )
+                    if (isMine) {
+                        IconButton(
+                            onClick = { editingShare = share.amount },
+                            modifier = Modifier.size(32.dp).testTag("edit_my_share"),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.expense_edit_my_share),
+                            )
+                        }
+                    }
                 }
             }
         }
     }
+
+    editingShare?.let { current ->
+        EditMyShareDialog(
+            current = current,
+            onDismiss = { editingShare = null },
+            onSave = {
+                onUpdateMyShare(it)
+                editingShare = null
+            },
+        )
+    }
+}
+
+@Composable
+private fun EditMyShareDialog(
+    current: Money,
+    onDismiss: () -> Unit,
+    onSave: (Money) -> Unit,
+) {
+    var input by remember { mutableStateOf(current.format()) }
+    val parsed = Money.parse(input.trim())
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.expense_edit_my_share)) },
+        text = {
+            OutlinedTextField(
+                value = input,
+                onValueChange = { input = it },
+                label = { Text(stringResource(R.string.expense_edit_my_share_label)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.fillMaxWidth().testTag("edit_my_share_input"),
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { parsed?.let(onSave) },
+                enabled = parsed != null,
+            ) {
+                Text(stringResource(R.string.expense_edit_my_share_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.expense_detail_cancel))
+            }
+        },
+    )
 }
 
 @Composable
@@ -374,6 +445,7 @@ private fun ExpenseDetailContentPreview() {
             snackbarHostState = SnackbarHostState(),
             onEdit = {},
             onDelete = {},
+            onUpdateMyShare = {},
             onBack = {},
         )
     }

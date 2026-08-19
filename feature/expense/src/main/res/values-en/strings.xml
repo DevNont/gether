@@ -29,6 +29,8 @@
     <string name="expense_mode_equal">Equal</string>
     <string name="expense_mode_exact">Exact</string>
     <string name="expense_mode_shares">By shares</string>
+    <string name="expense_mode_itemized">By person</string>
+    <string name="expense_editor_total_auto">Total (auto): %1$s</string>
     <string name="expense_editor_weight_up">Increase share</string>
     <string name="expense_editor_weight_down">Decrease share</string>
     <string name="expense_delta_enter_total">Enter the total first</string>
@@ -46,6 +48,10 @@
     <string name="expense_detail_delete_confirm_title">Delete this bill?</string>
     <string name="expense_detail_delete_confirm_text">This cannot be undone. Everyone\'s totals will change.</string>
     <string name="expense_detail_delete_error">Could not delete. Please try again.</string>
+    <string name="expense_detail_edit_share_error">Could not update your amount. Please try again.</string>
+    <string name="expense_edit_my_share">Edit my amount</string>
+    <string name="expense_edit_my_share_label">My amount (baht)</string>
+    <string name="expense_edit_my_share_save">Save</string>
     <string name="expense_detail_not_found">Bill not found</string>
     <string name="expense_detail_created_by">Created by %1$s</string>
     <string name="expense_detail_shares_title">Split (%1$s)</string>

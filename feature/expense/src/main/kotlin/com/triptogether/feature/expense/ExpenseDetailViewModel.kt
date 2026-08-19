@@ -8,6 +8,8 @@ import androidx.navigation.toRoute
 import com.triptogether.core.domain.model.Expense
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.MemberRole
+import com.triptogether.core.domain.model.Money
+import com.triptogether.core.domain.model.SplitMode
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.ExpenseRepository
 import com.triptogether.core.domain.repository.TripRepository
@@ -28,8 +30,13 @@ data class ExpenseDetailUiState(
     val expense: Expense? = null,
     val members: List<Member> = emptyList(),
     val canEdit: Boolean = false,
+    val myMemberId: String? = null,
 ) {
     fun memberName(memberId: String): String = members.firstOrNull { it.id == memberId }?.displayName ?: ""
+
+    /** A logged-in member may edit only their own amount on an ITEMIZED bill. */
+    val canEditOwnShare: Boolean
+        get() = expense?.splitMode == SplitMode.ITEMIZED && myMemberId != null
 }
 
 sealed interface ExpenseDetailEvent {
@@ -71,6 +78,7 @@ class ExpenseDetailViewModel
                     expense = expense,
                     members = members,
                     canEdit = canEdit,
+                    myMemberId = myMember?.id,
                 )
             }.stateIn(
                 scope = viewModelScope,
@@ -83,6 +91,15 @@ class ExpenseDetailViewModel
                 expenseRepository.delete(route.tripId, route.expenseId)
                     .onSuccess { _events.send(ExpenseDetailEvent.Deleted) }
                     .onFailure { _events.send(ExpenseDetailEvent.Error(R.string.expense_detail_delete_error)) }
+            }
+        }
+
+        /** ITEMIZED bills: the current member edits only their own amount; the total recomputes. */
+        fun updateOwnShare(amount: Money) {
+            val memberId = uiState.value.myMemberId ?: return
+            viewModelScope.launch {
+                expenseRepository.updateOwnShare(route.tripId, route.expenseId, memberId, amount)
+                    .onFailure { _events.send(ExpenseDetailEvent.Error(R.string.expense_detail_edit_share_error)) }
             }
         }
 

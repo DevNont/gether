@@ -191,14 +191,26 @@ internal fun ExpenseEditorContent(
                 modifier = Modifier.fillMaxWidth().testTag("expense_title"),
             )
             CategoryPicker(selected = uiState.category, onSelect = callbacks.onCategoryChange)
-            OutlinedTextField(
-                value = uiState.totalInput,
-                onValueChange = callbacks.onTotalChange,
-                label = { Text(stringResource(R.string.expense_editor_total)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth().testTag("expense_total"),
-            )
+            if (uiState.splitMode == SplitMode.ITEMIZED) {
+                Text(
+                    text =
+                        stringResource(
+                            R.string.expense_editor_total_auto,
+                            (uiState.total ?: Money.ZERO).formatWithSymbol(),
+                        ),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth().testTag("expense_total_auto"),
+                )
+            } else {
+                OutlinedTextField(
+                    value = uiState.totalInput,
+                    onValueChange = callbacks.onTotalChange,
+                    label = { Text(stringResource(R.string.expense_editor_total)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth().testTag("expense_total"),
+                )
+            }
             PaidByDropdown(
                 rows = uiState.rows.map { it.member },
                 selectedId = uiState.paidByMemberId,
@@ -456,7 +468,7 @@ private fun MemberRow(
                     text = computedAmount?.formatWithSymbol() ?: "—",
                     style = MaterialTheme.typography.bodyMedium,
                 )
-            SplitMode.EXACT ->
+            SplitMode.EXACT, SplitMode.ITEMIZED ->
                 OutlinedTextField(
                     value = row.amountInput,
                     onValueChange = onAmountChange,
@@ -550,6 +562,7 @@ internal fun SplitMode.labelRes(): Int =
         SplitMode.EQUAL -> R.string.expense_mode_equal
         SplitMode.EXACT -> R.string.expense_mode_exact
         SplitMode.SHARES -> R.string.expense_mode_shares
+        SplitMode.ITEMIZED -> R.string.expense_mode_itemized
     }
 
 @Preview(showBackground = true)

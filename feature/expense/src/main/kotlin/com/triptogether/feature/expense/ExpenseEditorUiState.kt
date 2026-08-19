@@ -6,6 +6,7 @@ import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Money
 import com.triptogether.core.domain.model.Share
 import com.triptogether.core.domain.model.SplitMode
+import com.triptogether.core.domain.model.sum
 import com.triptogether.core.domain.money.ExpenseSplitter
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -38,7 +39,13 @@ data class ExpenseEditorUiState(
 ) {
     val isPrepaid: Boolean get() = date != null && tripStart != null && date < tripStart
 
-    val total: Money? get() = Money.parse(totalInput.trim())
+    val total: Money?
+        get() =
+            if (splitMode == SplitMode.ITEMIZED) {
+                selectedRows.map { it.enteredAmount ?: Money.ZERO }.sum()
+            } else {
+                Money.parse(totalInput.trim())
+            }
 
     val selectedRows: List<MemberSplitRow> get() = rows.filter { it.selected }
 
@@ -52,7 +59,7 @@ data class ExpenseEditorUiState(
                 SplitMode.EQUAL -> ExpenseSplitter.splitEqually(total, selected.map { it.member.id })
                 SplitMode.SHARES ->
                     ExpenseSplitter.splitByWeights(total, selected.associate { it.member.id to it.weight })
-                SplitMode.EXACT ->
+                SplitMode.EXACT, SplitMode.ITEMIZED ->
                     selected.map { Share(memberId = it.member.id, amount = it.enteredAmount ?: Money.ZERO) }
             }
         }
@@ -76,7 +83,7 @@ data class ExpenseEditorUiState(
             if (paidByMemberId == null || date == null) return false
             if (selectedRows.isEmpty()) return false
             return when (splitMode) {
-                SplitMode.EQUAL, SplitMode.SHARES -> true
+                SplitMode.EQUAL, SplitMode.SHARES, SplitMode.ITEMIZED -> true
                 SplitMode.EXACT -> everyoneEntered && delta?.isZero == true
             }
         }
