@@ -352,16 +352,17 @@ private fun openInMaps(
     context: Context,
     activity: Activity,
 ) {
-    val uri =
-        if (activity.lat != null && activity.lng != null) {
-            Uri.parse("geo:${activity.lat},${activity.lng}?q=${Uri.encode(activity.placeName)}")
-        } else {
-            Uri.parse("geo:0,0?q=${Uri.encode(activity.placeName)}")
-        }
-    val intent = Intent(Intent.ACTION_VIEW, uri)
-    if (intent.resolveActivity(context.packageManager) != null) {
-        context.startActivity(intent)
+    // Try the geo: URI first (opens a maps app with a pin), then fall back to the https Maps URL
+    // which any browser handles. resolveActivity is unreliable on API 30+ (package visibility),
+    // so launch directly and catch instead.
+    val hasCoords = activity.lat != null && activity.lng != null
+    val query = if (hasCoords) "${activity.lat},${activity.lng}" else activity.placeName.orEmpty()
+    if (hasCoords) {
+        val geo = Uri.parse("geo:${activity.lat},${activity.lng}?q=${Uri.encode(activity.placeName)}")
+        if (runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, geo)) }.isSuccess) return
     }
+    val web = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(query)}")
+    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, web)) }
 }
 
 @Preview(showBackground = true)

@@ -259,8 +259,8 @@ private fun searchPlaceInMaps(
     query: String,
 ) {
     val uri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(query)}")
-    val intent = Intent(Intent.ACTION_VIEW, uri)
-    if (intent.resolveActivity(context.packageManager) != null) context.startActivity(intent)
+    // Launch directly with a catch — resolveActivity returns null on API 30+ without a <queries> entry.
+    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
