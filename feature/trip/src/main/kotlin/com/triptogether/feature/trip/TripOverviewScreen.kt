@@ -1,5 +1,7 @@
 package com.triptogether.feature.trip
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.HowToVote
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
@@ -340,10 +344,14 @@ private fun MembersCard(
     modifier: Modifier = Modifier,
 ) {
     var showGuestDialog by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(true) }
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = !expanded },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -351,32 +359,49 @@ private fun MembersCard(
                     text = stringResource(R.string.overview_members, members.size),
                     style = MaterialTheme.typography.titleMedium,
                 )
-                TextButton(onClick = onShareInvite) {
-                    Icon(imageVector = Icons.Default.Share, contentDescription = null)
-                    Text(
-                        text = stringResource(R.string.overview_invite),
-                        modifier = Modifier.padding(start = 4.dp),
-                    )
-                }
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription =
+                        stringResource(
+                            if (expanded) R.string.overview_members_collapse else R.string.overview_members_expand,
+                        ),
+                )
             }
-            members.forEach { member ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    MemberAvatar(member = member)
-                    Text(text = member.displayName, style = MaterialTheme.typography.bodyMedium)
-                    if (member.isGuest) {
-                        Text(
-                            text = stringResource(R.string.overview_guest_tag),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+            AnimatedVisibility(visible = expanded) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    members.forEach { member ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            MemberAvatar(member = member)
+                            Text(text = member.displayName, style = MaterialTheme.typography.bodyMedium)
+                            if (member.isGuest) {
+                                Text(
+                                    text = stringResource(R.string.overview_guest_tag),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextButton(onClick = { showGuestDialog = true }) {
+                            Text(stringResource(R.string.overview_add_guest))
+                        }
+                        TextButton(onClick = onShareInvite) {
+                            Icon(imageVector = Icons.Default.Share, contentDescription = null)
+                            Text(
+                                text = stringResource(R.string.overview_invite),
+                                modifier = Modifier.padding(start = 4.dp),
+                            )
+                        }
                     }
                 }
-            }
-            TextButton(onClick = { showGuestDialog = true }) {
-                Text(stringResource(R.string.overview_add_guest))
             }
         }
     }

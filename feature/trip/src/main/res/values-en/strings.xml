@@ -53,6 +53,8 @@
     <string name="overview_countdown_day_of_trip">Day %1$d of the trip</string>
     <string name="overview_countdown_finished">Finished</string>
     <string name="overview_members">Members (%1$d)</string>
+    <string name="overview_members_expand">Expand members</string>
+    <string name="overview_members_collapse">Collapse members</string>
     <string name="overview_invite">Invite friends</string>
     <string name="overview_invite_qr">QR to join the trip</string>
     <string name="overview_invite_code_hint">Tap the code to copy, or let friends scan the QR</string>

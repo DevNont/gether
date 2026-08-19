@@ -53,6 +53,8 @@
     <string name="overview_countdown_day_of_trip">วันที่ %1$d ของทริป</string>
     <string name="overview_countdown_finished">จบแล้ว</string>
     <string name="overview_members">สมาชิก (%1$d)</string>
+    <string name="overview_members_expand">ขยายรายชื่อสมาชิก</string>
+    <string name="overview_members_collapse">ย่อรายชื่อสมาชิก</string>
     <string name="overview_invite">ชวนเพื่อน</string>
     <string name="overview_invite_qr">QR สำหรับเข้าร่วมทริป</string>
     <string name="overview_invite_code_hint">แตะรหัสเพื่อคัดลอก หรือให้เพื่อนสแกน QR</string>
