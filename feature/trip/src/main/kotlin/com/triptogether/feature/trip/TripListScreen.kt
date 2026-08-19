@@ -16,10 +16,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,11 +33,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +62,7 @@ fun TripListScreen(
     onCreateTrip: () -> Unit,
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
+    onEditTrip: (String) -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
     devMode: Boolean = false,
@@ -68,12 +76,19 @@ fun TripListScreen(
             snackbarHostState.showSnackbar(context.getString(R.string.trip_list_seed_error))
         }
     }
+    LaunchedEffect(Unit) {
+        viewModel.deleteError.collect {
+            snackbarHostState.showSnackbar(context.getString(R.string.trip_list_delete_error))
+        }
+    }
     TripListContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onCreateTrip = onCreateTrip,
         onJoinTrip = onJoinTrip,
         onTripClick = onTripClick,
+        onEditTrip = onEditTrip,
+        onDeleteTrip = viewModel::deleteTrip,
         onOpenSettings = onOpenSettings,
         onSeedDemo = if (devMode) viewModel::seedDemoTrip else null,
         modifier = modifier,
@@ -88,6 +103,8 @@ private fun TripListContent(
     onCreateTrip: () -> Unit,
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
+    onEditTrip: (String) -> Unit,
+    onDeleteTrip: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onSeedDemo: (() -> Unit)?,
     modifier: Modifier = Modifier,
@@ -138,6 +155,8 @@ private fun TripListContent(
                 TripGroups(
                     uiState = uiState,
                     onTripClick = onTripClick,
+                    onEditTrip = onEditTrip,
+                    onDeleteTrip = onDeleteTrip,
                     modifier = Modifier.padding(innerPadding),
                 )
         }
@@ -174,6 +193,8 @@ private fun EmptyState(modifier: Modifier = Modifier) {
 private fun TripGroups(
     uiState: TripListUiState,
     onTripClick: (String) -> Unit,
+    onEditTrip: (String) -> Unit,
+    onDeleteTrip: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -183,13 +204,23 @@ private fun TripGroups(
         if (uiState.upcoming.isNotEmpty()) {
             item { GroupHeader(stringResource(R.string.trip_list_group_upcoming)) }
             items(uiState.upcoming, key = { it.trip.id }) { card ->
-                TripCard(card = card, onClick = { onTripClick(card.trip.id) })
+                TripCard(
+                    card = card,
+                    onClick = { onTripClick(card.trip.id) },
+                    onEdit = { onEditTrip(card.trip.id) },
+                    onDelete = { onDeleteTrip(card.trip.id) },
+                )
             }
         }
         if (uiState.past.isNotEmpty()) {
             item { GroupHeader(stringResource(R.string.trip_list_group_past)) }
             items(uiState.past, key = { it.trip.id }) { card ->
-                TripCard(card = card, onClick = { onTripClick(card.trip.id) })
+                TripCard(
+                    card = card,
+                    onClick = { onTripClick(card.trip.id) },
+                    onEdit = { onEditTrip(card.trip.id) },
+                    onDelete = { onDeleteTrip(card.trip.id) },
+                )
             }
         }
     }
@@ -208,32 +239,130 @@ private fun GroupHeader(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TripCard(
     card: TripCardUi,
     onClick: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showInvite by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-                text = card.trip.name,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = formatDateRange(card.trip.startDate, card.trip.endDate),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            if (card.members.isNotEmpty()) {
-                AvatarStack(members = card.members)
+        Row(
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = card.trip.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = formatDateRange(card.trip.startDate, card.trip.endDate),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (card.members.isNotEmpty()) {
+                    AvatarStack(members = card.members)
+                }
             }
+            TripCardMenu(
+                onEdit = onEdit,
+                onInvite = { showInvite = true },
+                onDelete = onDelete,
+            )
         }
+    }
+    if (showInvite) {
+        InviteDialog(
+            trip = card.trip,
+            onShare = { shareInvite(context, card.trip) },
+            onDismiss = { showInvite = false },
+        )
+    }
+}
+
+/** Per-card overflow: manage (edit), invite friends, delete — the destructive item confirms first. */
+@Composable
+private fun TripCardMenu(
+    onEdit: () -> Unit,
+    onInvite: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.overview_menu),
+            )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.overview_edit_trip)) },
+                onClick = {
+                    expanded = false
+                    onEdit()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.overview_invite)) },
+                onClick = {
+                    expanded = false
+                    onInvite()
+                },
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(R.string.overview_delete_trip),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    showDeleteConfirm = true
+                },
+            )
+        }
+    }
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text(stringResource(R.string.overview_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.overview_delete_confirm_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirm = false
+                        onDelete()
+                    },
+                ) {
+                    Text(
+                        text = stringResource(R.string.overview_delete_trip),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text(stringResource(R.string.overview_guest_cancel))
+                }
+            },
+        )
     }
 }
 
@@ -304,6 +433,8 @@ private fun TripListContentPreview() {
             onCreateTrip = {},
             onJoinTrip = {},
             onTripClick = {},
+            onEditTrip = {},
+            onDeleteTrip = {},
             onOpenSettings = {},
             onSeedDemo = null,
         )
@@ -320,6 +451,8 @@ private fun TripListEmptyPreview() {
             onCreateTrip = {},
             onJoinTrip = {},
             onTripClick = {},
+            onEditTrip = {},
+            onDeleteTrip = {},
             onOpenSettings = {},
             onSeedDemo = null,
         )

@@ -26,6 +26,7 @@ fun NavGraphBuilder.tripListScreen(
     onCreateTrip: () -> Unit,
     onJoinTrip: () -> Unit,
     onTripClick: (String) -> Unit,
+    onEditTrip: (String) -> Unit,
     onOpenSettings: () -> Unit,
     devMode: Boolean = false,
 ) {
@@ -34,6 +35,7 @@ fun NavGraphBuilder.tripListScreen(
             onCreateTrip = onCreateTrip,
             onJoinTrip = onJoinTrip,
             onTripClick = onTripClick,
+            onEditTrip = onEditTrip,
             onOpenSettings = onOpenSettings,
             devMode = devMode,
         )

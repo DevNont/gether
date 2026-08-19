@@ -59,6 +59,7 @@ fun AppNavHost(
             onCreateTrip = { navController.navigate(CreateTripRoute()) },
             onJoinTrip = { navController.navigate(JoinTripRoute()) },
             onTripClick = { tripId -> navController.navigate(TripOverviewRoute(tripId)) },
+            onEditTrip = { tripId -> navController.navigate(CreateTripRoute(tripId)) },
             onOpenSettings = { navController.navigate(SettingsRoute) },
             devMode = BuildConfig.DEBUG,
         )

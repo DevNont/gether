@@ -37,10 +37,20 @@ class TripListViewModel
         private val _seedError = Channel<Unit>(Channel.BUFFERED)
         val seedError: Flow<Unit> = _seedError.receiveAsFlow()
 
+        private val _deleteError = Channel<Unit>(Channel.BUFFERED)
+        val deleteError: Flow<Unit> = _deleteError.receiveAsFlow()
+
         /** Debug builds only — populate a demo trip to browse every screen. */
         fun seedDemoTrip() {
             viewModelScope.launch {
                 demoSeeder.seedJapanTrip().onFailure { _seedError.send(Unit) }
+            }
+        }
+
+        /** Delete a trip straight from its card; the list updates via the realtime listener. */
+        fun deleteTrip(tripId: String) {
+            viewModelScope.launch {
+                tripRepository.deleteTrip(tripId).onFailure { _deleteError.send(Unit) }
             }
         }
 
