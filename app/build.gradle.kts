@@ -24,6 +24,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            // Signed with the debug keystore on purpose: its SHA-1 is already registered in
+            // Firebase, so Google/LINE sign-in keeps working for the beta APK shared with testers.
+            // Swap to a dedicated release keystore before any Play Store distribution.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
