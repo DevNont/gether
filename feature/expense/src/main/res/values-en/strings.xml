@@ -23,6 +23,8 @@
     <string name="expense_editor_total">Total (baht)</string>
     <string name="expense_editor_paid_by">Paid by</string>
     <string name="expense_editor_date">Date</string>
+    <string name="expense_editor_time">Time</string>
+    <string name="expense_editor_time_clear">No time</string>
     <string name="expense_editor_date_ok">OK</string>
     <string name="expense_mode_equal">Equal</string>
     <string name="expense_mode_exact">Exact</string>

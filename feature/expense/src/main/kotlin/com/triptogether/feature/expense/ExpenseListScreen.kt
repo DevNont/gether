@@ -302,8 +302,9 @@ private fun ExpenseRow(
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = expense.title, style = MaterialTheme.typography.bodyLarge)
+                val paidBy = stringResource(R.string.expense_paid_by, paidByName)
                 Text(
-                    text = stringResource(R.string.expense_paid_by, paidByName),
+                    text = expense.time?.let { "${formatExpenseTime(it)} · $paidBy" } ?: paidBy,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

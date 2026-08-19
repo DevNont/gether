@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import javax.inject.Inject
@@ -77,6 +78,7 @@ class ExpenseEditorViewModel
                         isLoading = false,
                         paidByMemberId = myMemberId,
                         date = defaultDate,
+                        time = null,
                         tripStart = trip.startDate,
                         rows = members.map { member -> MemberSplitRow(member = member) },
                     )
@@ -88,6 +90,7 @@ class ExpenseEditorViewModel
                         totalInput = expense.totalAmount.format(),
                         paidByMemberId = expense.paidByMemberId,
                         date = expense.date,
+                        time = expense.time,
                         tripStart = trip.startDate,
                         splitMode = expense.splitMode,
                         isExisting = true,
@@ -115,6 +118,8 @@ class ExpenseEditorViewModel
         fun onPaidByChange(memberId: String) = _uiState.update { it.copy(paidByMemberId = memberId) }
 
         fun onDateChange(value: LocalDate) = _uiState.update { it.copy(date = value) }
+
+        fun onTimeChange(value: LocalTime?) = _uiState.update { it.copy(time = value) }
 
         fun onSplitModeChange(mode: SplitMode) = _uiState.update { it.copy(splitMode = mode) }
 
@@ -218,6 +223,7 @@ class ExpenseEditorViewModel
                         totalAmount = total,
                         paidByMemberId = checkNotNull(state.paidByMemberId),
                         date = checkNotNull(state.date),
+                        time = state.time,
                         splitMode = state.splitMode,
                         shares = shares,
                         slipUrls = existing?.slipUrls ?: emptyList(),

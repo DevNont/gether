@@ -6,6 +6,7 @@ import com.triptogether.core.domain.model.Money
 import com.triptogether.core.domain.model.Share
 import com.triptogether.core.domain.model.SplitMode
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 
 /**
  * Firestore shape of trips/{tripId}/expenses/{expenseId}.
@@ -17,6 +18,7 @@ data class ExpenseDto(
     val totalAmount: Long = 0,
     val paidByMemberId: String = "",
     val date: String = "",
+    val time: String? = null,
     val splitMode: String = "EQUAL",
     val shares: List<ShareDto> = emptyList(),
     val slipUrls: List<String> = emptyList(),
@@ -38,6 +40,7 @@ fun ExpenseDto.toDomain(id: String): Expense =
         totalAmount = Money(totalAmount),
         paidByMemberId = paidByMemberId,
         date = LocalDate.parse(date),
+        time = time?.let { runCatching { LocalTime.parse(it) }.getOrNull() },
         splitMode = runCatching { SplitMode.valueOf(splitMode) }.getOrDefault(SplitMode.EQUAL),
         shares = shares.map { Share(memberId = it.memberId, amount = Money(it.amount), weight = it.weight) },
         slipUrls = slipUrls,
@@ -52,6 +55,7 @@ fun Expense.toDto(): ExpenseDto =
         totalAmount = totalAmount.satang,
         paidByMemberId = paidByMemberId,
         date = date.toString(),
+        time = time?.toString(),
         splitMode = splitMode.name,
         shares = shares.map { ShareDto(memberId = it.memberId, amount = it.amount.satang, weight = it.weight) },
         slipUrls = slipUrls,

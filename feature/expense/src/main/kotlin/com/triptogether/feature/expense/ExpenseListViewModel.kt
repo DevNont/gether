@@ -78,7 +78,8 @@ class ExpenseListViewModel
                         ExpenseDayGroup(
                             date = date,
                             total = Money(dayExpenses.sumOf { it.totalAmount.satang }),
-                            expenses = dayExpenses,
+                            // Timed bills first in chronological order; untimed ones fall to the end.
+                            expenses = dayExpenses.sortedWith(compareBy({ it.time == null }, { it.time })),
                         )
                     }
             // Header totals always cover the whole trip, not the active filter.

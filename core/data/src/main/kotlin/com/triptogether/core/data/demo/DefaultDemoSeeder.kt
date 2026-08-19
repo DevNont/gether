@@ -197,6 +197,7 @@ class DefaultDemoSeeder
                     totalAmount = Money.fromBaht(1_200),
                     paidByMemberId = owner,
                     date = parseDate(d1),
+                    time = LocalTime(19, 30),
                     splitMode = SplitMode.EQUAL,
                     shares = ExpenseSplitter.splitEqually(Money.fromBaht(1_200), everyone),
                     createdBy = owner,
@@ -232,6 +233,7 @@ class DefaultDemoSeeder
                     totalAmount = Money.fromBaht(7_500),
                     paidByMemberId = friend,
                     date = parseDate(d2),
+                    time = LocalTime(9, 0),
                     splitMode = SplitMode.SHARES,
                     shares =
                         ExpenseSplitter.splitByWeights(
@@ -251,6 +253,7 @@ class DefaultDemoSeeder
                     totalAmount = Money.fromBaht(3_000),
                     paidByMemberId = cat,
                     date = parseDate(d3),
+                    time = LocalTime(8, 15),
                     splitMode = SplitMode.EQUAL,
                     shares = ExpenseSplitter.splitEqually(Money.fromBaht(3_000), everyone),
                     createdBy = cat,

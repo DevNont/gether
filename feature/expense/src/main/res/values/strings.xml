@@ -23,6 +23,8 @@
     <string name="expense_editor_total">ยอดรวม (บาท)</string>
     <string name="expense_editor_paid_by">คนจ่าย</string>
     <string name="expense_editor_date">วันที่</string>
+    <string name="expense_editor_time">เวลา</string>
+    <string name="expense_editor_time_clear">ไม่ระบุเวลา</string>
     <string name="expense_editor_date_ok">ตกลง</string>
     <string name="expense_mode_equal">หารเท่า</string>
     <string name="expense_mode_exact">ใส่เอง</string>

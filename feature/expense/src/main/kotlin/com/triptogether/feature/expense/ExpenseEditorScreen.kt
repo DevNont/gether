@@ -17,6 +17,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,8 +41,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +68,7 @@ import com.triptogether.core.domain.model.SplitMode
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
@@ -101,6 +106,7 @@ fun ExpenseEditorScreen(
                 onTotalChange = viewModel::onTotalChange,
                 onPaidByChange = viewModel::onPaidByChange,
                 onDateChange = viewModel::onDateChange,
+                onTimeChange = viewModel::onTimeChange,
                 onSplitModeChange = viewModel::onSplitModeChange,
                 onMemberToggle = viewModel::onMemberToggle,
                 onAmountChange = viewModel::onAmountChange,
@@ -121,6 +127,7 @@ data class ExpenseEditorCallbacks(
     val onTotalChange: (String) -> Unit,
     val onPaidByChange: (String) -> Unit,
     val onDateChange: (LocalDate) -> Unit,
+    val onTimeChange: (LocalTime?) -> Unit,
     val onSplitModeChange: (SplitMode) -> Unit,
     val onMemberToggle: (String) -> Unit,
     val onAmountChange: (String, String) -> Unit,
@@ -192,16 +199,21 @@ internal fun ExpenseEditorContent(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth().testTag("expense_total"),
             )
+            PaidByDropdown(
+                rows = uiState.rows.map { it.member },
+                selectedId = uiState.paidByMemberId,
+                onSelect = callbacks.onPaidByChange,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PaidByDropdown(
-                    rows = uiState.rows.map { it.member },
-                    selectedId = uiState.paidByMemberId,
-                    onSelect = callbacks.onPaidByChange,
-                    modifier = Modifier.weight(1f),
-                )
                 DateField(
                     date = uiState.date,
                     onDateChange = callbacks.onDateChange,
+                    modifier = Modifier.weight(1f),
+                )
+                TimeField(
+                    time = uiState.time,
+                    onTimeChange = callbacks.onTimeChange,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -340,6 +352,61 @@ private fun DateField(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimeField(
+    time: LocalTime?,
+    onTimeChange: (LocalTime?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showPicker by remember { mutableStateOf(false) }
+    OutlinedButton(onClick = { showPicker = true }, modifier = modifier) {
+        Icon(imageVector = Icons.Default.Schedule, contentDescription = null)
+        Text(
+            text = time?.let { formatExpenseTime(it) } ?: stringResource(R.string.expense_editor_time),
+            modifier = Modifier.padding(start = 4.dp),
+        )
+    }
+    if (showPicker) {
+        val pickerState =
+            rememberTimePickerState(
+                initialHour = time?.hour ?: DEFAULT_PICKER_HOUR,
+                initialMinute = time?.minute ?: 0,
+                is24Hour = true,
+            )
+        AlertDialog(
+            onDismissRequest = { showPicker = false },
+            title = { Text(stringResource(R.string.expense_editor_time)) },
+            text = { TimePicker(state = pickerState) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onTimeChange(LocalTime(pickerState.hour, pickerState.minute))
+                        showPicker = false
+                    },
+                ) {
+                    Text(stringResource(R.string.expense_editor_date_ok))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        onTimeChange(null)
+                        showPicker = false
+                    },
+                ) {
+                    Text(stringResource(R.string.expense_editor_time_clear))
+                }
+            },
+        )
+    }
+}
+
+private const val DEFAULT_PICKER_HOUR = 9
+
+internal fun formatExpenseTime(time: LocalTime): String =
+    "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -513,6 +580,7 @@ private fun ExpenseEditorContentPreview() {
                     onTotalChange = {},
                     onPaidByChange = {},
                     onDateChange = {},
+                    onTimeChange = {},
                     onSplitModeChange = {},
                     onMemberToggle = {},
                     onAmountChange = { _, _ -> },

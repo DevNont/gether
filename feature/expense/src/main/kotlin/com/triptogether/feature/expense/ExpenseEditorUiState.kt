@@ -8,6 +8,7 @@ import com.triptogether.core.domain.model.Share
 import com.triptogether.core.domain.model.SplitMode
 import com.triptogether.core.domain.money.ExpenseSplitter
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 
 data class MemberSplitRow(
     val member: Member,
@@ -27,6 +28,7 @@ data class ExpenseEditorUiState(
     val totalInput: String = "",
     val paidByMemberId: String? = null,
     val date: LocalDate? = null,
+    val time: LocalTime? = null,
     val splitMode: SplitMode = SplitMode.EQUAL,
     val rows: List<MemberSplitRow> = emptyList(),
     val isExisting: Boolean = false,

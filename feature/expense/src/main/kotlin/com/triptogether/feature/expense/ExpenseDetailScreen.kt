@@ -219,7 +219,10 @@ private fun SummaryCard(
             }
             Text(
                 text =
-                    expense.date.toJavaLocalDate().format(DateTimeFormatter.ofPattern("E d MMM yy")),
+                    buildString {
+                        append(expense.date.toJavaLocalDate().format(DateTimeFormatter.ofPattern("E d MMM yy")))
+                        expense.time?.let { append(" · ${formatExpenseTime(it)}") }
+                    },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

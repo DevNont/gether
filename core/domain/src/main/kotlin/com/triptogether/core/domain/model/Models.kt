@@ -86,6 +86,7 @@ data class Expense(
     val totalAmount: Money,
     val paidByMemberId: String,
     val date: LocalDate,
+    val time: LocalTime? = null,
     val splitMode: SplitMode,
     val shares: List<Share>,
     val slipUrls: List<String> = emptyList(),
