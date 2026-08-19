@@ -11,6 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # CLAUDE.md dependency rule: feature:* may depend only on core:domain + core:ui —
+      # never on core:data or another feature module.
+      - name: Check feature module dependencies
+        run: |
+          if grep -RnE 'project\(":(core:data|feature:[a-z]+)"\)' feature/*/build.gradle.kts; then
+            echo "feature modules must not depend on core:data or other feature modules (CLAUDE.md dependency rule)"
+            exit 1
+          fi
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -60,9 +69,9 @@ jobs:
       - name: Assemble debug
         run: ./gradlew assembleDebug
 
-      - name: Check core:domain has no Android/Firebase imports
+      - name: Check core:domain has no Android/Firebase/JVM-only imports
         run: |
-          if grep -rnE '^import (android|androidx|com\.google\.firebase)' core/domain/src/main; then
-            echo "core:domain must not depend on Android or Firebase (CLAUDE.md rule 3)"
+          if grep -rnE '^import (android\.|androidx\.|com\.google\.|dagger\.|javax\.|java\.)' core/domain/src/main; then
+            echo "core:domain must stay pure Kotlin — no Android/Firebase/DI/JVM-only imports (CLAUDE.md rule 3, KMP-ready)"
             exit 1
           fi

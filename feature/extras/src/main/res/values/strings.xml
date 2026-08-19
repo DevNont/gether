@@ -25,6 +25,10 @@
     <string name="meetup_add">เพิ่มนัดหมาย</string>
     <string name="meetup_empty">ยังไม่มีนัดหมาย กด + เพื่อเพิ่ม</string>
     <string name="meetup_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="meetup_save_error">บันทึกนัดไม่สำเร็จ</string>
+    <string name="meetup_delete_error">ลบนัดไม่สำเร็จ</string>
+    <string name="meetup_notifications_off">การแจ้งเตือนถูกปิด จะไม่มีเสียงเตือนนัด</string>
+    <string name="meetup_open_settings">เปิดการตั้งค่า</string>
     <string name="meetup_editor_title_new">เพิ่มนัดหมาย</string>
     <string name="meetup_editor_title_edit">แก้ไขนัดหมาย</string>
     <string name="meetup_name">เรื่องนัด</string>

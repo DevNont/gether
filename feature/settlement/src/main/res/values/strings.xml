@@ -18,6 +18,8 @@
     <string name="settlement_marked">บันทึกการโอนแล้ว รอผู้รับยืนยัน</string>
     <string name="settlement_confirmed">ยืนยันแล้ว</string>
     <string name="settlement_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="settlement_mark_error">บันทึกการโอนไม่สำเร็จ</string>
+    <string name="settlement_confirm_error">ยืนยันรับเงินไม่สำเร็จ</string>
     <string name="settlement_qr_invalid">พร้อมเพย์ของผู้รับไม่ถูกต้อง</string>
     <string name="settlement_qr_close">ปิด</string>
 </resources>

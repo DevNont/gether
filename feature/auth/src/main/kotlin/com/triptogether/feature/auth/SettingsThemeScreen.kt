@@ -26,10 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.triptogether.core.ui.theme.TripTogetherTheme
 
 /** Settings > ธีม — Light / Dark / System; applies immediately, the activity recreates. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsThemeScreen(
     onBack: () -> Unit,
@@ -38,11 +39,25 @@ fun SettingsThemeScreen(
     val context = LocalContext.current
     var mode by remember { mutableIntStateOf(ThemePreference.read(context)) }
 
-    fun select(value: Int) {
-        mode = value
-        ThemePreference.set(context, value)
-    }
+    SettingsThemeContent(
+        mode = mode,
+        onSelect = { value ->
+            mode = value
+            ThemePreference.set(context, value)
+        },
+        onBack = onBack,
+        modifier = modifier,
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsThemeContent(
+    mode: Int,
+    onSelect: (Int) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -63,19 +78,19 @@ fun SettingsThemeScreen(
             ThemeRow(
                 label = stringResource(R.string.settings_theme_system),
                 selected = mode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM,
-                onClick = { select(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) },
+                onClick = { onSelect(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) },
             )
             HorizontalDivider()
             ThemeRow(
                 label = stringResource(R.string.settings_theme_light),
                 selected = mode == AppCompatDelegate.MODE_NIGHT_NO,
-                onClick = { select(AppCompatDelegate.MODE_NIGHT_NO) },
+                onClick = { onSelect(AppCompatDelegate.MODE_NIGHT_NO) },
             )
             HorizontalDivider()
             ThemeRow(
                 label = stringResource(R.string.settings_theme_dark),
                 selected = mode == AppCompatDelegate.MODE_NIGHT_YES,
-                onClick = { select(AppCompatDelegate.MODE_NIGHT_YES) },
+                onClick = { onSelect(AppCompatDelegate.MODE_NIGHT_YES) },
             )
         }
     }
@@ -94,4 +109,16 @@ private fun ThemeRow(
         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         modifier = modifier.clickable(onClick = onClick),
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsThemeContentPreview() {
+    TripTogetherTheme {
+        SettingsThemeContent(
+            mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM,
+            onSelect = {},
+            onBack = {},
+        )
+    }
 }

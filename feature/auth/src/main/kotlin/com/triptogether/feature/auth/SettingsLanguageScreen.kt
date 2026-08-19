@@ -21,11 +21,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
+import com.triptogether.core.ui.theme.TripTogetherTheme
 
 /** Settings > ภาษา — applies immediately; the activity recreates in the chosen locale. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsLanguageScreen(
     onBack: () -> Unit,
@@ -34,6 +35,22 @@ fun SettingsLanguageScreen(
     val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
     val isThai = !current.startsWith("en")
 
+    SettingsLanguageContent(
+        isThai = isThai,
+        onSelect = ::setAppLanguage,
+        onBack = onBack,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsLanguageContent(
+    isThai: Boolean,
+    onSelect: (String) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -54,13 +71,13 @@ fun SettingsLanguageScreen(
             LanguageRow(
                 label = stringResource(R.string.settings_language_th),
                 selected = isThai,
-                onClick = { setAppLanguage("th") },
+                onClick = { onSelect("th") },
             )
             HorizontalDivider()
             LanguageRow(
                 label = stringResource(R.string.settings_language_en),
                 selected = !isThai,
-                onClick = { setAppLanguage("en") },
+                onClick = { onSelect("en") },
             )
         }
     }
@@ -83,4 +100,16 @@ private fun LanguageRow(
 
 private fun setAppLanguage(tag: String) {
     AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsLanguageContentPreview() {
+    TripTogetherTheme {
+        SettingsLanguageContent(
+            isThai = true,
+            onSelect = {},
+            onBack = {},
+        )
+    }
 }

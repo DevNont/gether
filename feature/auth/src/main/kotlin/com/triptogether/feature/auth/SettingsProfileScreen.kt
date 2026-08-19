@@ -24,12 +24,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.triptogether.core.ui.theme.TripTogetherTheme
 
 /** Settings > โปรไฟล์ — display name only; photo edit waits for Storage. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsProfileScreen(
     onBack: () -> Unit,
@@ -49,6 +50,26 @@ fun SettingsProfileScreen(
         }
     }
 
+    SettingsProfileContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onDisplayNameChange = viewModel::onDisplayNameChange,
+        onSave = viewModel::save,
+        onBack = onBack,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsProfileContent(
+    uiState: SettingsUiState,
+    snackbarHostState: SnackbarHostState,
+    onDisplayNameChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -72,7 +93,7 @@ fun SettingsProfileScreen(
         ) {
             OutlinedTextField(
                 value = uiState.displayNameDraft,
-                onValueChange = viewModel::onDisplayNameChange,
+                onValueChange = onDisplayNameChange,
                 label = { Text(stringResource(R.string.settings_display_name)) },
                 leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
                 singleLine = true,
@@ -80,7 +101,7 @@ fun SettingsProfileScreen(
             )
             if (uiState.touched) {
                 Button(
-                    onClick = viewModel::save,
+                    onClick = onSave,
                     enabled = uiState.canSave,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -88,5 +109,19 @@ fun SettingsProfileScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsProfileContentPreview() {
+    TripTogetherTheme {
+        SettingsProfileContent(
+            uiState = SettingsUiState(isLoading = false, displayNameDraft = "สมชาย", touched = true),
+            snackbarHostState = SnackbarHostState(),
+            onDisplayNameChange = {},
+            onSave = {},
+            onBack = {},
+        )
     }
 }

@@ -201,7 +201,7 @@ class ExpenseEditorViewModel
                     row.enteredAmount?.let { Share(row.member.id, it) }
                 }
             if (entered.isEmpty()) return
-            val (updated, newTotal) = ExpenseSplitter.applySurcharge(entered, SERVICE_CHARGE_PERCENT)
+            val (updated, newTotal) = ExpenseSplitter.applySurcharge(entered, SERVICE_CHARGE_BASIS_POINTS)
             _uiState.update { s ->
                 s.copy(
                     totalInput = newTotal.format(),
@@ -250,6 +250,7 @@ class ExpenseEditorViewModel
         }
 
         private companion object {
-            const val SERVICE_CHARGE_PERCENT = 10.0
+            /** 10% service charge expressed in integer basis points — no Double near money. */
+            const val SERVICE_CHARGE_BASIS_POINTS = 1_000
         }
     }

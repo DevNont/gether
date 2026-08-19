@@ -31,6 +31,7 @@
     <string name="expense_mode_shares">By shares</string>
     <string name="expense_mode_itemized">By person</string>
     <string name="expense_editor_total_auto">Total (auto): %1$s</string>
+    <string name="expense_amount_invalid">Invalid amount</string>
     <string name="expense_editor_weight_up">Increase share</string>
     <string name="expense_editor_weight_down">Decrease share</string>
     <string name="expense_delta_enter_total">Enter the total first</string>

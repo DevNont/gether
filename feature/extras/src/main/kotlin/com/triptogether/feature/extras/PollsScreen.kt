@@ -40,7 +40,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -96,7 +100,7 @@ private fun PollsContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showCreate by remember { mutableStateOf(false) }
+    var showCreate by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -263,9 +267,16 @@ private fun CreatePollDialog(
     onCreate: (String, List<String>, Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var question by remember { mutableStateOf("") }
-    val options = remember { mutableStateListOf("", "") }
-    var multiChoice by remember { mutableStateOf(false) }
+    var question by rememberSaveable { mutableStateOf("") }
+    val options =
+        rememberSaveable(
+            saver =
+                listSaver<SnapshotStateList<String>, String>(
+                    save = { it.toList() },
+                    restore = { it.toMutableStateList() },
+                ),
+        ) { mutableStateListOf("", "") }
+    var multiChoice by rememberSaveable { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,

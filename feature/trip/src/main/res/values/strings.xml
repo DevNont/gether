@@ -48,6 +48,7 @@
     <string name="join_trip_not_found">ไม่พบรหัสนี้</string>
     <string name="join_trip_confirm">เข้าร่วมทริปนี้</string>
     <string name="join_trip_error">เข้าร่วมไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="join_trip_offline">ต่ออินเทอร์เน็ตก่อนใช้รหัสเชิญ</string>
     <string name="join_trip_scan">สแกน QR</string>
     <string name="join_trip_scan_prompt">ส่องกล้องไปที่ QR ของทริป</string>
 
@@ -57,6 +58,11 @@
     <string name="overview_close_invite">ปิดรหัสเชิญ</string>
     <string name="overview_invite_closed">ปิดรหัสเชิญแล้ว</string>
     <string name="overview_action_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="overview_archive_error">เก็บทริปเข้าคลังไม่สำเร็จ</string>
+    <string name="overview_add_guest_error">เพิ่มสมาชิกไม่สำเร็จ</string>
+    <string name="overview_delete_error">ลบทริปไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="overview_close_invite_error">ปิดรหัสเชิญไม่สำเร็จ</string>
+    <string name="overview_not_found">ไม่พบทริปนี้ อาจถูกลบไปแล้ว</string>
     <string name="overview_countdown_days">อีก %1$d วัน</string>
     <string name="overview_countdown_day_of_trip">วันที่ %1$d ของทริป</string>
     <string name="overview_countdown_finished">จบแล้ว</string>

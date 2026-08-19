@@ -31,6 +31,7 @@
     <string name="expense_mode_shares">ตามสัดส่วน</string>
     <string name="expense_mode_itemized">แยกรายคน</string>
     <string name="expense_editor_total_auto">ยอดรวม (อัตโนมัติ): %1$s</string>
+    <string name="expense_amount_invalid">จำนวนเงินไม่ถูกต้อง</string>
     <string name="expense_editor_weight_up">เพิ่มสัดส่วน</string>
     <string name="expense_editor_weight_down">ลดสัดส่วน</string>
     <string name="expense_delta_enter_total">กรอกยอดรวมก่อน</string>

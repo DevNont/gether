@@ -2,22 +2,17 @@ package com.triptogether.core.domain.usecase
 
 import com.triptogether.core.domain.model.Balance
 import com.triptogether.core.domain.model.Expense
-import com.triptogether.core.domain.model.InvitePreview
 import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Money
 import com.triptogether.core.domain.model.Settlement
 import com.triptogether.core.domain.model.SettlementStatus
 import com.triptogether.core.domain.model.Share
 import com.triptogether.core.domain.model.SplitMode
-import com.triptogether.core.domain.model.Trip
-import com.triptogether.core.domain.model.TripDraft
-import com.triptogether.core.domain.repository.ExpenseRepository
-import com.triptogether.core.domain.repository.SettlementRepository
-import com.triptogether.core.domain.repository.TripRepository
-import kotlinx.coroutines.flow.Flow
+import com.triptogether.core.testing.FakeExpenseRepo
+import com.triptogether.core.testing.FakeSettlementRepo
+import com.triptogether.core.testing.FakeTripRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -125,104 +120,4 @@ class SettlementUseCaseTest {
         status = status,
         markedBy = from,
     )
-}
-
-private class FakeTripRepo(private val members: MutableStateFlow<List<Member>>) : TripRepository {
-    override fun observeTrips(userId: String): Flow<List<Trip>> = flowOf(emptyList())
-
-    override fun observeTrip(tripId: String): Flow<Trip?> = flowOf(null)
-
-    override fun observeMembers(tripId: String): Flow<List<Member>> = members
-
-    override suspend fun createTrip(draft: TripDraft): Result<String> = Result.success("t1")
-
-    override suspend fun updateTrip(trip: Trip): Result<Unit> = Result.success(Unit)
-
-    override suspend fun deleteTrip(tripId: String): Result<Unit> = Result.success(Unit)
-
-    override suspend fun setArchived(
-        tripId: String,
-        archived: Boolean,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun updateTripNote(
-        tripId: String,
-        note: String?,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun setInviteActive(
-        code: String,
-        active: Boolean,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun getInvitePreview(code: String): Result<InvitePreview> =
-        Result.success(InvitePreview("t1", "trip"))
-
-    override suspend fun joinByCode(
-        code: String,
-        userId: String,
-    ): Result<String> = Result.success("t1")
-
-    override suspend fun addGuestMember(
-        tripId: String,
-        displayName: String,
-    ): Result<String> = Result.success("m-guest")
-
-    override suspend fun updateMember(
-        tripId: String,
-        member: Member,
-    ): Result<Unit> = Result.success(Unit)
-}
-
-private class FakeExpenseRepo(private val expenses: MutableStateFlow<List<Expense>>) : ExpenseRepository {
-    override fun observeExpenses(tripId: String): Flow<List<Expense>> = expenses
-
-    override suspend fun upsert(
-        tripId: String,
-        expense: Expense,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun updateOwnShare(
-        tripId: String,
-        expenseId: String,
-        memberId: String,
-        amount: com.triptogether.core.domain.model.Money,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun delete(
-        tripId: String,
-        expenseId: String,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun uploadSlip(
-        tripId: String,
-        expenseId: String,
-        bytes: ByteArray,
-    ): Result<String> = Result.success("url")
-}
-
-private class FakeSettlementRepo(private val settlements: MutableStateFlow<List<Settlement>>) : SettlementRepository {
-    override fun observeSettlements(tripId: String): Flow<List<Settlement>> = settlements
-
-    override suspend fun create(
-        tripId: String,
-        settlement: Settlement,
-    ): Result<String> = Result.success("s1")
-
-    override suspend fun confirm(
-        tripId: String,
-        settlementId: String,
-        confirmedByMemberId: String,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun delete(
-        tripId: String,
-        settlementId: String,
-    ): Result<Unit> = Result.success(Unit)
-
-    override suspend fun uploadSlip(
-        tripId: String,
-        settlementId: String,
-        bytes: ByteArray,
-    ): Result<String> = Result.success("url")
 }

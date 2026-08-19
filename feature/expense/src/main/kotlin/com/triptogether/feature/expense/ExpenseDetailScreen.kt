@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -252,7 +253,8 @@ private fun SharesCard(
     onUpdateMyShare: (Money) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var editingShare by remember { mutableStateOf<Money?>(null) }
+    // Money is not Saveable, so the satang Long survives rotation and the Money is rebuilt.
+    var editingShareSatang by rememberSaveable { mutableStateOf<Long?>(null) }
 
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -286,13 +288,15 @@ private fun SharesCard(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     if (isMine) {
+                        // Default 48dp IconButton keeps the touch target accessible; only the glyph is small.
                         IconButton(
-                            onClick = { editingShare = share.amount },
-                            modifier = Modifier.size(32.dp).testTag("edit_my_share"),
+                            onClick = { editingShareSatang = share.amount.satang },
+                            modifier = Modifier.testTag("edit_my_share"),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = stringResource(R.string.expense_edit_my_share),
+                                modifier = Modifier.size(20.dp),
                             )
                         }
                     }
@@ -301,13 +305,13 @@ private fun SharesCard(
         }
     }
 
-    editingShare?.let { current ->
+    editingShareSatang?.let { satang ->
         EditMyShareDialog(
-            current = current,
-            onDismiss = { editingShare = null },
+            current = Money(satang),
+            onDismiss = { editingShareSatang = null },
             onSave = {
                 onUpdateMyShare(it)
-                editingShare = null
+                editingShareSatang = null
             },
         )
     }
@@ -319,7 +323,7 @@ private fun EditMyShareDialog(
     onDismiss: () -> Unit,
     onSave: (Money) -> Unit,
 ) {
-    var input by remember { mutableStateOf(current.format()) }
+    var input by rememberSaveable { mutableStateOf(current.format()) }
     val parsed = Money.parse(input.trim())
     AlertDialog(
         onDismissRequest = onDismiss,

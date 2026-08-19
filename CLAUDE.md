@@ -28,7 +28,7 @@ Firebase project = `triptogether-703c3` (Firestore asia-southeast1, rules/indexe
 | `docs/05-architecture.md` | โมดูล, package, การตั้งชื่อ |
 | `docs/06-roadmap.md` | ลำดับงาน แบ่งเป็นเฟส |
 | `mockups/all-screens.html` | mockup ครบทุกหน้า เปิดในเบราว์เซอร์ |
-| `code/` | โค้ด domain layer ที่เขียนไว้แล้ว — คัดลอกไปใช้ อย่าเขียนใหม่ |
+| `core/domain/src/main/kotlin/com/triptogether/core/domain/` | โค้ด domain layer + money logic ตัวจริง — แก้ที่นี่ที่เดียว |
 
 ## Tech stack (ตายตัว — อย่าเปลี่ยนโดยไม่ถาม)
 
@@ -56,12 +56,12 @@ Repository ทุก method คืน `Result<T>` ไม่ throw ข้าม l
 
 ## กฎที่ห้ามละเมิด
 
-1. **เงินเป็น `Long` หน่วยสตางค์เสมอ** — ห้ามใช้ `Double`/`Float` กับจำนวนเงินทุกกรณี รวมถึงตัวแปรชั่วคราว ใช้ value class `Money` ใน `code/domain/Money.kt`
+1. **เงินเป็น `Long` หน่วยสตางค์เสมอ** — ห้ามใช้ `Double`/`Float` กับจำนวนเงินทุกกรณี รวมถึงตัวแปรชั่วคราว ใช้ value class `Money` ใน `core/domain/src/main/kotlin/com/triptogether/core/domain/model/Money.kt`
 2. **ห้ามให้ผลรวมของ share ไม่เท่ากับยอดบิล** — validate ทั้งฝั่ง client และ Firestore rules
 3. **`domain` layer ห้าม import อะไรที่ขึ้นกับ Android หรือ Firebase** — เตรียมย้ายไป KMP ตอนทำ iOS
 4. **ห้ามอ่าน/เขียน Firestore ตรงจาก ViewModel** — ผ่าน Repository interface ใน `domain` เท่านั้น
 5. **ห้าม hardcode ข้อความ UI** — ใส่ `strings.xml` ทั้งหมด ภาษาหลักคือไทย มี `values-en/` ด้วย
-6. **ทุก use case ที่เกี่ยวกับเงินต้องมี unit test** — ดูเทสต์ตัวอย่างใน `code/test/`
+6. **ทุก use case ที่เกี่ยวกับเงินต้องมี unit test** — ดูเทสต์ตัวอย่างใน `core/domain/src/test/kotlin/com/triptogether/core/domain/`
 7. ห้าม commit `google-services.json` — ใส่ `.gitignore` ตั้งแต่ commit แรก
 
 ## สไตล์โค้ด

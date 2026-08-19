@@ -120,13 +120,13 @@ class ActivityEditorViewModel
                             createdBy = existing?.createdBy ?: currentMemberId(),
                         )
                     }.getOrElse {
-                        _events.send(ActivityEditorEvent.Error(R.string.activity_editor_error))
+                        _events.send(ActivityEditorEvent.Error(R.string.activity_save_error))
                         _uiState.update { state -> state.copy(isSaving = false) }
                         return@launch
                     }
                 planRepository.upsertActivity(route.tripId, route.dayId, activity)
                     .onSuccess { _events.send(ActivityEditorEvent.Saved) }
-                    .onFailure { _events.send(ActivityEditorEvent.Error(R.string.activity_editor_error)) }
+                    .onFailure { _events.send(ActivityEditorEvent.Error(R.string.activity_save_error)) }
                 _uiState.update { it.copy(isSaving = false) }
             }
         }
@@ -136,7 +136,7 @@ class ActivityEditorViewModel
             viewModelScope.launch {
                 planRepository.deleteActivity(route.tripId, route.dayId, id)
                     .onSuccess { _events.send(ActivityEditorEvent.Deleted) }
-                    .onFailure { _events.send(ActivityEditorEvent.Error(R.string.activity_editor_error)) }
+                    .onFailure { _events.send(ActivityEditorEvent.Error(R.string.activity_delete_error)) }
             }
         }
 

@@ -24,7 +24,8 @@
     <string name="activity_editor_cancel">ยกเลิก</string>
     <string name="activity_editor_time_ok">ตกลง</string>
     <string name="activity_editor_time_clear">ไม่ระบุเวลา</string>
-    <string name="activity_editor_error">บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="activity_save_error">บันทึกกิจกรรมไม่สำเร็จ</string>
+    <string name="activity_delete_error">ลบกิจกรรมไม่สำเร็จ</string>
 
     <string name="activity_type_place">สถานที่</string>
     <string name="activity_type_food">ร้านอาหาร</string>

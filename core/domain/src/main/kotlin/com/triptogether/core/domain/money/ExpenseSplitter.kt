@@ -97,25 +97,60 @@ object ExpenseSplitter {
     }
 
     /**
-     * Adds a service charge / VAT of [percent] on top of each share, keeping
-     * each person's proportion intact.
+     * Adds a service charge / VAT of [percentBasisPoints] (10% = 1000 bp) on
+     * top of each share, keeping each person's proportion intact.
+     *
+     * The new total is `sum(shares) * (10000 + bp) / 10000` in pure Long math,
+     * then redistributed with the largest-remainder method of section 2.4:
+     * each raw share is truncated, and the leftover satang go one each to the
+     * members who lost the most to truncation, ties broken by memberId.
      *
      * Returns the new shares together with the new total, which the caller must
      * write back to the expense — the old total no longer matches.
      */
     fun applySurcharge(
         shares: List<Share>,
-        percent: Double,
+        percentBasisPoints: Int,
     ): Pair<List<Share>, Money> {
-        require(percent >= 0) { "Surcharge cannot be negative" }
-        val multiplierBasisPoints = Math.round(percent * 100) // 10% -> 1000
-        val updated =
-            shares.sortedBy { it.memberId }.map { share ->
-                val extra = share.amount.satang * multiplierBasisPoints / 10_000
-                share.copy(amount = Money(share.amount.satang + extra))
+        require(percentBasisPoints >= 0) { "Surcharge cannot be negative" }
+        if (shares.isEmpty()) return emptyList<Share>() to Money.ZERO
+
+        val multiplier = BASIS_POINT_SCALE + percentBasisPoints
+        val ordered = shares.sortedBy { it.memberId }
+        val newTotal = ordered.sumOf { it.amount.satang } * multiplier / BASIS_POINT_SCALE
+
+        val raw =
+            ordered.map { share ->
+                val exact = share.amount.satang * multiplier
+                val floor = exact / BASIS_POINT_SCALE
+                Triple(share, floor, exact - floor * BASIS_POINT_SCALE)
             }
-        return updated to Money(updated.sumOf { it.amount.satang })
+
+        val remainder = newTotal - raw.sumOf { it.second }
+        val bonusIds =
+            raw
+                .sortedWith(
+                    compareByDescending<Triple<Share, Long, Long>> { it.third }.thenBy { it.first.memberId },
+                )
+                .take(remainder.toInt())
+                .map { it.first.memberId }
+                .toSet()
+
+        val updated =
+            raw.map { (share, floor, _) ->
+                val extra = if (share.memberId in bonusIds) 1L else 0L
+                share.copy(amount = Money(floor + extra))
+            }
+        return updated to Money(newTotal)
     }
+
+    /**
+     * Total for `ITEMIZED` mode: the bill total is not entered by the user but
+     * derived as the sum of the per-member amounts, so the invariant
+     * `sum(shares) == totalAmount` holds by construction.
+     * See docs/04-money-logic.md section 2.5.
+     */
+    fun itemizedTotal(shares: List<Share>): Money = Money(shares.sumOf { it.amount.satang })
 
     /**
      * Difference between the shares as entered and the bill total.
@@ -126,4 +161,7 @@ object ExpenseSplitter {
         total: Money,
         shares: List<Share>,
     ): Money = Money(shares.sumOf { it.amount.satang }) - total
+
+    /** 100% expressed in basis points; 10% = 1000 bp. */
+    private const val BASIS_POINT_SCALE = 10_000L
 }

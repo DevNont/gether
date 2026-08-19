@@ -58,6 +58,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.todayIn
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /** S06 — horizontal day bar + vertical timeline with a per-day realtime listener. */
 @Composable
@@ -178,7 +179,9 @@ private fun DayChip(
         onClick = onClick,
         label = {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = day.date.toJavaLocalDate().format(DateTimeFormatter.ofPattern("E d MMM")))
+                // Locale.getDefault() follows the per-app locale, so day names match the UI language.
+                val formatter = DateTimeFormatter.ofPattern("E d MMM", Locale.getDefault())
+                Text(text = day.date.toJavaLocalDate().format(formatter))
                 if (isToday) {
                     Box(
                         modifier =

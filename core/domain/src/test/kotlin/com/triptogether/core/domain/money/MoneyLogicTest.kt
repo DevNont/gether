@@ -214,6 +214,13 @@ class MoneyLogicTest {
             val result = ExpenseSplitter.distributeRemainder(total, entered, listOf("c", "d", "e"))
             assertEquals(185_000L, result.sumOf { it.amount.satang })
             assertEquals(5, result.size)
+            // Leftover 950.00 baht over 3 people: 95000 / 3 = 31666 rem 2, and
+            // the 2 extra satang go to the first ids by sort order (docs 2.4).
+            assertEquals(52_000L, result.first { it.memberId == "a" }.amount.satang)
+            assertEquals(38_000L, result.first { it.memberId == "b" }.amount.satang)
+            assertEquals(31_667L, result.first { it.memberId == "c" }.amount.satang)
+            assertEquals(31_667L, result.first { it.memberId == "d" }.amount.satang)
+            assertEquals(31_666L, result.first { it.memberId == "e" }.amount.satang)
         }
 
         @Test fun `T18 - surcharge keeps proportions and returns the new total`() {
@@ -223,11 +230,41 @@ class MoneyLogicTest {
                     Share("b", Money(38_000)),
                     Share("c", Money(45_000)),
                 )
-            val (updated, newTotal) = ExpenseSplitter.applySurcharge(shares, 10.0)
+            val (updated, newTotal) = ExpenseSplitter.applySurcharge(shares, percentBasisPoints = 1_000)
+            assertEquals(148_500L, newTotal.satang)
             assertEquals(newTotal.satang, updated.sumOf { it.amount.satang })
             assertEquals(57_200L, updated.first { it.memberId == "a" }.amount.satang)
             assertEquals(41_800L, updated.first { it.memberId == "b" }.amount.satang)
             assertEquals(49_500L, updated.first { it.memberId == "c" }.amount.satang)
+        }
+
+        @Test fun `T18b - surcharge that does not divide evenly still sums to the new total`() {
+            val shares =
+                listOf(
+                    Share("a", Money(3_333)),
+                    Share("b", Money(3_333)),
+                    Share("c", Money(3_334)),
+                )
+            val (updated, newTotal) = ExpenseSplitter.applySurcharge(shares, percentBasisPoints = 1_000)
+            // newTotal = 10000 * 11000 / 10000 = 11000; truncated raws are
+            // [3666, 3666, 3667] and the 1 leftover satang goes to "c", whose
+            // truncated remainder (0.4 satang) is the largest.
+            assertEquals(11_000L, newTotal.satang)
+            assertEquals(newTotal.satang, updated.sumOf { it.amount.satang })
+            assertEquals(3_666L, updated.first { it.memberId == "a" }.amount.satang)
+            assertEquals(3_666L, updated.first { it.memberId == "b" }.amount.satang)
+            assertEquals(3_668L, updated.first { it.memberId == "c" }.amount.satang)
+        }
+
+        @Test fun `itemized total is the sum of the entered shares`() {
+            val shares =
+                listOf(
+                    Share("a", Money(12_050)),
+                    Share("b", Money(38_000)),
+                    Share("c", Money(1)),
+                )
+            assertEquals(Money(50_051), ExpenseSplitter.itemizedTotal(shares))
+            assertEquals(Money.ZERO, ExpenseSplitter.itemizedTotal(emptyList()))
         }
     }
 
@@ -242,6 +279,30 @@ class MoneyLogicTest {
             val shares = ExpenseSplitter.splitEqually(total, ids)
             assertEquals(total.satang, shares.sumOf { it.amount.satang })
         }
+    }
+
+    @Test
+    @DisplayName("T19b - property test: weighted shares sum to the total and are deterministic")
+    fun propertyWeightedSharesSumToTotal() {
+        // Two runs from the same seed must produce byte-identical share lists —
+        // the guarantee that two devices never disagree on a bill.
+        val runs =
+            List(2) {
+                val rng = Random(1212)
+                List(1_000) {
+                    val total = Money(rng.nextLong(0, 10_000_001))
+                    val n = rng.nextInt(1, 16)
+                    val weights = (1..n).associate { i -> "member-${rng.nextInt(100_000)}-$i" to rng.nextInt(1, 6) }
+                    val shares = ExpenseSplitter.splitByWeights(total, weights)
+                    assertEquals(
+                        total.satang,
+                        shares.sumOf { s -> s.amount.satang },
+                        "sum mismatch for total=${total.satang} weights=$weights",
+                    )
+                    shares
+                }
+            }
+        assertEquals(runs[0], runs[1])
     }
 
     @Test

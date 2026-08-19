@@ -1,5 +1,6 @@
 package com.triptogether.feature.extras
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,8 @@ import com.triptogether.core.domain.repository.MeetupRepository
 import com.triptogether.core.domain.repository.TripRepository
 import com.triptogether.feature.extras.navigation.MeetupRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +29,12 @@ data class MeetupUiState(
     val isLoading: Boolean = true,
     val meetups: List<Meetup> = emptyList(),
 )
+
+sealed interface MeetupEvent {
+    data class Error(
+        @StringRes val messageResId: Int,
+    ) : MeetupEvent
+}
 
 @HiltViewModel
 class MeetupViewModel
@@ -38,11 +48,17 @@ class MeetupViewModel
         private val route = savedStateHandle.toRoute<MeetupRoute>()
         val tripId: String get() = route.tripId
 
+        private val _events = Channel<MeetupEvent>(Channel.BUFFERED)
+        val events: Flow<MeetupEvent> = _events.receiveAsFlow()
+
         val uiState: StateFlow<MeetupUiState> =
             meetupRepository.observeMeetups(route.tripId)
                 .map { MeetupUiState(isLoading = false, meetups = it) }
-                // No event channel on this screen yet — degrade to an empty state instead of crashing.
-                .catch { emit(MeetupUiState(isLoading = false)) }
+                .catch {
+                    // A failed listener (e.g. PERMISSION_DENIED) must surface, not render as empty.
+                    _events.send(MeetupEvent.Error(R.string.meetup_error))
+                    emit(MeetupUiState(isLoading = false))
+                }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -64,7 +80,8 @@ class MeetupViewModel
         fun delete(meetup: Meetup) {
             viewModelScope.launch {
                 meetupRepository.delete(route.tripId, meetup.id)
-                scheduler.cancel(meetup.id)
+                    .onSuccess { scheduler.cancel(meetup.id) }
+                    .onFailure { _events.send(MeetupEvent.Error(R.string.meetup_error)) }
             }
         }
 

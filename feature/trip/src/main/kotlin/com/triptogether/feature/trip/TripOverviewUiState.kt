@@ -6,6 +6,8 @@ import com.triptogether.core.domain.model.Trip
 
 data class TripOverviewUiState(
     val isLoading: Boolean = true,
+    /** The trip document no longer exists (e.g. deleted by the owner while this screen was open). */
+    val notFound: Boolean = false,
     val trip: Trip? = null,
     val members: List<Member> = emptyList(),
     val isOwner: Boolean = false,

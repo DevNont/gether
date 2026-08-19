@@ -105,7 +105,7 @@ class SettlementViewModel
                     ),
                 )
                     .onSuccess { _events.send(SettlementEvent.Message(R.string.settlement_marked)) }
-                    .onFailure { _events.send(SettlementEvent.Message(R.string.settlement_error)) }
+                    .onFailure { _events.send(SettlementEvent.Message(R.string.settlement_mark_error)) }
             }
         }
 
@@ -118,7 +118,7 @@ class SettlementViewModel
                         analytics.log(AnalyticsLogger.SETTLEMENT_CONFIRMED)
                         _events.send(SettlementEvent.Message(R.string.settlement_confirmed))
                     }
-                    .onFailure { _events.send(SettlementEvent.Message(R.string.settlement_error)) }
+                    .onFailure { _events.send(SettlementEvent.Message(R.string.settlement_confirm_error)) }
             }
         }
 

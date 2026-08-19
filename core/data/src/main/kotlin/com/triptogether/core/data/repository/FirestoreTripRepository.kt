@@ -1,5 +1,6 @@
 package com.triptogether.core.data.repository
 
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -28,6 +29,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -107,7 +109,7 @@ class FirestoreTripRepository
                         "tripId" to tripRef.id,
                         "tripName" to draft.name,
                         "active" to true,
-                        "expiresAt" to null,
+                        "expiresAt" to Timestamp(Date(System.currentTimeMillis() + INVITE_TTL_MS)),
                     ),
                 )
                 batch.set(
@@ -354,6 +356,9 @@ class FirestoreTripRepository
             const val FIELD_ARCHIVED = "archived"
             const val FIELD_UPDATED_AT = "updatedAt"
             const val MAX_CODE_ATTEMPTS = 5
+
+            /** Invite codes stop working one week after the trip is created. */
+            const val INVITE_TTL_MS = 7L * 24 * 60 * 60 * 1000
         }
     }
 

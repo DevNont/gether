@@ -1,6 +1,5 @@
 package com.triptogether.core.domain.model
 
-import java.text.DecimalFormat
 import kotlin.jvm.JvmInline
 
 /**
@@ -27,8 +26,29 @@ value class Money(val satang: Long) : Comparable<Money> {
 
     fun abs() = Money(kotlin.math.abs(satang))
 
-    /** "1,850.00" — no currency symbol. */
-    fun format(): String = FORMAT.format(satang / 100.0)
+    /**
+     * "1,850.00" — no currency symbol, always 2 decimals, ASCII digits,
+     * ',' as the thousands separator regardless of device locale.
+     *
+     * Pure integer math: no Double ever touches money (docs/04 section 1)
+     * and the output never varies by locale (docs/04 section 6).
+     */
+    fun format(): String {
+        val negative = satang < 0
+        val abs = if (negative) -satang else satang
+        val baht = (abs / 100).toString()
+        val cents = (abs % 100).toInt()
+        return buildString {
+            if (negative) append('-')
+            for (i in baht.indices) {
+                if (i > 0 && (baht.length - i) % 3 == 0) append(',')
+                append(baht[i])
+            }
+            append('.')
+            if (cents < 10) append('0')
+            append(cents)
+        }
+    }
 
     /** "฿1,850.00" */
     fun formatWithSymbol(): String = "฿" + format()
@@ -45,8 +65,6 @@ value class Money(val satang: Long) : Comparable<Money> {
 
     companion object {
         val ZERO = Money(0)
-
-        private val FORMAT = DecimalFormat("#,##0.00")
 
         fun fromBaht(baht: Long) = Money(baht * 100)
 

@@ -132,7 +132,7 @@ class MeetupEditorViewModel
                     )
                 meetupRepository.upsert(route.tripId, meetup)
                     .onSuccess { _events.send(MeetupEditorEvent.Saved) }
-                    .onFailure { _events.send(MeetupEditorEvent.Error(R.string.meetup_error)) }
+                    .onFailure { _events.send(MeetupEditorEvent.Error(R.string.meetup_save_error)) }
                 _uiState.update { it.copy(isSaving = false) }
             }
         }
@@ -146,7 +146,7 @@ class MeetupEditorViewModel
                         reminderScheduler.cancel(id)
                         _events.send(MeetupEditorEvent.Deleted)
                     }
-                    .onFailure { _events.send(MeetupEditorEvent.Error(R.string.meetup_error)) }
+                    .onFailure { _events.send(MeetupEditorEvent.Error(R.string.meetup_delete_error)) }
             }
         }
     }

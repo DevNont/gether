@@ -16,6 +16,7 @@ import com.triptogether.core.domain.model.Member
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /** Small shared pieces used by the trip screens. */
 @Composable
@@ -50,6 +51,7 @@ internal fun formatDateRange(
     start: LocalDate,
     end: LocalDate,
 ): String {
-    val formatter = DateTimeFormatter.ofPattern("d MMM yy")
+    // Locale.getDefault() follows the per-app locale, so month names match the UI language.
+    val formatter = DateTimeFormatter.ofPattern("d MMM yy", Locale.getDefault())
     return "${formatter.format(start.toJavaLocalDate())} – ${formatter.format(end.toJavaLocalDate())}"
 }

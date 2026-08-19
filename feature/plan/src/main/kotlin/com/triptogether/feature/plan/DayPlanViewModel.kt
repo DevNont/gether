@@ -39,7 +39,9 @@ class DayPlanViewModel
                 days to (selected ?: defaultDayId(days))
             }.flatMapLatest { (days, selected) ->
                 if (selected == null) {
-                    flowOf(DayPlanUiState(isLoading = days.isEmpty(), days = days))
+                    // observeDayPlans has emitted by now, so an empty list is a real empty state,
+                    // not a loading one — spinning forever here would hide the empty-day hint.
+                    flowOf(DayPlanUiState(isLoading = false, days = days))
                 } else {
                     // Per-day snapshot listener only — never the whole trip (S06 spec).
                     planRepository.observeDayPlan(route.tripId, selected).map { day ->

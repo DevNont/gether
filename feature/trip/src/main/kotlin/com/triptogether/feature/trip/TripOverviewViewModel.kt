@@ -49,8 +49,11 @@ class TripOverviewViewModel
                 authRepository.observeAuthState(),
                 noteState,
             ) { trip, members, user, note ->
+                // combine only emits once the trip snapshot arrived, so a null trip here
+                // means the document does not exist — not that it is still loading.
                 TripOverviewUiState(
-                    isLoading = trip == null,
+                    isLoading = false,
+                    notFound = trip == null,
                     trip = trip,
                     members = members,
                     isOwner = trip != null && user != null && trip.ownerId == user.id,
@@ -88,7 +91,7 @@ class TripOverviewViewModel
             viewModelScope.launch {
                 tripRepository.setArchived(route.tripId, archived = true)
                     .onSuccess { _events.send(TripOverviewEvent.Message(R.string.overview_archived)) }
-                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_action_error)) }
+                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_archive_error)) }
             }
         }
 
@@ -99,7 +102,7 @@ class TripOverviewViewModel
             viewModelScope.launch {
                 tripRepository.addGuestMember(route.tripId, trimmed)
                     .onSuccess { _events.send(TripOverviewEvent.Message(R.string.overview_guest_added)) }
-                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_action_error)) }
+                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_add_guest_error)) }
             }
         }
 
@@ -108,7 +111,7 @@ class TripOverviewViewModel
             viewModelScope.launch {
                 tripRepository.deleteTrip(route.tripId)
                     .onSuccess { _events.send(TripOverviewEvent.Deleted) }
-                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_action_error)) }
+                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_delete_error)) }
             }
         }
 
@@ -117,7 +120,7 @@ class TripOverviewViewModel
             viewModelScope.launch {
                 tripRepository.setInviteActive(code, active = false)
                     .onSuccess { _events.send(TripOverviewEvent.Message(R.string.overview_invite_closed)) }
-                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_action_error)) }
+                    .onFailure { _events.send(TripOverviewEvent.Message(R.string.overview_close_invite_error)) }
             }
         }
 

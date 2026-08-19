@@ -31,12 +31,12 @@ docs/
 mockups/
   all-screens.html           mockup ครบ 14 หน้า เปิดในเบราว์เซอร์ได้เลย
 
-code/
-  domain/Money.kt            value class เงินหน่วยสตางค์
-  domain/Models.kt           domain model ทั้งหมด
-  domain/ExpenseSplitter.kt  ⭐ algorithm การหาร 3 โหมด
-  domain/DebtSimplifier.kt   ⭐ คำนวณ balance + ลดจำนวนครั้งการโอน
-  test/MoneyLogicTest.kt     เทสต์ T1–T20 ครอบทุกเคสใน 04-money-logic.md
+core/domain/src/
+  main/kotlin/.../model/Money.kt            value class เงินหน่วยสตางค์
+  main/kotlin/.../model/Models.kt           domain model ทั้งหมด
+  main/kotlin/.../money/ExpenseSplitter.kt  ⭐ algorithm การหาร
+  main/kotlin/.../money/DebtSimplifier.kt   ⭐ คำนวณ balance + ลดจำนวนครั้งการโอน
+  test/kotlin/.../MoneyLogicTest.kt         เทสต์ T1–T20 ครอบทุกเคสใน 04-money-logic.md
 
 firebase/
   firestore.rules            security rules
@@ -50,7 +50,7 @@ gradle/
 
 ## สิ่งที่ควรรู้ก่อนเริ่ม
 
-**โค้ดใน `code/` เขียนเสร็จแล้วและตรวจสอบ algorithm มาแล้ว** ทุกเคสใน `docs/04-money-logic.md` ถูกรันจริงกับ reference implementation แล้วผ่านหมด — ให้คัดลอกไปใช้ อย่าให้ Claude Code เขียนใหม่เพราะเป็นส่วนที่ผิดแล้วเสียหายที่สุด
+**Money logic ตัวจริงอยู่ใน `:core:domain` แล้ว** (`core/domain/src/main/kotlin/com/triptogether/core/domain/`) ทุกเคสใน `docs/04-money-logic.md` มีเทสต์ครอบใน `core/domain/src/test/` — อย่าเขียน logic การเงินใหม่เพราะเป็นส่วนที่ผิดแล้วเสียหายที่สุด
 
 **ทำ M1 ให้จบก่อนแตะ UI** โครงโมดูล + domain + เทสต์เขียว แล้วค่อยทำหน้าจอ เพราะทุกหน้าที่เกี่ยวกับเงินเรียกใช้ domain ที่เดียวกัน
 

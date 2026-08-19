@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.QrCode2
@@ -136,9 +137,10 @@ private fun SettlementContent(
                     }
                     if (uiState.transfers.isNotEmpty()) {
                         item { SectionHeader(stringResource(R.string.settlement_suggested)) }
-                        items(uiState.transfers.size) { index ->
+                        // Transfers carry no id; the (from, to) pair is unique per suggestion round.
+                        items(uiState.transfers, key = { "${it.fromMemberId}_${it.toMemberId}" }) { transfer ->
                             TransferRow(
-                                transfer = uiState.transfers[index],
+                                transfer = transfer,
                                 uiState = uiState,
                                 onShowQr = { qrTransfer = it },
                                 onMarkTransferred = onMarkTransferred,
@@ -147,9 +149,9 @@ private fun SettlementContent(
                     }
                     if (uiState.pending.isNotEmpty()) {
                         item { SectionHeader(stringResource(R.string.settlement_pending)) }
-                        items(uiState.pending.size) { index ->
+                        items(uiState.pending, key = { it.id }) { settlement ->
                             PendingRow(
-                                settlement = uiState.pending[index],
+                                settlement = settlement,
                                 uiState = uiState,
                                 onConfirm = onConfirm,
                             )
@@ -157,8 +159,8 @@ private fun SettlementContent(
                     }
                     if (uiState.confirmed.isNotEmpty()) {
                         item { SectionHeader(stringResource(R.string.settlement_cleared)) }
-                        items(uiState.confirmed.size) { index ->
-                            ConfirmedRow(settlement = uiState.confirmed[index], uiState = uiState)
+                        items(uiState.confirmed, key = { it.id }) { settlement ->
+                            ConfirmedRow(settlement = settlement, uiState = uiState)
                         }
                     }
                 }

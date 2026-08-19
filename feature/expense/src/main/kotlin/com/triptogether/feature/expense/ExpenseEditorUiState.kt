@@ -6,7 +6,6 @@ import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Money
 import com.triptogether.core.domain.model.Share
 import com.triptogether.core.domain.model.SplitMode
-import com.triptogether.core.domain.model.sum
 import com.triptogether.core.domain.money.ExpenseSplitter
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -20,6 +19,9 @@ data class MemberSplitRow(
     val weight: Int = 1,
 ) {
     val enteredAmount: Money? get() = Money.parse(amountInput.trim()).takeIf { amountInput.isNotBlank() }
+
+    /** True when something was typed but it does not parse as an amount of money. */
+    val isInvalid: Boolean get() = amountInput.isNotBlank() && Money.parse(amountInput.trim()) == null
 }
 
 data class ExpenseEditorUiState(
@@ -42,7 +44,9 @@ data class ExpenseEditorUiState(
     val total: Money?
         get() =
             if (splitMode == SplitMode.ITEMIZED) {
-                selectedRows.map { it.enteredAmount ?: Money.ZERO }.sum()
+                ExpenseSplitter.itemizedTotal(
+                    selectedRows.map { Share(memberId = it.member.id, amount = it.enteredAmount ?: Money.ZERO) },
+                )
             } else {
                 Money.parse(totalInput.trim())
             }
@@ -83,8 +87,13 @@ data class ExpenseEditorUiState(
             if (paidByMemberId == null || date == null) return false
             if (selectedRows.isEmpty()) return false
             return when (splitMode) {
-                SplitMode.EQUAL, SplitMode.SHARES, SplitMode.ITEMIZED -> true
-                SplitMode.EXACT -> everyoneEntered && delta?.isZero == true
+                SplitMode.EQUAL, SplitMode.SHARES -> true
+                SplitMode.ITEMIZED ->
+                    selectedRows.none { it.isInvalid } &&
+                        selectedRows.any { it.amountInput.isNotBlank() } &&
+                        total.satang > 0
+                SplitMode.EXACT ->
+                    selectedRows.none { it.isInvalid } && everyoneEntered && delta?.isZero == true
             }
         }
 

@@ -44,6 +44,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
@@ -203,6 +204,8 @@ private fun CreateTripContent(
             // Past dates are only pickable when editing an already-started trip.
             allowPastDates = uiState.isExisting,
             busyDates = uiState.busyDates,
+            initialStart = uiState.startDate,
+            initialEnd = uiState.endDate,
             onConfirm = { start, end ->
                 onDatesSelected(start, end)
                 showDatePicker = false
@@ -242,11 +245,16 @@ private fun BusyRangesLegend(
 private fun TripDateRangePickerDialog(
     allowPastDates: Boolean,
     busyDates: Set<LocalDate>,
+    initialStart: LocalDate?,
+    initialEnd: LocalDate?,
     onConfirm: (LocalDate, LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    // Open the picker at the range currently being edited, not at today.
     val pickerState =
         rememberDateRangePickerState(
+            initialSelectedStartDateMillis = initialStart?.atStartOfDayIn(TimeZone.UTC)?.toEpochMilliseconds(),
+            initialSelectedEndDateMillis = initialEnd?.atStartOfDayIn(TimeZone.UTC)?.toEpochMilliseconds(),
             selectableDates = remember(allowPastDates, busyDates) { tripSelectableDates(allowPastDates, busyDates) },
         )
     DatePickerDialog(

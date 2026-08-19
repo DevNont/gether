@@ -18,6 +18,8 @@
     <string name="settlement_marked">Transfer recorded, waiting for confirmation</string>
     <string name="settlement_confirmed">Confirmed</string>
     <string name="settlement_error">Action failed. Please try again.</string>
+    <string name="settlement_mark_error">Could not record the transfer</string>
+    <string name="settlement_confirm_error">Could not confirm the payment</string>
     <string name="settlement_qr_invalid">The receiver\'s PromptPay id is invalid</string>
     <string name="settlement_qr_close">Close</string>
 </resources>

@@ -70,6 +70,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
@@ -342,7 +343,11 @@ private fun DateField(
         )
     }
     if (showPicker) {
-        val pickerState = rememberDatePickerState()
+        // Open the picker at the date currently being edited, not at today.
+        val pickerState =
+            rememberDatePickerState(
+                initialSelectedDateMillis = date?.atStartOfDayIn(TimeZone.UTC)?.toEpochMilliseconds(),
+            )
         DatePickerDialog(
             onDismissRequest = { showPicker = false },
             confirmButton = {
@@ -357,6 +362,11 @@ private fun DateField(
                     },
                 ) {
                     Text(stringResource(R.string.expense_editor_date_ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPicker = false }) {
+                    Text(stringResource(R.string.expense_detail_cancel))
                 }
             },
         ) {
@@ -475,6 +485,18 @@ private fun MemberRow(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     placeholder = { Text("0.00") },
+                    isError = row.isInvalid,
+                    supportingText =
+                        if (row.isInvalid) {
+                            {
+                                Text(
+                                    text = stringResource(R.string.expense_amount_invalid),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        } else {
+                            null
+                        },
                     modifier = Modifier.width(120.dp).testTag("amount_${row.member.id}"),
                 )
             SplitMode.SHARES ->

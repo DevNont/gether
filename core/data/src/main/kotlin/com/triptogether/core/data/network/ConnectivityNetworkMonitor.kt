@@ -24,15 +24,25 @@ class ConnectivityNetworkMonitor
             callbackFlow {
                 val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-                fun current(): Boolean {
-                    val capabilities = manager.getNetworkCapabilities(manager.activeNetwork)
-                    return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-                }
+                // VALIDATED filters out captive portals and dead Wi-Fi that report INTERNET.
+                fun NetworkCapabilities.isConnected(): Boolean =
+                    hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                        hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+
+                fun current(): Boolean = manager.getNetworkCapabilities(manager.activeNetwork)?.isConnected() == true
 
                 val callback =
                     object : ConnectivityManager.NetworkCallback() {
                         override fun onAvailable(network: Network) {
-                            trySend(true)
+                            // The new network may not be validated yet; onCapabilitiesChanged follows.
+                            trySend(current())
+                        }
+
+                        override fun onCapabilitiesChanged(
+                            network: Network,
+                            networkCapabilities: NetworkCapabilities,
+                        ) {
+                            trySend(networkCapabilities.isConnected())
                         }
 
                         override fun onLost(network: Network) {

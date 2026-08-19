@@ -25,6 +25,10 @@
     <string name="meetup_add">Add meetup</string>
     <string name="meetup_empty">No meetups yet — tap + to add one</string>
     <string name="meetup_error">Action failed. Please try again.</string>
+    <string name="meetup_save_error">Could not save the meetup</string>
+    <string name="meetup_delete_error">Could not delete the meetup</string>
+    <string name="meetup_notifications_off">Notifications are off — reminders will not appear</string>
+    <string name="meetup_open_settings">Open settings</string>
     <string name="meetup_editor_title_new">Add meetup</string>
     <string name="meetup_editor_title_edit">Edit meetup</string>
     <string name="meetup_name">What</string>

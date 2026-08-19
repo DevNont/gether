@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.model.INVITE_CODE_LENGTH
 import com.triptogether.core.domain.repository.AnalyticsLogger
 import com.triptogether.core.domain.repository.AuthRepository
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -27,6 +28,7 @@ class JoinTripViewModel
         private val tripRepository: TripRepository,
         private val authRepository: AuthRepository,
         private val analytics: AnalyticsLogger,
+        private val networkMonitor: NetworkMonitor,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(JoinTripUiState())
         val uiState: StateFlow<JoinTripUiState> = _uiState.asStateFlow()
@@ -55,7 +57,13 @@ class JoinTripViewModel
                         _uiState.update { it.copy(isLookingUp = false, preview = preview, notFound = false) }
                     }
                     .onFailure {
-                        _uiState.update { it.copy(isLookingUp = false, preview = null, notFound = true) }
+                        // Offline lookups always fail — say so instead of a misleading "code not found".
+                        if (networkMonitor.isOnline.first()) {
+                            _uiState.update { it.copy(isLookingUp = false, preview = null, notFound = true) }
+                        } else {
+                            _uiState.update { it.copy(isLookingUp = false, preview = null, notFound = false) }
+                            _events.send(JoinTripEvent.Error(R.string.join_trip_offline))
+                        }
                     }
             }
 

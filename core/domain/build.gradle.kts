@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.datetime)
 
+    testImplementation(project(":core:testing"))
     testImplementation(libs.junit5.api)
     testImplementation(libs.junit5.params)
     testImplementation(libs.kotest.property)

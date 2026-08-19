@@ -48,6 +48,7 @@
     <string name="join_trip_not_found">Code not found</string>
     <string name="join_trip_confirm">Join this trip</string>
     <string name="join_trip_error">Could not join. Please try again.</string>
+    <string name="join_trip_offline">Connect to the internet to use an invite code</string>
     <string name="join_trip_scan">Scan QR</string>
     <string name="join_trip_scan_prompt">Point the camera at the trip\'s QR</string>
 
@@ -57,6 +58,11 @@
     <string name="overview_close_invite">Close invite code</string>
     <string name="overview_invite_closed">Invite code closed</string>
     <string name="overview_action_error">Action failed. Please try again.</string>
+    <string name="overview_archive_error">Could not archive the trip</string>
+    <string name="overview_add_guest_error">Could not add the member</string>
+    <string name="overview_delete_error">Could not delete the trip. Please try again.</string>
+    <string name="overview_close_invite_error">Could not close the invite code</string>
+    <string name="overview_not_found">Trip not found — it may have been deleted</string>
     <string name="overview_countdown_days">%1$d days to go</string>
     <string name="overview_countdown_day_of_trip">Day %1$d of the trip</string>
     <string name="overview_countdown_finished">Finished</string>

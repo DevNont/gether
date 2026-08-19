@@ -25,12 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.triptogether.core.ui.theme.TripTogetherTheme
 
 /** Settings > พร้อมเพย์ — the id behind the QR everyone pays you with (S11). */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPromptpayScreen(
     onBack: () -> Unit,
@@ -50,6 +51,26 @@ fun SettingsPromptpayScreen(
         }
     }
 
+    SettingsPromptpayContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onPromptpayChange = viewModel::onPromptpayChange,
+        onSave = viewModel::save,
+        onBack = onBack,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsPromptpayContent(
+    uiState: SettingsUiState,
+    snackbarHostState: SnackbarHostState,
+    onPromptpayChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -73,7 +94,7 @@ fun SettingsPromptpayScreen(
         ) {
             OutlinedTextField(
                 value = uiState.promptpayDraft,
-                onValueChange = viewModel::onPromptpayChange,
+                onValueChange = onPromptpayChange,
                 label = { Text(stringResource(R.string.settings_promptpay)) },
                 leadingIcon = { Icon(imageVector = Icons.Default.QrCode2, contentDescription = null) },
                 supportingText = {
@@ -92,7 +113,7 @@ fun SettingsPromptpayScreen(
             )
             if (uiState.touched) {
                 Button(
-                    onClick = viewModel::save,
+                    onClick = onSave,
                     enabled = uiState.canSave,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -100,5 +121,19 @@ fun SettingsPromptpayScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsPromptpayContentPreview() {
+    TripTogetherTheme {
+        SettingsPromptpayContent(
+            uiState = SettingsUiState(isLoading = false, promptpayDraft = "0812345678", touched = true),
+            snackbarHostState = SnackbarHostState(),
+            onPromptpayChange = {},
+            onSave = {},
+            onBack = {},
+        )
     }
 }
