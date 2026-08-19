@@ -55,6 +55,7 @@ import com.triptogether.core.domain.model.Member
 import com.triptogether.core.domain.model.Trip
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.daysUntil
 
 /** S02 — trips in two groups (upcoming / finished) with empty state, FAB to create, join via header. */
 @Composable
@@ -272,8 +273,11 @@ private fun TripCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                val days = card.trip.startDate.daysUntil(card.trip.endDate) + 1
                 Text(
-                    text = formatDateRange(card.trip.startDate, card.trip.endDate),
+                    text =
+                        formatDateRange(card.trip.startDate, card.trip.endDate) +
+                            " · " + stringResource(R.string.trip_list_days, days),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -8,6 +8,7 @@
     <string name="trip_list_create">Create trip</string>
     <string name="trip_list_join">Join with code</string>
     <string name="trip_list_avatar_overflow">+%1$d</string>
+    <string name="trip_list_days">%1$d days</string>
     <string name="trip_list_settings">Settings</string>
     <string name="trip_list_seed_demo">Seed a demo trip</string>
     <string name="trip_list_seed_error">Could not seed the demo trip</string>

@@ -8,6 +8,7 @@
     <string name="trip_list_create">สร้างทริป</string>
     <string name="trip_list_join">เข้าร่วมด้วยรหัส</string>
     <string name="trip_list_avatar_overflow">+%1$d</string>
+    <string name="trip_list_days">%1$d วัน</string>
     <string name="trip_list_settings">ตั้งค่า</string>
     <string name="trip_list_seed_demo">สร้างทริปตัวอย่าง</string>
     <string name="trip_list_seed_error">สร้างทริปตัวอย่างไม่สำเร็จ</string>
