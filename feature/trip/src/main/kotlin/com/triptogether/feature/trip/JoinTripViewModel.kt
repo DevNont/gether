@@ -37,7 +37,7 @@ class JoinTripViewModel
         private var lookupJob: Job? = null
 
         fun onCodeChange(raw: String) {
-            val code = raw.uppercase().filter { it.isLetterOrDigit() }.take(INVITE_CODE_LENGTH)
+            val code = raw.filter { it.isDigit() }.take(INVITE_CODE_LENGTH)
             _uiState.update {
                 it.copy(code = code, preview = null, notFound = false)
             }

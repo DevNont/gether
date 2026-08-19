@@ -8,22 +8,21 @@ import kotlin.random.Random
 
 class InviteCodesTest {
     @Test
-    @DisplayName("Codes are 6 chars drawn only from the unambiguous alphabet")
+    @DisplayName("Codes are 6 digits")
     fun codeShape() {
         val random = Random(42)
         repeat(1_000) {
             val code = InviteCodes.random(random)
             assertEquals(InviteCodes.LENGTH, code.length)
-            assertTrue(code.all { it in InviteCodes.ALPHABET }) { "Unexpected char in $code" }
+            assertTrue(code.all { it.isDigit() }) { "Unexpected char in $code" }
         }
     }
 
     @Test
-    @DisplayName("Alphabet excludes the confusable O, 0, I, 1")
-    fun alphabetExcludesConfusables() {
-        val forbidden = setOf('O', '0', 'I', '1')
-        assertTrue(InviteCodes.ALPHABET.none { it in forbidden })
-        assertEquals(32, InviteCodes.ALPHABET.length)
+    @DisplayName("Alphabet is the ten digits")
+    fun alphabetIsDigits() {
+        assertEquals("0123456789", InviteCodes.ALPHABET)
+        assertTrue(InviteCodes.ALPHABET.all { it.isDigit() })
     }
 
     @Test

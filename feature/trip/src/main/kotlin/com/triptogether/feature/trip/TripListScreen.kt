@@ -421,7 +421,7 @@ private fun TripListContentPreview() {
             startDate = LocalDate(2026, 12, 5),
             endDate = LocalDate(2026, 12, 7),
             ownerId = "u1",
-            inviteCode = "AB23CD",
+            inviteCode = "482913",
         )
     TripTogetherTheme {
         TripListContent(

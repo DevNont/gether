@@ -119,7 +119,7 @@ internal fun parseScannedInvite(text: String): String? {
             trimmed.contains("triptogether.app/join/") -> trimmed.substringAfterLast("/")
             else -> trimmed
         }
-    val code = raw.uppercase().filter { it.isLetterOrDigit() }
+    val code = raw.filter { it.isDigit() }
     return code.takeIf { it.length == INVITE_CODE_LENGTH }
 }
 
@@ -250,7 +250,7 @@ private fun CodeInput(
     BasicTextField(
         value = code,
         onValueChange = onCodeChange,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
         modifier = modifier,
         decorationBox = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -532,7 +532,7 @@ private fun TripOverviewContentPreview() {
                             startDate = LocalDate(2026, 12, 5),
                             endDate = LocalDate(2026, 12, 7),
                             ownerId = "u1",
-                            inviteCode = "AB23CD",
+                            inviteCode = "482913",
                         ),
                     members = listOf(Member(id = "m1", userId = "u1", displayName = "สมชาย")),
                     isOwner = true,

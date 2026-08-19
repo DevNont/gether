@@ -2,10 +2,10 @@ package com.triptogether.core.data.util
 
 import kotlin.random.Random
 
-/** 6-char invite codes from A-Z 0-9 minus the confusable O, 0, I, 1 (docs/02). */
+/** 6-digit numeric invite codes — easy to read out loud and type on a number pad. */
 object InviteCodes {
     const val LENGTH = 6
-    const val ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    const val ALPHABET = "0123456789"
 
     fun random(random: Random = Random.Default): String =
         buildString(LENGTH) {
