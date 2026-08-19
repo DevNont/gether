@@ -66,6 +66,9 @@ class FirebaseAuthRepository
                 val current = auth.currentUser ?: error("Not signed in")
                 val result = current.startActivityForLinkWithProvider(activity, lineProvider()).await()
                 val firebaseUser = result.user ?: error("Link returned no user")
+                // Linking does not fire AuthStateListener; re-set the user so
+                // observeAuthState re-emits with isAnonymous = false immediately.
+                auth.updateCurrentUser(firebaseUser).await()
                 firebaseUser.toDomainUser()
             }
 
@@ -74,6 +77,11 @@ class FirebaseAuthRepository
         private fun lineProvider(): OAuthProvider =
             OAuthProvider.newBuilder(LINE_PROVIDER_ID)
                 .setScopes(listOf("openid", "profile"))
+                // LINE's app-to-app auto login returns the callback in a NEW browser
+                // tab, losing the Firebase handler's sessionStorage ("missing initial
+                // state"). Forcing the web login form keeps the whole round-trip in
+                // one Custom Tab, at the cost of typing LINE credentials once.
+                .addCustomParameter("disable_auto_login", "true")
                 .build()
 
         private companion object {
