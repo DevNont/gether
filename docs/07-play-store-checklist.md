@@ -3,7 +3,7 @@
 รวมทุกอย่างที่ต้องทำก่อนปล่อยแอปบน Google Play — ยังไม่ได้ลงมือ เก็บไว้เป็น checklist
 สถานะปัจจุบัน: แอปปล่อยเป็น **debug-signed APK บน GitHub Releases** (beta ให้เพื่อน test) เท่านั้น
 
-> ⚠️ ตัวที่พังง่ายสุดคือ **SHA-1 ของ signing key** — Play เซ็นใหม่ทำให้ SHA-1 เปลี่ยน ถ้าไม่เพิ่มใน Firebase → Google sign-in พังทั้งที่ Firestore ยังทำงาน
+> หมายเหตุ: ตั้งแต่เปลี่ยนเป็น LINE login (OIDC browser flow) + Anonymous — **SHA-1 ไม่กระทบ login อีกต่อไป** ข้อ SHA-1 ด้านล่างเหลือไว้เผื่อกลับมาใช้ Google/Play Integrity ในอนาคต
 
 ---
 

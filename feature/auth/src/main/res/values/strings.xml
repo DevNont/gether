@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="auth_app_title">TripTogether</string>
-    <string name="auth_sign_in_with_google">เข้าสู่ระบบด้วย Google</string>
-    <string name="auth_sign_in_error">เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="auth_sign_in_with_line">เข้าสู่ระบบด้วย LINE</string>
+    <string name="auth_continue_without_account">เข้าใช้โดยไม่มีบัญชี</string>
+    <string name="auth_anon_name_label">ชื่อที่จะแสดงให้เพื่อนเห็น</string>
+    <string name="auth_anon_warning">ข้อมูลจะผูกกับเครื่องนี้ ถ้าลบแอปหรือเปลี่ยนเครื่อง บัญชีจะหาย — เชื่อม LINE ทีหลังได้ในหน้าตั้งค่า</string>
+    <string name="auth_anon_confirm">เริ่มใช้งาน</string>
+    <string name="auth_anon_back">ย้อนกลับ</string>
+    <string name="auth_line_error">เข้าสู่ระบบด้วย LINE ไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="auth_anon_error">เริ่มใช้งานไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="settings_link_line">เชื่อมบัญชี LINE</string>
+    <string name="settings_link_line_hint">เก็บทริปไว้ถาวร ใช้ได้หลายเครื่อง</string>
+    <string name="settings_link_line_error">เชื่อมบัญชี LINE ไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="settings_link_line_done">เชื่อมบัญชี LINE แล้ว</string>
 
     <string name="settings_title">ตั้งค่า</string>
     <string name="settings_back">ย้อนกลับ</string>

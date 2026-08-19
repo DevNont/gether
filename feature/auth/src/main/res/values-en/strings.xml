@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="auth_app_title">TripTogether</string>
-    <string name="auth_sign_in_with_google">Sign in with Google</string>
-    <string name="auth_sign_in_error">Sign-in failed. Please try again.</string>
+    <string name="auth_sign_in_with_line">Sign in with LINE</string>
+    <string name="auth_continue_without_account">Continue without an account</string>
+    <string name="auth_anon_name_label">Name your friends will see</string>
+    <string name="auth_anon_warning">Your data is tied to this device. Deleting the app or switching phones loses the account — you can link LINE later in Settings.</string>
+    <string name="auth_anon_confirm">Get started</string>
+    <string name="auth_anon_back">Back</string>
+    <string name="auth_line_error">LINE sign-in failed. Please try again.</string>
+    <string name="auth_anon_error">Could not get started. Please try again.</string>
+    <string name="settings_link_line">Link LINE account</string>
+    <string name="settings_link_line_hint">Keep your trips forever and use them on any device</string>
+    <string name="settings_link_line_error">Could not link LINE. Please try again.</string>
+    <string name="settings_link_line_done">LINE account linked</string>
 
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>

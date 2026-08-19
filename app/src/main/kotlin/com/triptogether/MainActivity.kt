@@ -24,14 +24,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.triptogether.core.domain.repository.AuthUiHost
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import com.triptogether.feature.auth.SignInScreen
 import com.triptogether.notifications.Notifications
 import dagger.hilt.android.AndroidEntryPoint
 
 // AppCompatActivity (not ComponentActivity) so setApplicationLocales recreates with the right locale.
+// AuthUiHost lets the data layer launch browser sign-in flows (LINE) from this activity.
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AuthUiHost {
     private val viewModel: MainViewModel by viewModels()
 
     /** Invite code from a deep link, held until the user is signed in (S01 spec). */

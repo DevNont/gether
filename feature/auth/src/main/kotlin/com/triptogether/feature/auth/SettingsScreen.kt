@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode2
@@ -64,12 +65,14 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     SettingsMenuContent(
         uiState = uiState,
         onOpenProfile = onOpenProfile,
         onOpenPromptpay = onOpenPromptpay,
         onOpenLanguage = onOpenLanguage,
         onOpenTheme = onOpenTheme,
+        onLinkLine = { context.findAuthUiHost()?.let(viewModel::linkLine) },
         onSignOut = viewModel::signOut,
         onBack = onBack,
         modifier = modifier,
@@ -84,6 +87,7 @@ private fun SettingsMenuContent(
     onOpenPromptpay: () -> Unit,
     onOpenLanguage: () -> Unit,
     onOpenTheme: () -> Unit,
+    onLinkLine: () -> Unit,
     onSignOut: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -175,6 +179,18 @@ private fun SettingsMenuContent(
                     enabled = false,
                     onClick = {},
                 )
+            }
+
+            if (uiState.isAnonymous) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    SettingsMenuRow(
+                        icon = Icons.Default.Link,
+                        label = stringResource(R.string.settings_link_line),
+                        value = stringResource(R.string.settings_link_line_hint),
+                        onClick = onLinkLine,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -298,6 +314,7 @@ private fun SettingsMenuContentPreview() {
             onOpenPromptpay = {},
             onOpenLanguage = {},
             onOpenTheme = {},
+            onLinkLine = {},
             onSignOut = {},
             onBack = {},
         )

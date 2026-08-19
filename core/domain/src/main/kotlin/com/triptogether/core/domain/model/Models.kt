@@ -152,6 +152,8 @@ data class User(
     val displayName: String,
     val photoUrl: String? = null,
     val promptpayId: String? = null,
+    /** True for a device-local account that has not been linked to LINE yet. */
+    val isAnonymous: Boolean = false,
 )
 
 const val INVITE_CODE_LENGTH = 6

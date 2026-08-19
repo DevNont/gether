@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.model.User
 import com.triptogether.core.domain.repository.AuthRepository
+import com.triptogether.core.domain.repository.AuthUiHost
 import com.triptogether.core.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -32,6 +34,8 @@ data class SettingsUiState(
     val promptpayDraft: String = "",
     val touched: Boolean = false,
     val isSaving: Boolean = false,
+    /** True while the session is an unlinked device-local account — shows the "link LINE" row. */
+    val isAnonymous: Boolean = false,
 ) {
     /** PromptPay must be a 10-digit phone (leading 0) or a 13-digit citizen id (S14 spec). */
     val isPromptpayInvalid: Boolean
@@ -77,8 +81,10 @@ class SettingsViewModel
         val uiState: StateFlow<SettingsUiState> =
             authRepository.observeAuthState()
                 .filterNotNull()
-                .flatMapLatest { userRepository.observeUser(it.id) }
-                .combine(draft) { user, draft ->
+                .flatMapLatest { authUser ->
+                    userRepository.observeUser(authUser.id).map { authUser to it }
+                }
+                .combine(draft) { (authUser, user), draft ->
                     SettingsUiState(
                         isLoading = user == null,
                         user = user,
@@ -86,6 +92,7 @@ class SettingsViewModel
                         promptpayDraft = if (draft.touched) draft.promptpay else user?.promptpayId.orEmpty(),
                         touched = draft.touched,
                         isSaving = draft.saving,
+                        isAnonymous = authUser.isAnonymous,
                     )
                 }.stateIn(
                     scope = viewModelScope,
@@ -138,6 +145,15 @@ class SettingsViewModel
 
         fun signOut() {
             viewModelScope.launch { authRepository.signOut() }
+        }
+
+        /** Upgrades the anonymous account to LINE, keeping the same uid so trips stay attached. */
+        fun linkLine(host: AuthUiHost) {
+            viewModelScope.launch {
+                authRepository.linkWithLine(host)
+                    .onSuccess { _events.send(SettingsEvent.Message(R.string.settings_link_line_done)) }
+                    .onFailure { _events.send(SettingsEvent.Message(R.string.settings_link_line_error)) }
+            }
         }
 
         private companion object {

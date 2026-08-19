@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## สถานะปัจจุบัน
 
 โครงโปรเจกต์ครบทุกโมดูลแล้ว ทำถึง M7 ตาม `docs/06-roadmap.md` (ดู git log — commit ตั้งชื่อตามรหัส task)
-Firebase project = `triptogether-703c3` (Firestore asia-southeast1 + Auth Google เปิดแล้ว, rules/indexes deploy แล้ว)
+Firebase project = `triptogether-703c3` (Firestore asia-southeast1, rules/indexes deploy แล้ว; Auth = LINE `oidc.line` + Anonymous — ต้องตั้งค่า console ตาม `docs/09-line-login-setup.md`)
 
 **สิ่งที่ยังทำไม่ได้เพราะติด blocker ภายนอก:**
 - Storage bucket ยังไม่มี (ต้อง upgrade Blaze) → M3.4, M4.6, รูปปก, รูปโปรไฟล์, และ `storage.rules` ยังไม่ deploy
@@ -35,7 +35,7 @@ Firebase project = `triptogether-703c3` (Firestore asia-southeast1 + Auth Google
 - Kotlin 2.x, Jetpack Compose + Material 3, minSdk 26, targetSdk 35
 - MVVM: `ui` → `domain` → `data` (dependency ชี้ทางเดียวเข้าใน)
 - Hilt (DI), Coroutines + Flow, Navigation Compose แบบ type-safe
-- Firebase: Auth (Google Sign-in ผ่าน Credential Manager), Firestore, Storage, FCM
+- Firebase: Auth (LINE ผ่าน OIDC `oidc.line` + Anonymous — ดู `docs/09-line-login-setup.md`), Firestore, Storage, FCM
 - Coil (รูป), CameraX (ถ่ายสลิป)
 - Test: JUnit5, Turbine, MockK, Compose UI Test
 - Gradle version catalog ที่ `gradle/libs.versions.toml` (ปักหมุดเวอร์ชันไว้แล้ว)

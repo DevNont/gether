@@ -32,7 +32,7 @@ Deep link: `triptogether://join/{code}` และ `https://triptogether.app/join
 ## รายละเอียดแต่ละหน้า
 
 ### S01 SignIn
-ปุ่มเดียว "เข้าสู่ระบบด้วย Google" ผ่าน Credential Manager
+ปุ่ม "เข้าสู่ระบบด้วย LINE" (OIDC browser flow) + "เข้าใช้โดยไม่มีบัญชี" (กรอกชื่อ, Firebase Anonymous, เชื่อม LINE ทีหลังได้ในตั้งค่า)
 - ถ้าเข้ามาจาก deep link ให้เก็บ `pendingInviteCode` ไว้ แล้วพาไป JoinTrip ทันทีหลังล็อกอินสำเร็จ
 - ครั้งแรกที่ล็อกอิน สร้าง `users/{uid}` แล้วพาไป Settings เพื่อกรอกพร้อมเพย์ (ข้ามได้)
 
