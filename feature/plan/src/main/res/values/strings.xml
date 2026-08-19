@@ -6,6 +6,7 @@
     <string name="day_plan_empty">ยังไม่มีแผนวันนี้</string>
     <string name="day_plan_empty_hint">กดปุ่ม + เพื่อเพิ่มกิจกรรมแรก</string>
     <string name="day_plan_has_attachments">มีไฟล์แนบ</string>
+    <string name="day_plan_open_maps">เปิดใน Maps</string>
 
     <string name="activity_editor_title_new">เพิ่มกิจกรรม</string>
     <string name="activity_editor_title_edit">แก้ไขกิจกรรม</string>

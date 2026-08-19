@@ -22,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Attachment
-import androidx.compose.material.icons.filled.Hotel
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Card
@@ -241,8 +241,9 @@ private fun StayCard(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val hasPlace = activity.placeName != null
     Card(
-        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
     ) {
         Row(
@@ -250,29 +251,62 @@ private fun StayCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Icon(
-                imageVector = Icons.Default.Hotel,
-                contentDescription = stringResource(R.string.activity_type_stay),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.day_plan_stay_label),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
-                Text(text = activity.title, style = MaterialTheme.typography.titleSmall)
-            }
-            if (activity.placeName != null) {
+            // Icon + name together are the Maps link (when there is a place to open).
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .then(if (hasPlace) Modifier.clickable { openInMaps(context, activity) } else Modifier),
+            ) {
                 Icon(
                     imageVector = Icons.Default.Place,
-                    contentDescription = null,
+                    contentDescription = if (hasPlace) stringResource(R.string.day_plan_open_maps) else null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier =
-                        Modifier.size(20.dp).clickable { openInMaps(context, activity) },
                 )
+                Column {
+                    Text(
+                        text = stringResource(R.string.day_plan_stay_label),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                    Text(text = activity.title, style = MaterialTheme.typography.titleSmall)
+                }
             }
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = stringResource(R.string.activity_editor_title_edit),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.size(20.dp).clickable(onClick = onClick),
+            )
         }
+    }
+}
+
+/** Place pin + name shown as a link to Google Maps. */
+@Composable
+private fun PlaceLink(
+    activity: Activity,
+    onOpenMaps: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier.clickable(onClick = onOpenMaps),
+    ) {
+        Icon(
+            imageVector = Icons.Default.Place,
+            contentDescription = stringResource(R.string.day_plan_open_maps),
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(16.dp),
+        )
+        Text(
+            text = activity.placeName.orEmpty(),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }
 
@@ -290,7 +324,7 @@ private fun ActivityRow(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.width(56.dp).padding(top = 16.dp),
         )
-        Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -300,6 +334,7 @@ private fun ActivityRow(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.weight(1f),
                     ) {
                         if (activity.type == ActivityType.FOOD) {
                             Icon(
@@ -311,33 +346,28 @@ private fun ActivityRow(
                         }
                         Text(text = activity.title, style = MaterialTheme.typography.titleSmall)
                     }
-                    if (activity.attachments.isNotEmpty()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        if (activity.attachments.isNotEmpty()) {
+                            Icon(
+                                imageVector = Icons.Default.Attachment,
+                                contentDescription = stringResource(R.string.day_plan_has_attachments),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
                         Icon(
-                            imageVector = Icons.Default.Attachment,
-                            contentDescription = stringResource(R.string.day_plan_has_attachments),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.activity_editor_title_edit),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp),
+                            modifier = Modifier.size(20.dp).clickable(onClick = onClick),
                         )
                     }
                 }
                 if (activity.placeName != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.clickable { openInMaps(context, activity) },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Place,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(16.dp),
-                        )
-                        Text(
-                            text = activity.placeName.orEmpty(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
+                    PlaceLink(activity = activity, onOpenMaps = { openInMaps(context, activity) })
                 }
                 // Poll badge arrives with S13 voting in M6.
             }
