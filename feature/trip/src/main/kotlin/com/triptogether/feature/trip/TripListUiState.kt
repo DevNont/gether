@@ -13,6 +13,8 @@ data class TripListUiState(
     val isLoading: Boolean = true,
     val upcoming: List<TripCardUi> = emptyList(),
     val past: List<TripCardUi> = emptyList(),
+    /** Trips whose delete is in flight — the card shows a spinner until the listener drops it. */
+    val deletingIds: Set<String> = emptySet(),
 ) {
     val isEmpty: Boolean get() = !isLoading && upcoming.isEmpty() && past.isEmpty()
 }

@@ -206,6 +206,7 @@ private fun TripGroups(
             items(uiState.upcoming, key = { it.trip.id }) { card ->
                 TripCard(
                     card = card,
+                    isDeleting = card.trip.id in uiState.deletingIds,
                     onClick = { onTripClick(card.trip.id) },
                     onEdit = { onEditTrip(card.trip.id) },
                     onDelete = { onDeleteTrip(card.trip.id) },
@@ -217,6 +218,7 @@ private fun TripGroups(
             items(uiState.past, key = { it.trip.id }) { card ->
                 TripCard(
                     card = card,
+                    isDeleting = card.trip.id in uiState.deletingIds,
                     onClick = { onTripClick(card.trip.id) },
                     onEdit = { onEditTrip(card.trip.id) },
                     onDelete = { onDeleteTrip(card.trip.id) },
@@ -243,6 +245,7 @@ private fun GroupHeader(
 @Composable
 private fun TripCard(
     card: TripCardUi,
+    isDeleting: Boolean,
     onClick: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -252,6 +255,7 @@ private fun TripCard(
     val context = LocalContext.current
     Card(
         onClick = onClick,
+        enabled = !isDeleting,
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
     ) {
         Row(
@@ -277,11 +281,18 @@ private fun TripCard(
                     AvatarStack(members = card.members)
                 }
             }
-            TripCardMenu(
-                onEdit = onEdit,
-                onInvite = { showInvite = true },
-                onDelete = onDelete,
-            )
+            if (isDeleting) {
+                CircularProgressIndicator(
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.padding(12.dp).size(24.dp),
+                )
+            } else {
+                TripCardMenu(
+                    onEdit = onEdit,
+                    onInvite = { showInvite = true },
+                    onDelete = onDelete,
+                )
+            }
         }
     }
     if (showInvite) {

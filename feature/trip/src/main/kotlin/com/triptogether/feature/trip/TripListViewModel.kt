@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -40,6 +42,8 @@ class TripListViewModel
         private val _deleteError = Channel<Unit>(Channel.BUFFERED)
         val deleteError: Flow<Unit> = _deleteError.receiveAsFlow()
 
+        private val deletingIds = MutableStateFlow<Set<String>>(emptySet())
+
         /** Debug builds only — populate a demo trip to browse every screen. */
         fun seedDemoTrip() {
             viewModelScope.launch {
@@ -47,19 +51,23 @@ class TripListViewModel
             }
         }
 
-        /** Delete a trip straight from its card; the list updates via the realtime listener. */
+        /** Delete a trip from its card; the card shows a spinner until the listener drops it. */
         fun deleteTrip(tripId: String) {
+            deletingIds.update { it + tripId }
             viewModelScope.launch {
                 tripRepository.deleteTrip(tripId).onFailure { _deleteError.send(Unit) }
+                deletingIds.update { it - tripId }
             }
         }
 
         val uiState: StateFlow<TripListUiState> =
-            authRepository.observeAuthState()
-                .filterNotNull()
-                .flatMapLatest { user -> tripRepository.observeTrips(user.id) }
-                .flatMapLatest { trips -> withMembers(trips) }
-                .map { cards -> buildState(cards) }
+            combine(
+                authRepository.observeAuthState()
+                    .filterNotNull()
+                    .flatMapLatest { user -> tripRepository.observeTrips(user.id) }
+                    .flatMapLatest { trips -> withMembers(trips) },
+                deletingIds,
+            ) { cards, deleting -> buildState(cards, deleting) }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -77,7 +85,10 @@ class TripListViewModel
                 ) { it.toList() }
             }
 
-        private fun buildState(cards: List<TripCardUi>): TripListUiState {
+        private fun buildState(
+            cards: List<TripCardUi>,
+            deleting: Set<String>,
+        ): TripListUiState {
             val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
             // Archived trips stay out of the list until trip settings (S14) exposes them.
             val visible = cards.filterNot { it.trip.archived }
@@ -86,6 +97,7 @@ class TripListViewModel
                 isLoading = false,
                 upcoming = upcoming.sortedByDescending { it.trip.startDate },
                 past = past.sortedByDescending { it.trip.endDate },
+                deletingIds = deleting,
             )
         }
 
