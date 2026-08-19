@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">TripTogether</string>
     <string name="offline_banner">ออฟไลน์ — จะซิงก์เมื่อมีเน็ต</string>
+    <string name="meetup_channel_name">นัดหมาย</string>
+    <string name="meetup_notification_title">นัดหมาย: %1$s</string>
 </resources>

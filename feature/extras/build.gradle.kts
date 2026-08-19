@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.coil.compose)
 
     debugImplementation(libs.compose.ui.tooling)

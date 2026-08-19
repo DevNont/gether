@@ -20,4 +20,27 @@
     <string name="polls_close">ปิดโหวต</string>
     <string name="polls_closed">ปิดแล้ว</string>
     <string name="polls_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+
+    <string name="meetup_title">นัดหมาย</string>
+    <string name="meetup_add">เพิ่มนัดหมาย</string>
+    <string name="meetup_empty">ยังไม่มีนัดหมาย กด + เพื่อเพิ่ม</string>
+    <string name="meetup_error">ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="meetup_editor_title_new">เพิ่มนัดหมาย</string>
+    <string name="meetup_editor_title_edit">แก้ไขนัดหมาย</string>
+    <string name="meetup_name">เรื่องนัด</string>
+    <string name="meetup_place">สถานที่</string>
+    <string name="meetup_date">วันที่</string>
+    <string name="meetup_time">เวลา</string>
+    <string name="meetup_reminder">แจ้งเตือน</string>
+    <string name="meetup_reminder_at_time">ตรงเวลานัด</string>
+    <string name="meetup_reminder_15">15 นาทีก่อน</string>
+    <string name="meetup_reminder_30">30 นาทีก่อน</string>
+    <string name="meetup_reminder_60">1 ชั่วโมงก่อน</string>
+    <string name="meetup_note">โน้ต</string>
+    <string name="meetup_save">บันทึก</string>
+    <string name="meetup_delete">ลบนัดหมาย</string>
+    <string name="meetup_cancel">ยกเลิก</string>
+    <string name="meetup_ok">ตกลง</string>
+    <string name="meetup_delete_confirm_title">ลบนัดหมายนี้?</string>
+    <string name="meetup_delete_confirm_text">ลบแล้วกู้คืนไม่ได้ และการแจ้งเตือนจะถูกยกเลิก</string>
 </resources>

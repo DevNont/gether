@@ -130,6 +130,10 @@ service cloud.firestore {
       match /polls/{pollId} {
         allow read, write: if isMember(tripId);
       }
+
+      match /meetups/{meetupId} {
+        allow read, write: if isMember(tripId);
+      }
     }
   }
 }

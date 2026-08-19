@@ -133,6 +133,19 @@ data class ChecklistItem(
     val sortOrder: Int = 0,
 )
 
+/** A shared trip appointment (e.g. "meet at the lobby 07:00") with a local reminder. */
+data class Meetup(
+    val id: String,
+    val title: String,
+    val place: String? = null,
+    val date: LocalDate,
+    val time: LocalTime,
+    /** Minutes before [time] to fire the reminder; 0 = at the appointed time. */
+    val reminderMinutesBefore: Int = 30,
+    val note: String? = null,
+    val createdBy: String,
+)
+
 /** Profile stored at users/{userId}; id is the auth UID. */
 data class User(
     val id: String,

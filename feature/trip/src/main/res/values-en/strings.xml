@@ -79,6 +79,7 @@
     <string name="overview_open_expenses">Expenses</string>
     <string name="overview_open_checklist">Checklist</string>
     <string name="overview_open_polls">Polls</string>
+    <string name="overview_open_meetup">Meetups</string>
     <string name="overview_add_guest">+ Add guest</string>
     <string name="overview_guest_name">Member name</string>
     <string name="overview_add_guest_confirm">Add</string>

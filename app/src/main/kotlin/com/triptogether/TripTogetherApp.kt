@@ -2,6 +2,8 @@ package com.triptogether
 
 import android.app.Application
 import android.app.LocaleManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.LocaleList
@@ -9,6 +11,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import com.triptogether.feature.auth.ThemePreference
+import com.triptogether.notifications.Notifications
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -18,6 +21,18 @@ class TripTogetherApp : Application() {
         seedDefaultLanguage()
         // Re-apply the saved Light/Dark/System choice so it survives a cold start.
         ThemePreference.apply(this)
+        createMeetupChannel()
+    }
+
+    /** Channel for meetup reminders (minSdk 26 always has channels). */
+    private fun createMeetupChannel() {
+        val channel =
+            NotificationChannel(
+                Notifications.MEETUP_CHANNEL_ID,
+                getString(R.string.meetup_channel_name),
+                NotificationManager.IMPORTANCE_HIGH,
+            )
+        getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
     /**

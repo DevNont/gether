@@ -20,4 +20,27 @@
     <string name="polls_close">Close poll</string>
     <string name="polls_closed">Closed</string>
     <string name="polls_error">Action failed. Please try again.</string>
+
+    <string name="meetup_title">Meetups</string>
+    <string name="meetup_add">Add meetup</string>
+    <string name="meetup_empty">No meetups yet — tap + to add one</string>
+    <string name="meetup_error">Action failed. Please try again.</string>
+    <string name="meetup_editor_title_new">Add meetup</string>
+    <string name="meetup_editor_title_edit">Edit meetup</string>
+    <string name="meetup_name">What</string>
+    <string name="meetup_place">Place</string>
+    <string name="meetup_date">Date</string>
+    <string name="meetup_time">Time</string>
+    <string name="meetup_reminder">Reminder</string>
+    <string name="meetup_reminder_at_time">At the time</string>
+    <string name="meetup_reminder_15">15 min before</string>
+    <string name="meetup_reminder_30">30 min before</string>
+    <string name="meetup_reminder_60">1 hour before</string>
+    <string name="meetup_note">Note</string>
+    <string name="meetup_save">Save</string>
+    <string name="meetup_delete">Delete meetup</string>
+    <string name="meetup_cancel">Cancel</string>
+    <string name="meetup_ok">OK</string>
+    <string name="meetup_delete_confirm_title">Delete this meetup?</string>
+    <string name="meetup_delete_confirm_text">This cannot be undone and its reminder will be cancelled.</string>
 </resources>

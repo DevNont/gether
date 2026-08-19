@@ -18,8 +18,12 @@ import com.triptogether.feature.expense.navigation.expenseDetailScreen
 import com.triptogether.feature.expense.navigation.expenseEditorScreen
 import com.triptogether.feature.expense.navigation.expenseListScreen
 import com.triptogether.feature.extras.navigation.ChecklistRoute
+import com.triptogether.feature.extras.navigation.MeetupEditorRoute
+import com.triptogether.feature.extras.navigation.MeetupRoute
 import com.triptogether.feature.extras.navigation.PollsRoute
 import com.triptogether.feature.extras.navigation.checklistScreen
+import com.triptogether.feature.extras.navigation.meetupEditorScreen
+import com.triptogether.feature.extras.navigation.meetupScreen
 import com.triptogether.feature.extras.navigation.pollsScreen
 import com.triptogether.feature.plan.navigation.DayPlanRoute
 import com.triptogether.feature.plan.navigation.activityEditorScreen
@@ -40,6 +44,8 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     pendingInviteCode: String? = null,
     onInviteConsumed: () -> Unit = {},
+    pendingTripId: String? = null,
+    onTripConsumed: () -> Unit = {},
 ) {
     val navController = rememberNavController()
 
@@ -47,6 +53,13 @@ fun AppNavHost(
         if (pendingInviteCode != null) {
             navController.navigate(JoinTripRoute(code = pendingInviteCode))
             onInviteConsumed()
+        }
+    }
+
+    LaunchedEffect(pendingTripId) {
+        if (pendingTripId != null) {
+            navController.navigate(TripOverviewRoute(pendingTripId))
+            onTripConsumed()
         }
     }
 
@@ -92,6 +105,7 @@ fun AppNavHost(
             onOpenSettlement = { tripId -> navController.navigate(SettlementRoute(tripId)) },
             onOpenChecklist = { tripId -> navController.navigate(ChecklistRoute(tripId)) },
             onOpenPolls = { tripId -> navController.navigate(PollsRoute(tripId)) },
+            onOpenMeetup = { tripId -> navController.navigate(MeetupRoute(tripId)) },
             onEditTrip = { tripId -> navController.navigate(CreateTripRoute(tripId)) },
             onDeleted = { navController.popBackStack(TripListRoute, inclusive = false) },
             onBack = { navController.popBackStack() },
@@ -99,6 +113,16 @@ fun AppNavHost(
         settlementScreen(onBack = { navController.popBackStack() })
         checklistScreen(onBack = { navController.popBackStack() })
         pollsScreen(onBack = { navController.popBackStack() })
+        meetupScreen(
+            onBack = { navController.popBackStack() },
+            onOpenEditor = { tripId, meetupId ->
+                navController.navigate(MeetupEditorRoute(tripId, meetupId))
+            },
+        )
+        meetupEditorScreen(
+            onDone = { navController.popBackStack() },
+            onBack = { navController.popBackStack() },
+        )
         expenseListScreen(
             onAddExpense = { tripId -> navController.navigate(ExpenseEditorRoute(tripId)) },
             onExpenseClick = { tripId, expenseId ->

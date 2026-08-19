@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import com.triptogether.feature.auth.SignInScreen
+import com.triptogether.notifications.Notifications
 import dagger.hilt.android.AndroidEntryPoint
 
 // AppCompatActivity (not ComponentActivity) so setApplicationLocales recreates with the right locale.
@@ -36,9 +37,13 @@ class MainActivity : AppCompatActivity() {
     /** Invite code from a deep link, held until the user is signed in (S01 spec). */
     private var pendingInviteCode by mutableStateOf<String?>(null)
 
+    /** Trip id from a tapped meetup notification, held until the nav graph consumes it. */
+    private var pendingTripId by mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pendingInviteCode = intent?.extractInviteCode()
+        pendingTripId = intent?.getStringExtra(Notifications.EXTRA_TRIP_ID)
         setContent {
             TripTogetherTheme {
                 val authState by viewModel.authState.collectAsStateWithLifecycle()
@@ -55,6 +60,8 @@ class MainActivity : AppCompatActivity() {
                             AppNavHost(
                                 pendingInviteCode = pendingInviteCode,
                                 onInviteConsumed = { pendingInviteCode = null },
+                                pendingTripId = pendingTripId,
+                                onTripConsumed = { pendingTripId = null },
                             )
                     }
                 }
@@ -65,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.extractInviteCode()?.let { pendingInviteCode = it }
+        intent.getStringExtra(Notifications.EXTRA_TRIP_ID)?.let { pendingTripId = it }
     }
 }
 

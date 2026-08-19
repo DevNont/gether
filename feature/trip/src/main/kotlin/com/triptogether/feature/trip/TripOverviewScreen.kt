@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.HowToVote
@@ -67,6 +68,7 @@ fun TripOverviewScreen(
     onOpenSettlement: (String) -> Unit,
     onOpenChecklist: (String) -> Unit,
     onOpenPolls: (String) -> Unit,
+    onOpenMeetup: (String) -> Unit,
     onEditTrip: (String) -> Unit,
     onDeleted: () -> Unit,
     onBack: () -> Unit,
@@ -104,6 +106,7 @@ fun TripOverviewScreen(
         onOpenSettlement = onOpenSettlement,
         onOpenChecklist = onOpenChecklist,
         onOpenPolls = onOpenPolls,
+        onOpenMeetup = onOpenMeetup,
         onBack = onBack,
         modifier = modifier,
     )
@@ -135,6 +138,7 @@ private fun TripOverviewContent(
     onOpenSettlement: (String) -> Unit,
     onOpenChecklist: (String) -> Unit,
     onOpenPolls: (String) -> Unit,
+    onOpenMeetup: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -197,6 +201,11 @@ private fun TripOverviewContent(
                     icon = Icons.Default.HowToVote,
                     label = stringResource(R.string.overview_open_polls),
                     onClick = { onOpenPolls(trip.id) },
+                )
+                LinkCard(
+                    icon = Icons.Default.Event,
+                    label = stringResource(R.string.overview_open_meetup),
+                    onClick = { onOpenMeetup(trip.id) },
                 )
                 MembersCard(
                     members = uiState.members,
@@ -551,6 +560,7 @@ private fun TripOverviewContentPreview() {
             onOpenSettlement = {},
             onOpenChecklist = {},
             onOpenPolls = {},
+            onOpenMeetup = {},
             onBack = {},
         )
     }
