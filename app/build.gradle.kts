@@ -17,17 +17,36 @@ android {
         applicationId = "com.triptogether"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.1.1"
+        versionCode = 3
+        versionName = "0.1.2"
+    }
+
+    signingConfigs {
+        // CI signs with the exact keystore whose SHA-1 is registered in Firebase, restored to a
+        // known path via the SIGNING_KEYSTORE env var. Relying on AGP's default debug-keystore
+        // location failed on the runner (it generated a fresh random key), breaking sign-in.
+        create("ci") {
+            System.getenv("SIGNING_KEYSTORE")?.let { path ->
+                storeFile = file(path)
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Signed with the debug keystore on purpose: its SHA-1 is already registered in
-            // Firebase, so Google/LINE sign-in keeps working for the beta APK shared with testers.
-            // Swap to a dedicated release keystore before any Play Store distribution.
-            signingConfig = signingConfigs.getByName("debug")
+            // Beta APK signed with the debug key (SHA-1 registered in Firebase) so Google/LINE
+            // sign-in works for testers. On CI use the explicit restored keystore; locally fall
+            // back to the machine debug keystore. Swap to a real release key before Play Store.
+            signingConfig =
+                if (System.getenv("SIGNING_KEYSTORE") != null) {
+                    signingConfigs.getByName("ci")
+                } else {
+                    signingConfigs.getByName("debug")
+                }
         }
     }
 
