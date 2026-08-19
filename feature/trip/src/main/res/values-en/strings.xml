@@ -62,7 +62,7 @@
     <string name="overview_members">Members (%1$d)</string>
     <string name="overview_members_expand">Expand members</string>
     <string name="overview_members_collapse">Collapse members</string>
-    <string name="overview_invite">Invite friends</string>
+    <string name="overview_invite">Invite</string>
     <string name="overview_invite_qr">QR to join the trip</string>
     <string name="overview_invite_code_hint">Tap the code to copy, or let friends scan the QR</string>
     <string name="overview_invite_copy_link">Copy link</string>
@@ -79,7 +79,7 @@
     <string name="overview_open_expenses">Expenses</string>
     <string name="overview_open_checklist">Checklist</string>
     <string name="overview_open_polls">Polls</string>
-    <string name="overview_add_guest">+ Add member without an account</string>
+    <string name="overview_add_guest">+ Add guest</string>
     <string name="overview_guest_name">Member name</string>
     <string name="overview_add_guest_confirm">Add</string>
     <string name="overview_guest_cancel">Cancel</string>
