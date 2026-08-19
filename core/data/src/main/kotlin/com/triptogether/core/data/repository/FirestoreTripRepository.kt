@@ -81,9 +81,20 @@ class FirestoreTripRepository
                 val uid = auth.currentUser?.uid ?: error("Not signed in")
                 val profile = firestore.collection(USERS).document(uid).get().await()
                 val tripRef = firestore.collection(TRIPS).document()
-                val code = reserveInviteCode(tripRef.id, draft.name)
+                val code = reserveInviteCode()
 
                 val batch = firestore.batch()
+                // Rules require the invite doc to be minted in the same batch as its
+                // trip (create checks getAfter(trip).ownerId == uid).
+                batch.set(
+                    firestore.collection(INVITE_CODES).document(code),
+                    mapOf(
+                        "tripId" to tripRef.id,
+                        "tripName" to draft.name,
+                        "active" to true,
+                        "expiresAt" to null,
+                    ),
+                )
                 batch.set(
                     tripRef,
                     mapOf(
@@ -100,8 +111,9 @@ class FirestoreTripRepository
                         FIELD_UPDATED_AT to FieldValue.serverTimestamp(),
                     ),
                 )
+                // Member doc id == auth uid for account holders, so joins are idempotent.
                 batch.set(
-                    tripRef.collection(MEMBERS).document(),
+                    tripRef.collection(MEMBERS).document(uid),
                     MemberDto(
                         userId = uid,
                         displayName = profile.getString("displayName") ?: "",
@@ -254,29 +266,28 @@ class FirestoreTripRepository
                 check(codeSnap.exists() && codeSnap.getBoolean("active") == true) { "Invalid invite code" }
                 val tripId = checkNotNull(codeSnap.getString("tripId")) { "Corrupt invite code" }
 
-                val alreadyMember =
-                    !firestore.collection(TRIPS).document(tripId).collection(MEMBERS)
-                        .whereEqualTo("userId", userId).limit(1).get().await().isEmpty
-                if (!alreadyMember) {
-                    val profile = firestore.collection(USERS).document(userId).get().await()
-                    val batch = firestore.batch()
-                    batch.update(
-                        firestore.collection(TRIPS).document(tripId),
-                        FIELD_MEMBER_IDS,
-                        FieldValue.arrayUnion(userId),
-                    )
-                    batch.set(
-                        firestore.collection(TRIPS).document(tripId).collection(MEMBERS).document(),
-                        MemberDto(
-                            userId = userId,
-                            displayName = profile.getString("displayName") ?: "",
-                            photoUrl = profile.getString("photoUrl"),
-                            promptpayId = profile.getString("promptpayId"),
-                            role = ROLE_MEMBER,
-                        ).withJoinedAt(),
-                    )
-                    batch.commit().await()
-                }
+                // A non-member cannot query the members collection (rules), so joining
+                // is made idempotent instead: the member doc id is the auth uid —
+                // arrayUnion + set on a fixed id make a repeat join a no-op.
+                val profile = firestore.collection(USERS).document(userId).get().await()
+                val batch = firestore.batch()
+                batch.update(
+                    firestore.collection(TRIPS).document(tripId),
+                    FIELD_MEMBER_IDS,
+                    FieldValue.arrayUnion(userId),
+                )
+                batch.set(
+                    firestore.collection(TRIPS).document(tripId).collection(MEMBERS).document(userId),
+                    MemberDto(
+                        userId = userId,
+                        displayName = profile.getString("displayName") ?: "",
+                        photoUrl = profile.getString("photoUrl"),
+                        promptpayId = profile.getString("promptpayId"),
+                        role = ROLE_MEMBER,
+                    ).withJoinedAt(),
+                    SetOptions.merge(),
+                )
+                batch.commit().await()
                 tripId
             }
 
@@ -302,25 +313,16 @@ class FirestoreTripRepository
                 Unit
             }
 
-        /** Reserves a unique code doc in inviteCodes/, retrying on the rare collision. */
-        private suspend fun reserveInviteCode(
-            tripId: String,
-            tripName: String,
-        ): String {
+        /**
+         * Picks a code not currently in use. The doc itself is written by the caller
+         * inside the trip-create batch (rules verify ownership via getAfter), so the
+         * tiny window between this check and the commit is an accepted race.
+         */
+        private suspend fun reserveInviteCode(): String {
             repeat(MAX_CODE_ATTEMPTS) {
                 val code = InviteCodes.random()
                 val ref = firestore.collection(INVITE_CODES).document(code)
-                if (!ref.get().await().exists()) {
-                    ref.set(
-                        mapOf(
-                            "tripId" to tripId,
-                            "tripName" to tripName,
-                            "active" to true,
-                            "expiresAt" to null,
-                        ),
-                    ).await()
-                    return code
-                }
+                if (!ref.get().await().exists()) return code
             }
             error("Could not allocate an invite code")
         }

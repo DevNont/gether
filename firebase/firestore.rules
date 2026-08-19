@@ -4,7 +4,7 @@ rules_version = '2';
 //
 // Core idea: everything about a trip lives under trips/{tripId}, so almost every
 // rule reduces to "is the caller in this trip's memberIds array". The one thing
-// outsiders may read is inviteCodes, which is how a non-member gets in.
+// outsiders may read is a single inviteCodes doc (by exact code) — never a list.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -45,16 +45,22 @@ service cloud.firestore {
     // never a float, which is asserted on every expense and settlement write below.
 
     match /users/{userId} {
-      allow read: if signedIn();
+      // get only — listing every profile would leak PII (names, promptpay ids).
+      allow get: if signedIn();
+      allow list: if false;
       allow create, update: if signedIn() && uid() == userId;
       allow delete: if signedIn() && uid() == userId;
     }
 
-    // Invite codes are readable by anyone signed in — that is the point of them.
-    // Only Cloud Functions and the trip owner may write.
+    // A single code doc may be fetched by anyone signed in — that is how a
+    // non-member joins. Listing the collection would enumerate every trip.
     match /inviteCodes/{code} {
-      allow read: if signedIn();
-      allow create: if signedIn();
+      allow get: if signedIn();
+      allow list: if false;
+      // Created in the same batch as its trip; only that trip's owner may mint it.
+      allow create: if signedIn()
+        && getAfter(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.ownerId == uid()
+        && request.resource.data.keys().hasOnly(['tripId', 'tripName', 'active', 'expiresAt']);
       allow update, delete: if signedIn() && isOwner(resource.data.tripId);
     }
 
@@ -67,13 +73,23 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.ownerId == uid()
         && uid() in request.resource.data.memberIds;
-      // A member may join themselves (memberIds grows by one, and that one is them).
-      allow update: if isOwner(tripId)
-        || (isMember(tripId)
+      // Three distinct update paths:
+      //  1. owner — anything except transferring ownership;
+      //  2. member — shared fields (note, cover, dates via editor is owner-only in
+      //     UI but not security-critical) — never membership, ownership, or the code;
+      //  3. join — a signed-in outsider may append exactly themselves, and only
+      //     while the trip's invite code doc is still active.
+      allow update: if (isOwner(tripId)
             && request.resource.data.ownerId == resource.data.ownerId)
+        || (isMember(tripId)
+            && !request.resource.data.diff(resource.data).affectedKeys()
+                .hasAny(['ownerId', 'memberIds', 'inviteCode'].toSet()))
         || (signedIn()
+            && request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['memberIds'].toSet())
             && request.resource.data.memberIds.hasAll(resource.data.memberIds)
-            && request.resource.data.memberIds.removeAll(resource.data.memberIds) == [uid()]);
+            && request.resource.data.memberIds.removeAll(resource.data.memberIds) == [uid()]
+            && get(/databases/$(database)/documents/inviteCodes/$(resource.data.inviteCode)).data.active == true);
       allow delete: if isOwner(tripId);
 
       match /members/{memberId} {
@@ -81,8 +97,14 @@ service cloud.firestore {
         // isMemberAfter covers create-trip and join-by-code batches, where the
         // caller only becomes a member inside this very batch.
         allow create: if isMember(tripId) || isMemberAfter(tripId);
-        allow update: if isMember(tripId);
-        allow delete: if isOwner(tripId);
+        // Own doc, guest docs (userId == null), or the owner — a member must not
+        // rewrite another real member's profile (their promptpayId routes money).
+        allow update: if isOwner(tripId)
+          || (isMember(tripId) && resource.data.userId == uid())
+          || (isMember(tripId) && resource.data.userId == null);
+        // The owner, or a member removing themselves (leaving the trip).
+        allow delete: if isOwner(tripId)
+          || (isMember(tripId) && resource.data.userId == uid());
       }
 
       match /days/{dayId} {
@@ -103,7 +125,8 @@ service cloud.firestore {
           && request.resource.data.shares.size() > 0;
         allow update: if isMember(tripId)
           && request.resource.data.totalAmount is int
-          && request.resource.data.totalAmount >= 0;
+          && request.resource.data.totalAmount >= 0
+          && request.resource.data.shares.size() > 0;
         // Only the person who logged the bill, or the trip owner, may remove it.
         allow delete: if isOwner(tripId)
           || (isMember(tripId) && resource.data.createdBy == uid());
@@ -115,11 +138,14 @@ service cloud.firestore {
           && request.resource.data.amount is int
           && request.resource.data.amount > 0
           && request.resource.data.status == 'PENDING';
-        // Confirming a transfer is the recipient's call, not the sender's.
+        // from/to/amount are immutable; flipping status is the RECIPIENT's call
+        // only — the sender must not be able to confirm their own transfer.
         allow update: if isMember(tripId)
           && request.resource.data.fromMemberId == resource.data.fromMemberId
           && request.resource.data.toMemberId == resource.data.toMemberId
-          && request.resource.data.amount == resource.data.amount;
+          && request.resource.data.amount == resource.data.amount
+          && (request.resource.data.status == resource.data.status
+              || get(/databases/$(database)/documents/trips/$(tripId)/members/$(resource.data.toMemberId)).data.userId == uid());
         allow delete: if isOwner(tripId);
       }
 
