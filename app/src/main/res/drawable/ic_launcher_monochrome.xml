@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Single-colour silhouette: ticket with notches, airplane punched out (evenOdd) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M31,36 h46 a7,7 0 0 1 7,7 v22 a7,7 0 0 1 -7,7 h-46 a7,7 0 0 1 -7,-7 v-22 a7,7 0 0 1 7,-7 z
+                          M63.5,36 a4.5,4.5 0 1 1 9,0 a4.5,4.5 0 1 1 -9,0 z
+                          M63.5,72 a4.5,4.5 0 1 1 9,0 a4.5,4.5 0 1 1 -9,0 z
+                          M47,42 c1.3,0 2.2,1.8 2.2,4.4 v3.2 l7,4 v2.6 l-7,-2 v4.6 l2.2,1.8 v2 l-4.4,-1.1 l-4.4,1.1 v-2 l2.2,-1.8 v-4.6 l-7,2 v-2.6 l7,-4 v-3.2 c0,-2.6 0.9,-4.4 2.2,-4.4 z" />
+</vector>
