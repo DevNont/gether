@@ -170,7 +170,7 @@ private fun JoinTripContent(
                     .padding(innerPadding)
                     .fillMaxSize()
                     .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
+            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (showCodeEntry) {
