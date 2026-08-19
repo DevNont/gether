@@ -43,6 +43,7 @@
     <string name="join_method_scan_desc">ส่องกล้องอ่านโค้ดของทริป</string>
     <string name="join_method_code_title">กรอกรหัส</string>
     <string name="join_method_code_desc">ใส่รหัสเชิญ 6 หลัก</string>
+    <string name="join_code_title">กรอกรหัสเชิญ</string>
     <string name="join_trip_not_found">ไม่พบรหัสนี้</string>
     <string name="join_trip_confirm">เข้าร่วมทริปนี้</string>
     <string name="join_trip_error">เข้าร่วมไม่สำเร็จ ลองใหม่อีกครั้ง</string>

@@ -45,6 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -169,7 +171,6 @@ private fun JoinTripContent(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Hero()
             if (showCodeEntry) {
                 CodeEntry(
                     uiState = uiState,
@@ -197,6 +198,7 @@ private fun MethodMenu(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        HeroIcon(Icons.Default.QrCode2)
         Text(
             text = stringResource(R.string.join_trip_headline),
             style = MaterialTheme.typography.headlineSmall,
@@ -282,13 +284,20 @@ private fun CodeEntry(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        HeroIcon(Icons.Default.Dialpad)
+        Text(
+            text = stringResource(R.string.join_code_title),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
         Text(
             text = stringResource(R.string.join_trip_hint),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        CodeInput(code = uiState.code, onCodeChange = onCodeChange)
+        CodeInput(code = uiState.code, onCodeChange = onCodeChange, autoFocus = true)
         Box(contentAlignment = Alignment.Center) {
             when {
                 uiState.isLookingUp -> CircularProgressIndicator()
@@ -309,7 +318,10 @@ private fun CodeEntry(
 }
 
 @Composable
-private fun Hero(modifier: Modifier = Modifier) {
+private fun HeroIcon(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier =
             modifier
@@ -319,7 +331,7 @@ private fun Hero(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = Icons.Default.QrCode2,
+            imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.size(48.dp),
@@ -332,12 +344,17 @@ private fun CodeInput(
     code: String,
     onCodeChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    autoFocus: Boolean = false,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    if (autoFocus) {
+        LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    }
     BasicTextField(
         value = code,
         onValueChange = onCodeChange,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-        modifier = modifier,
+        modifier = modifier.focusRequester(focusRequester),
         decorationBox = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 repeat(INVITE_CODE_LENGTH) { index ->
