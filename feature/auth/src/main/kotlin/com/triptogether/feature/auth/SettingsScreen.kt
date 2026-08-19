@@ -3,8 +3,11 @@ package com.triptogether.feature.auth
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -283,15 +286,17 @@ private fun StatusRow(
     modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.primary,
 ) {
-    ListItem(
-        leadingContent = { Icon(imageVector = icon, contentDescription = null, tint = tint) },
-        headlineContent = { Text(text = label) },
-        supportingContent = {
-            Text(text = value, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        modifier = modifier,
-    )
+    CompactRow(modifier = modifier) {
+        Icon(imageVector = icon, contentDescription = null, tint = tint)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 @Composable
@@ -305,33 +310,45 @@ private fun SettingsMenuRow(
 ) {
     val contentColor =
         if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
-    ListItem(
-        leadingContent = {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (enabled) MaterialTheme.colorScheme.primary else contentColor,
-            )
-        },
-        headlineContent = { Text(text = label, color = contentColor) },
-        supportingContent = {
+    CompactRow(modifier = modifier.clickable(enabled = enabled, onClick = onClick)) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (enabled) MaterialTheme.colorScheme.primary else contentColor,
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, style = MaterialTheme.typography.bodyLarge, color = contentColor)
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-        },
-        trailingContent = {
-            if (enabled) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        modifier = modifier.clickable(enabled = enabled, onClick = onClick),
+        }
+        if (enabled) {
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/** Dense two-line row — ListItem's 72dp two-line height wastes half the screen here. */
+@Composable
+private fun CompactRow(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        content = content,
     )
 }
 
