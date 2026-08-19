@@ -310,8 +310,11 @@ private fun HeaderCard(
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(text = trip.name, style = MaterialTheme.typography.titleLarge)
+            val days = trip.startDate.daysUntil(trip.endDate) + 1
             Text(
-                text = formatDateRange(trip.startDate, trip.endDate),
+                text =
+                    formatDateRange(trip.startDate, trip.endDate) +
+                        " · " + stringResource(R.string.trip_list_days, days),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
