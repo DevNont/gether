@@ -16,7 +16,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
@@ -44,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -199,6 +203,41 @@ private fun SettingsMenuContent(
                 )
             }
 
+            Spacer(modifier = Modifier.height(24.dp))
+            Card(modifier = Modifier.fillMaxWidth()) {
+                StatusRow(
+                    icon = Icons.Default.AccountCircle,
+                    label = stringResource(R.string.settings_account_status),
+                    value =
+                        stringResource(
+                            if (uiState.isAnonymous) {
+                                R.string.settings_account_anonymous
+                            } else {
+                                R.string.settings_account_line
+                            },
+                        ),
+                )
+                HorizontalDivider()
+                StatusRow(
+                    icon = if (uiState.isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
+                    label = stringResource(R.string.settings_sync_status),
+                    value =
+                        stringResource(
+                            if (uiState.isOnline) {
+                                R.string.settings_sync_online
+                            } else {
+                                R.string.settings_sync_offline
+                            },
+                        ),
+                    tint =
+                        if (uiState.isOnline) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        },
+                )
+            }
+
             if (uiState.isAnonymous) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Card(modifier = Modifier.fillMaxWidth()) {
@@ -234,6 +273,25 @@ private fun SettingsMenuContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
+}
+
+@Composable
+private fun StatusRow(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    tint: Color = MaterialTheme.colorScheme.primary,
+) {
+    ListItem(
+        leadingContent = { Icon(imageVector = icon, contentDescription = null, tint = tint) },
+        headlineContent = { Text(text = label) },
+        supportingContent = {
+            Text(text = value, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        },
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = modifier,
+    )
 }
 
 @Composable

@@ -31,22 +31,23 @@ class ConnectivityNetworkMonitor
 
                 fun current(): Boolean = manager.getNetworkCapabilities(manager.activeNetwork)?.isConnected() == true
 
+                // Track validated networks ourselves: during onLost, activeNetwork can
+                // still return the dying network with stale capabilities, which would
+                // leave the flow stuck at "online" until some other callback fires.
+                val validated = mutableSetOf<Network>()
                 val callback =
                     object : ConnectivityManager.NetworkCallback() {
-                        override fun onAvailable(network: Network) {
-                            // The new network may not be validated yet; onCapabilitiesChanged follows.
-                            trySend(current())
-                        }
-
                         override fun onCapabilitiesChanged(
                             network: Network,
                             networkCapabilities: NetworkCapabilities,
                         ) {
-                            trySend(networkCapabilities.isConnected())
+                            if (networkCapabilities.isConnected()) validated.add(network) else validated.remove(network)
+                            trySend(validated.isNotEmpty())
                         }
 
                         override fun onLost(network: Network) {
-                            trySend(current())
+                            validated.remove(network)
+                            trySend(validated.isNotEmpty())
                         }
                     }
                 trySend(current())

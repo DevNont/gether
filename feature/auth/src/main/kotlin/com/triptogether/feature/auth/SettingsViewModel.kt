@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.triptogether.core.domain.model.User
 import com.triptogether.core.domain.repository.AuthRepository
 import com.triptogether.core.domain.repository.AuthUiHost
+import com.triptogether.core.domain.repository.NetworkMonitor
 import com.triptogether.core.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,6 +38,8 @@ data class SettingsUiState(
     val isSaving: Boolean = false,
     /** True while the session is an unlinked device-local account — shows the "link LINE" row. */
     val isAnonymous: Boolean = false,
+    /** Network state — drives the sync-status row (Firestore queues writes while offline). */
+    val isOnline: Boolean = true,
 ) {
     /** PromptPay must be a 10-digit phone (leading 0) or a 13-digit citizen id (S14 spec). */
     val isPromptpayInvalid: Boolean
@@ -66,6 +69,7 @@ class SettingsViewModel
     constructor(
         private val authRepository: AuthRepository,
         private val userRepository: UserRepository,
+        networkMonitor: NetworkMonitor,
     ) : ViewModel() {
         private data class Draft(
             val displayName: String = "",
@@ -80,30 +84,34 @@ class SettingsViewModel
         val events: Flow<SettingsEvent> = _events.receiveAsFlow()
 
         val uiState: StateFlow<SettingsUiState> =
-            authRepository.observeAuthState()
-                .filterNotNull()
-                .flatMapLatest { authUser ->
-                    userRepository.observeUser(authUser.id).map { authUser to it }
-                }
-                .combine(draft) { (authUser, user), draft ->
-                    SettingsUiState(
-                        isLoading = user == null,
-                        user = user,
-                        displayNameDraft = if (draft.touched) draft.displayName else user?.displayName.orEmpty(),
-                        promptpayDraft = if (draft.touched) draft.promptpay else user?.promptpayId.orEmpty(),
-                        touched = draft.touched,
-                        isSaving = draft.saving,
-                        isAnonymous = authUser.isAnonymous,
-                    )
-                }.catch {
-                    // A failed profile listener (e.g. PERMISSION_DENIED) must surface, not spin forever.
-                    _events.send(SettingsEvent.Message(R.string.settings_error))
-                    emit(SettingsUiState(isLoading = false))
-                }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
-                    initialValue = SettingsUiState(),
+            combine(
+                authRepository.observeAuthState()
+                    .filterNotNull()
+                    .flatMapLatest { authUser ->
+                        userRepository.observeUser(authUser.id).map { authUser to it }
+                    },
+                networkMonitor.isOnline,
+                draft,
+            ) { (authUser, user), online, draft ->
+                SettingsUiState(
+                    isLoading = user == null,
+                    user = user,
+                    displayNameDraft = if (draft.touched) draft.displayName else user?.displayName.orEmpty(),
+                    promptpayDraft = if (draft.touched) draft.promptpay else user?.promptpayId.orEmpty(),
+                    touched = draft.touched,
+                    isSaving = draft.saving,
+                    isAnonymous = authUser.isAnonymous,
+                    isOnline = online,
                 )
+            }.catch {
+                // A failed profile listener (e.g. PERMISSION_DENIED) must surface, not spin forever.
+                _events.send(SettingsEvent.Message(R.string.settings_error))
+                emit(SettingsUiState(isLoading = false))
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+                initialValue = SettingsUiState(),
+            )
 
         fun onDisplayNameChange(value: String) {
             draft.update {

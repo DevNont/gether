@@ -9,6 +9,12 @@
     <string name="auth_anon_back">ย้อนกลับ</string>
     <string name="auth_line_error">เข้าสู่ระบบด้วย LINE ไม่สำเร็จ ลองใหม่อีกครั้ง</string>
     <string name="auth_anon_error">เริ่มใช้งานไม่สำเร็จ ลองใหม่อีกครั้ง</string>
+    <string name="settings_account_status">บัญชี</string>
+    <string name="settings_account_line">เชื่อมกับ LINE แล้ว</string>
+    <string name="settings_account_anonymous">บัญชีบนเครื่องนี้ — ยังไม่เชื่อม LINE</string>
+    <string name="settings_sync_status">การซิงค์</string>
+    <string name="settings_sync_online">ซิงค์กับเซิร์ฟเวอร์แล้ว</string>
+    <string name="settings_sync_offline">ออฟไลน์ — จะซิงค์เมื่อต่อเน็ต</string>
     <string name="settings_link_line">เชื่อมบัญชี LINE</string>
     <string name="settings_link_line_hint">เก็บทริปไว้ถาวร ใช้ได้หลายเครื่อง</string>
     <string name="settings_link_line_error">เชื่อมบัญชี LINE ไม่สำเร็จ ลองใหม่อีกครั้ง</string>
