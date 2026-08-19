@@ -33,6 +33,7 @@
     <string name="meetup_time">Time</string>
     <string name="meetup_reminder">Reminder</string>
     <string name="meetup_reminder_at_time">At the time</string>
+    <string name="meetup_passed">Passed</string>
     <string name="meetup_reminder_15">15 min before</string>
     <string name="meetup_reminder_30">30 min before</string>
     <string name="meetup_reminder_60">1 hour before</string>

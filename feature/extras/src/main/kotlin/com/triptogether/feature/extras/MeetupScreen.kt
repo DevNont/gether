@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,9 +42,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.triptogether.core.domain.model.Meetup
 import com.triptogether.core.ui.theme.TripTogetherTheme
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 
 /** Trip meetups (appointments) with a per-meetup local reminder. */
@@ -122,8 +126,12 @@ private fun MeetupContent(
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
+                    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                     items(uiState.meetups, key = { it.id }) { meetup ->
-                        MeetupCard(meetup = meetup, onClick = { onOpen(meetup.id) })
+                        val isPast =
+                            meetup.date < now.date ||
+                                (meetup.date == now.date && meetup.time < now.time)
+                        MeetupCard(meetup = meetup, isPast = isPast, onClick = { onOpen(meetup.id) })
                     }
                 }
         }
@@ -133,16 +141,35 @@ private fun MeetupContent(
 @Composable
 private fun MeetupCard(
     meetup: Meetup,
+    isPast: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    Card(modifier = modifier.fillMaxWidth().alpha(if (isPast) 0.6f else 1f).clickable(onClick = onClick)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(text = meetup.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = meetup.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
+                if (isPast) {
+                    Text(
+                        text = stringResource(R.string.meetup_passed),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
             Text(
                 text = formatDateTime(meetup.date, meetup.time),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
+                color = if (isPast) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
             )
             meetup.place?.takeIf { it.isNotBlank() }?.let { place ->
                 IconLabel(icon = Icons.Default.Place, text = place)

@@ -33,6 +33,7 @@
     <string name="meetup_time">เวลา</string>
     <string name="meetup_reminder">แจ้งเตือน</string>
     <string name="meetup_reminder_at_time">ตรงเวลานัด</string>
+    <string name="meetup_passed">ผ่านไปแล้ว</string>
     <string name="meetup_reminder_15">15 นาทีก่อน</string>
     <string name="meetup_reminder_30">30 นาทีก่อน</string>
     <string name="meetup_reminder_60">1 ชั่วโมงก่อน</string>
