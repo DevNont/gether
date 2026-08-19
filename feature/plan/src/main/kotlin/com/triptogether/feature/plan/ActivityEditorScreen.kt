@@ -1,5 +1,8 @@
 package com.triptogether.feature.plan
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,7 +50,7 @@ import com.triptogether.core.domain.model.ActivityType
 import com.triptogether.core.ui.theme.TripTogetherTheme
 import kotlinx.datetime.LocalTime
 
-/** S07 — activity form; place is free text until the Places API decision, attachments wait for Storage. */
+/** S07 — activity form; place is typed, with a "search in Google Maps" launcher. Attachments wait for Storage. */
 @Composable
 fun ActivityEditorScreen(
     onDone: () -> Unit,
@@ -168,13 +172,28 @@ private fun ActivityEditorContent(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            OutlinedTextField(
-                value = uiState.placeName,
-                onValueChange = onPlaceChange,
-                label = { Text(stringResource(R.string.activity_editor_place)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            val context = LocalContext.current
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            ) {
+                OutlinedTextField(
+                    value = uiState.placeName,
+                    onValueChange = onPlaceChange,
+                    label = { Text(stringResource(R.string.activity_editor_place)) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+                IconButton(
+                    onClick = { searchPlaceInMaps(context, uiState.placeName) },
+                    enabled = uiState.placeName.isNotBlank(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.TravelExplore,
+                        contentDescription = stringResource(R.string.activity_editor_place_search),
+                    )
+                }
+            }
             OutlinedTextField(
                 value = uiState.note,
                 onValueChange = onNoteChange,
@@ -232,6 +251,16 @@ private fun ActivityEditorContent(
             },
         )
     }
+}
+
+/** Open Google Maps (app or web) searching the typed place name. No coordinates come back. */
+private fun searchPlaceInMaps(
+    context: Context,
+    query: String,
+) {
+    val uri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(query)}")
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    if (intent.resolveActivity(context.packageManager) != null) context.startActivity(intent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

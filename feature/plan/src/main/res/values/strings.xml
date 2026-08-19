@@ -14,6 +14,7 @@
     <string name="activity_editor_end">เวลาจบ</string>
     <string name="activity_editor_time_invalid">เวลาจบต้องไม่ก่อนเวลาเริ่ม</string>
     <string name="activity_editor_place">สถานที่</string>
+    <string name="activity_editor_place_search">ค้นใน Google Maps</string>
     <string name="activity_editor_note">โน้ต</string>
     <string name="activity_editor_save">บันทึก</string>
     <string name="activity_editor_delete">ลบกิจกรรม</string>

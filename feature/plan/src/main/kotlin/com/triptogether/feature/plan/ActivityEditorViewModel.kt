@@ -98,6 +98,9 @@ class ActivityEditorViewModel
                         startTime = state.startTime,
                         endTime = state.endTime,
                         placeName = state.placeName.trim().ifBlank { null },
+                        // Preserve coordinates from an existing activity; the editor doesn't capture them.
+                        lat = existing?.lat,
+                        lng = existing?.lng,
                         note = state.note.trim().ifBlank { null },
                         attachments = existing?.attachments ?: emptyList(),
                         sortOrder = existing?.sortOrder ?: nextSortOrder(),

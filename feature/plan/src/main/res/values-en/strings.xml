@@ -14,6 +14,7 @@
     <string name="activity_editor_end">End time</string>
     <string name="activity_editor_time_invalid">End time must not be before start time</string>
     <string name="activity_editor_place">Place</string>
+    <string name="activity_editor_place_search">Search in Google Maps</string>
     <string name="activity_editor_note">Note</string>
     <string name="activity_editor_save">Save</string>
     <string name="activity_editor_delete">Delete activity</string>
