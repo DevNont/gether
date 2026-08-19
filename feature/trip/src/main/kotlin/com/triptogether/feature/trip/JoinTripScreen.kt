@@ -19,14 +19,15 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +39,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -134,6 +137,13 @@ private fun JoinTripContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showCodeEntry by remember { mutableStateOf(false) }
+
+    fun backToMenu() {
+        onCodeChange("")
+        showCodeEntry = false
+    }
+
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -141,7 +151,7 @@ private fun JoinTripContent(
             TopAppBar(
                 title = { Text(stringResource(R.string.join_trip_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { if (showCodeEntry) backToMenu() else onBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.create_trip_back),
@@ -160,46 +170,139 @@ private fun JoinTripContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Hero()
-            Text(
-                text = stringResource(R.string.join_trip_headline),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = stringResource(R.string.join_trip_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            Button(
-                onClick = onScan,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-            ) {
-                Icon(imageVector = Icons.Default.QrCodeScanner, contentDescription = null)
-                Text(
-                    text = stringResource(R.string.join_trip_scan),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 8.dp),
+            if (showCodeEntry) {
+                CodeEntry(
+                    uiState = uiState,
+                    onCodeChange = onCodeChange,
+                    onConfirm = onConfirm,
+                )
+            } else {
+                MethodMenu(
+                    onScan = onScan,
+                    onEnterCode = { showCodeEntry = true },
                 )
             }
-            OrDivider()
-            CodeInput(code = uiState.code, onCodeChange = onCodeChange)
-            Box(contentAlignment = Alignment.Center) {
-                when {
-                    uiState.isLookingUp -> CircularProgressIndicator()
-                    uiState.notFound ->
-                        Text(
-                            text = stringResource(R.string.join_trip_not_found),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                }
+        }
+    }
+}
+
+@Composable
+private fun MethodMenu(
+    onScan: () -> Unit,
+    onEnterCode: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.join_trip_headline),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(R.string.join_trip_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        MethodCard(
+            icon = Icons.Default.QrCodeScanner,
+            title = stringResource(R.string.join_trip_scan),
+            desc = stringResource(R.string.join_method_scan_desc),
+            onClick = onScan,
+        )
+        MethodCard(
+            icon = Icons.Default.Dialpad,
+            title = stringResource(R.string.join_method_code_title),
+            desc = stringResource(R.string.join_method_code_desc),
+            onClick = onEnterCode,
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MethodCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    desc: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
             }
-            AnimatedVisibility(visible = uiState.preview != null) {
-                uiState.preview?.let {
-                    PreviewCard(preview = it, isJoining = uiState.isJoining, onConfirm = onConfirm)
-                }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = desc,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CodeEntry(
+    uiState: JoinTripUiState,
+    onCodeChange: (String) -> Unit,
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.join_trip_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        CodeInput(code = uiState.code, onCodeChange = onCodeChange)
+        Box(contentAlignment = Alignment.Center) {
+            when {
+                uiState.isLookingUp -> CircularProgressIndicator()
+                uiState.notFound ->
+                    Text(
+                        text = stringResource(R.string.join_trip_not_found),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+            }
+        }
+        AnimatedVisibility(visible = uiState.preview != null) {
+            uiState.preview?.let {
+                PreviewCard(preview = it, isJoining = uiState.isJoining, onConfirm = onConfirm)
             }
         }
     }
@@ -221,23 +324,6 @@ private fun Hero(modifier: Modifier = Modifier) {
             tint = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.size(48.dp),
         )
-    }
-}
-
-@Composable
-private fun OrDivider(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        HorizontalDivider(modifier = Modifier.weight(1f))
-        Text(
-            text = stringResource(R.string.join_trip_or),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }
 
