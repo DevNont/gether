@@ -37,6 +37,10 @@
 
     <string name="join_trip_title">Join a trip</string>
     <string name="join_trip_hint">Enter the 6-character invite code</string>
+    <string name="join_trip_headline">Join your friends</string>
+    <string name="join_trip_subtitle">Scan the trip\'s QR or enter the 6-character invite code</string>
+    <string name="join_trip_or">or enter the code</string>
+    <string name="join_trip_found">Found this trip</string>
     <string name="join_trip_not_found">Code not found</string>
     <string name="join_trip_confirm">Join this trip</string>
     <string name="join_trip_error">Could not join. Please try again.</string>
