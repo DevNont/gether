@@ -37,6 +37,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -211,25 +213,40 @@ private fun SettingsMenuContent(
                     enabled = false,
                     onClick = {},
                 )
-                HorizontalDivider()
-                AccountStatusRows(
-                    uiState = uiState,
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            AccountStatusCard(uiState = uiState)
+
+            // Google users picked their provider — show nothing about LINE to them.
+            if (uiState.linkedWithLine || uiState.isAnonymous) {
+                Spacer(modifier = Modifier.height(24.dp))
+                LineLinkCard(
+                    linkedWithLine = uiState.linkedWithLine,
                     onLinkLine = onLinkLine,
                     onUnlinkClick = { showUnlinkConfirm = true },
                 )
-                HorizontalDivider()
-                CompactRow(modifier = Modifier.clickable(onClick = onSignOut)) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
-                    )
-                    Text(
-                        text = stringResource(R.string.settings_sign_out),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Card(modifier = Modifier.fillMaxWidth()) {
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_sign_out),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    modifier = Modifier.clickable(onClick = onSignOut),
+                )
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -262,14 +279,13 @@ private fun SettingsMenuContent(
     }
 }
 
-/** Which provider this account is on, live sync state, and the LINE link/unlink action. */
+/** Which provider this account is on, plus live sync state. */
 @Composable
-private fun AccountStatusRows(
+private fun AccountStatusCard(
     uiState: SettingsUiState,
-    onLinkLine: () -> Unit,
-    onUnlinkClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Card(modifier = modifier.fillMaxWidth()) {
         StatusRow(
             icon = Icons.Default.AccountCircle,
             label = stringResource(R.string.settings_account_status),
@@ -301,26 +317,32 @@ private fun AccountStatusRows(
                     MaterialTheme.colorScheme.error
                 },
         )
-        // Google users picked their provider — show nothing about LINE to them.
-        when {
-            uiState.linkedWithLine -> {
-                HorizontalDivider()
-                SettingsMenuRow(
-                    icon = Icons.Default.LinkOff,
-                    label = stringResource(R.string.settings_unlink_line),
-                    value = stringResource(R.string.settings_unlink_line_hint),
-                    onClick = onUnlinkClick,
-                )
-            }
-            uiState.isAnonymous -> {
-                HorizontalDivider()
-                SettingsMenuRow(
-                    icon = Icons.Default.Link,
-                    label = stringResource(R.string.settings_link_line),
-                    value = stringResource(R.string.settings_link_line_hint),
-                    onClick = onLinkLine,
-                )
-            }
+    }
+}
+
+/** Link LINE when the account has no LINE provider; otherwise offer to unlink it. */
+@Composable
+private fun LineLinkCard(
+    linkedWithLine: Boolean,
+    onLinkLine: () -> Unit,
+    onUnlinkClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(modifier = modifier.fillMaxWidth()) {
+        if (!linkedWithLine) {
+            SettingsMenuRow(
+                icon = Icons.Default.Link,
+                label = stringResource(R.string.settings_link_line),
+                value = stringResource(R.string.settings_link_line_hint),
+                onClick = onLinkLine,
+            )
+        } else {
+            SettingsMenuRow(
+                icon = Icons.Default.LinkOff,
+                label = stringResource(R.string.settings_unlink_line),
+                value = stringResource(R.string.settings_unlink_line_hint),
+                onClick = onUnlinkClick,
+            )
         }
     }
 }
