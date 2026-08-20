@@ -21,8 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
@@ -289,7 +287,7 @@ private fun SectionHeader(
     )
 }
 
-/** Which provider this account is on, plus live sync state. */
+/** Which provider this account is on — and the LINE link/unlink action. */
 @Composable
 private fun AccountStatusCard(
     uiState: SettingsUiState,
@@ -322,25 +320,6 @@ private fun AccountStatusCard(
                     onClick = onLinkLine,
                 )
         }
-        HorizontalDivider()
-        StatusRow(
-            icon = if (uiState.isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
-            label = stringResource(R.string.settings_sync_status),
-            value =
-                stringResource(
-                    if (uiState.isOnline) {
-                        R.string.settings_sync_online
-                    } else {
-                        R.string.settings_sync_offline
-                    },
-                ),
-            tint =
-                if (uiState.isOnline) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.error
-                },
-        )
     }
 }
 

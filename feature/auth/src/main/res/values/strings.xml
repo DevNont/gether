@@ -14,9 +14,6 @@
     <string name="settings_account_status">บัญชี</string>
     <string name="settings_account_line">เชื่อมกับ LINE แล้ว</string>
     <string name="settings_account_anonymous">บัญชีบนเครื่องนี้ — ยังไม่เชื่อม LINE</string>
-    <string name="settings_sync_status">การซิงค์</string>
-    <string name="settings_sync_online">ซิงค์กับเซิร์ฟเวอร์แล้ว</string>
-    <string name="settings_sync_offline">ออฟไลน์ — จะซิงค์เมื่อต่อเน็ต</string>
     <string name="settings_link_line_error">เชื่อมบัญชี LINE ไม่สำเร็จ ลองใหม่อีกครั้ง</string>
     <string name="settings_link_line_done">เชื่อมบัญชี LINE แล้ว</string>
     <string name="settings_account_google">เชื่อมกับ Google แล้ว</string>
@@ -40,7 +37,7 @@
     <string name="settings_language">ภาษา</string>
     <string name="settings_section_profile">โปรไฟล์</string>
     <string name="settings_section_display">การแสดงผล</string>
-    <string name="settings_section_account">บัญชีและการซิงค์</string>
+    <string name="settings_section_account">บัญชี</string>
     <string name="settings_menu_promptpay">พร้อมเพย์</string>
     <string name="settings_menu_notifications">การแจ้งเตือน</string>
     <string name="settings_promptpay_not_set">ยังไม่ได้ตั้ง</string>
