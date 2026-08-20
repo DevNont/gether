@@ -35,6 +35,11 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
+
+    // Google sign-in via Credential Manager.
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.google.id)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)

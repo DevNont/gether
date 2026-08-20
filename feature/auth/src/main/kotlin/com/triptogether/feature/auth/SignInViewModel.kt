@@ -14,12 +14,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class SignInViewModel
     @Inject
     constructor(
         private val authRepository: AuthRepository,
+        @Named("googleServerClientId") val googleServerClientId: String,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(SignInUiState())
         val uiState: StateFlow<SignInUiState> = _uiState.asStateFlow()
@@ -30,6 +32,19 @@ class SignInViewModel
         /** Auth state flow in the app layer flips the UI on success, so only failures emit events here. */
         fun onCredentialFlowFailed() {
             viewModelScope.launch { _events.send(SignInEvent.Error(R.string.auth_line_error)) }
+        }
+
+        fun onGoogleIdToken(idToken: String) {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true) }
+                authRepository.signInWithGoogleIdToken(idToken)
+                    .onFailure { _events.send(SignInEvent.Error(R.string.auth_google_error)) }
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+
+        fun onGoogleFlowFailed() {
+            viewModelScope.launch { _events.send(SignInEvent.Error(R.string.auth_google_error)) }
         }
 
         fun onLineSignIn(host: AuthUiHost) {

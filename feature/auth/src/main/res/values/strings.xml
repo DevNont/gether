@@ -2,6 +2,8 @@
 <resources>
     <string name="auth_app_title">TripTogether</string>
     <string name="auth_sign_in_with_line">เข้าสู่ระบบด้วย LINE</string>
+    <string name="auth_sign_in_with_google">เข้าสู่ระบบด้วย Google</string>
+    <string name="auth_google_error">เข้าสู่ระบบด้วย Google ไม่สำเร็จ ลองใหม่อีกครั้ง</string>
     <string name="auth_continue_without_account">เข้าใช้โดยไม่มีบัญชี</string>
     <string name="auth_anon_name_label">ชื่อที่จะแสดงให้เพื่อนเห็น</string>
     <string name="auth_anon_warning">ข้อมูลจะผูกกับเครื่องนี้ ถ้าลบแอปหรือเปลี่ยนเครื่อง บัญชีจะหาย — เชื่อม LINE ทีหลังได้ในหน้าตั้งค่า</string>

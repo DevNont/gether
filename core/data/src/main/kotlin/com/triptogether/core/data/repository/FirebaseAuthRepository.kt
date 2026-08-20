@@ -3,6 +3,7 @@ package com.triptogether.core.data.repository
 import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
@@ -43,6 +44,16 @@ class FirebaseAuthRepository
                     auth.pendingAuthResult?.await()
                         ?: auth.startActivityForSignInWithProvider(activity, lineProvider()).await()
                 val firebaseUser = result.user ?: error("Sign-in returned no user")
+                ensureUserDoc(firebaseUser)
+                firebaseUser.toDomainUser()
+            }
+
+        override suspend fun signInWithGoogleIdToken(idToken: String): Result<User> =
+            runCatching {
+                val credential = GoogleAuthProvider.getCredential(idToken, null)
+                val firebaseUser =
+                    auth.signInWithCredential(credential).await().user
+                        ?: error("Sign-in returned no user")
                 ensureUserDoc(firebaseUser)
                 firebaseUser.toDomainUser()
             }

@@ -17,6 +17,9 @@ interface AuthRepository {
     /** LINE Login via the oidc.line provider (browser flow launched from [host]). */
     suspend fun signInWithLine(host: AuthUiHost): Result<User>
 
+    /** Exchanges a Google ID token (obtained via Credential Manager in the app layer) for a session. */
+    suspend fun signInWithGoogleIdToken(idToken: String): Result<User>
+
     /** Device-local account with a user-entered display name; upgradable later via [linkWithLine]. */
     suspend fun signInAnonymously(displayName: String): Result<User>
 
