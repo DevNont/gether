@@ -21,6 +21,15 @@
     <string name="settings_link_line_hint">เก็บทริปไว้ถาวร ใช้ได้หลายเครื่อง</string>
     <string name="settings_link_line_error">เชื่อมบัญชี LINE ไม่สำเร็จ ลองใหม่อีกครั้ง</string>
     <string name="settings_link_line_done">เชื่อมบัญชี LINE แล้ว</string>
+    <string name="settings_account_google">เชื่อมกับ Google แล้ว</string>
+    <string name="settings_unlink_line">ยกเลิกการเชื่อมบัญชี LINE</string>
+    <string name="settings_unlink_line_hint">ถอด LINE ออกจากบัญชีนี้</string>
+    <string name="settings_unlink_line_confirm_title">ยกเลิกการเชื่อมบัญชี LINE?</string>
+    <string name="settings_unlink_line_confirm_text">ทริปทั้งหมดยังอยู่ครบ แต่ถ้าไม่มีช่องทางเข้าสู่ระบบอื่น บัญชีจะกลับเป็นแบบผูกกับเครื่องนี้ — ออกจากระบบหรือลบแอปแล้วจะกู้คืนไม่ได้</string>
+    <string name="settings_unlink_line_confirm">ยกเลิกการเชื่อม</string>
+    <string name="settings_unlink_line_cancel">ไม่ยกเลิก</string>
+    <string name="settings_unlink_line_done">ยกเลิกการเชื่อมบัญชี LINE แล้ว</string>
+    <string name="settings_unlink_line_error">ยกเลิกการเชื่อมไม่สำเร็จ ลองใหม่อีกครั้ง</string>
 
     <string name="settings_title">ตั้งค่า</string>
     <string name="settings_back">ย้อนกลับ</string>

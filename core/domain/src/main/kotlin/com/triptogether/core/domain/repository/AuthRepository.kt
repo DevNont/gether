@@ -26,5 +26,11 @@ interface AuthRepository {
     /** Upgrades the current anonymous account to LINE, keeping the same uid (trips stay attached). */
     suspend fun linkWithLine(host: AuthUiHost): Result<User>
 
+    /**
+     * Detaches LINE from the current account (uid unchanged). If no other provider
+     * remains, the account becomes device-local again — unrecoverable after sign-out.
+     */
+    suspend fun unlinkLine(): Result<User>
+
     suspend fun signOut(): Result<Unit>
 }

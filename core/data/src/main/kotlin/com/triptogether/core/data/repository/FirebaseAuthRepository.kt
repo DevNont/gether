@@ -83,6 +83,15 @@ class FirebaseAuthRepository
                 firebaseUser.toDomainUser()
             }
 
+        /** Detaches LINE; the uid and every trip stay. Same listener nudge as linking. */
+        override suspend fun unlinkLine(): Result<User> =
+            runCatching {
+                val current = auth.currentUser ?: error("Not signed in")
+                val firebaseUser = current.unlink(LINE_PROVIDER_ID).await().user ?: error("Unlink returned no user")
+                auth.updateCurrentUser(firebaseUser).await()
+                firebaseUser.toDomainUser()
+            }
+
         override suspend fun signOut(): Result<Unit> = runCatching { auth.signOut() }
 
         private fun lineProvider(): OAuthProvider =
@@ -125,4 +134,6 @@ private fun FirebaseUser.toDomainUser() =
         displayName = displayName ?: "",
         photoUrl = photoUrl?.toString(),
         isAnonymous = isAnonymous,
+        linkedWithLine = providerData.any { it.providerId == "oidc.line" },
+        linkedWithGoogle = providerData.any { it.providerId == "google.com" },
     )

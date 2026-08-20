@@ -154,6 +154,9 @@ data class User(
     val promptpayId: String? = null,
     /** True for a device-local account that has not been linked to LINE yet. */
     val isAnonymous: Boolean = false,
+    /** Sign-in providers attached to this account. */
+    val linkedWithLine: Boolean = false,
+    val linkedWithGoogle: Boolean = false,
 )
 
 const val INVITE_CODE_LENGTH = 6

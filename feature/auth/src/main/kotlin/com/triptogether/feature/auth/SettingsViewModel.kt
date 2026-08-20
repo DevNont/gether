@@ -38,6 +38,8 @@ data class SettingsUiState(
     val isSaving: Boolean = false,
     /** True while the session is an unlinked device-local account — shows the "link LINE" row. */
     val isAnonymous: Boolean = false,
+    val linkedWithLine: Boolean = false,
+    val linkedWithGoogle: Boolean = false,
     /** Network state — drives the sync-status row (Firestore queues writes while offline). */
     val isOnline: Boolean = true,
 ) {
@@ -101,6 +103,8 @@ class SettingsViewModel
                     touched = draft.touched,
                     isSaving = draft.saving,
                     isAnonymous = authUser.isAnonymous,
+                    linkedWithLine = authUser.linkedWithLine,
+                    linkedWithGoogle = authUser.linkedWithGoogle,
                     isOnline = online,
                 )
             }.catch {
@@ -166,6 +170,15 @@ class SettingsViewModel
                 authRepository.linkWithLine(host)
                     .onSuccess { _events.send(SettingsEvent.Message(R.string.settings_link_line_done)) }
                     .onFailure { _events.send(SettingsEvent.Message(R.string.settings_link_line_error)) }
+            }
+        }
+
+        /** Detaches LINE (uid unchanged); the UI has already confirmed the consequences. */
+        fun unlinkLine() {
+            viewModelScope.launch {
+                authRepository.unlinkLine()
+                    .onSuccess { _events.send(SettingsEvent.Message(R.string.settings_unlink_line_done)) }
+                    .onFailure { _events.send(SettingsEvent.Message(R.string.settings_unlink_line_error)) }
             }
         }
 

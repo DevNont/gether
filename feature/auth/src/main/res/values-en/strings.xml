@@ -21,6 +21,15 @@
     <string name="settings_link_line_hint">Keep your trips forever and use them on any device</string>
     <string name="settings_link_line_error">Could not link LINE. Please try again.</string>
     <string name="settings_link_line_done">LINE account linked</string>
+    <string name="settings_account_google">Linked with Google</string>
+    <string name="settings_unlink_line">Unlink LINE account</string>
+    <string name="settings_unlink_line_hint">Remove LINE from this account</string>
+    <string name="settings_unlink_line_confirm_title">Unlink LINE account?</string>
+    <string name="settings_unlink_line_confirm_text">All trips stay, but without another sign-in method the account becomes tied to this device — signing out or deleting the app makes it unrecoverable.</string>
+    <string name="settings_unlink_line_confirm">Unlink</string>
+    <string name="settings_unlink_line_cancel">Keep linked</string>
+    <string name="settings_unlink_line_done">LINE account unlinked</string>
+    <string name="settings_unlink_line_error">Could not unlink. Please try again.</string>
 
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>
