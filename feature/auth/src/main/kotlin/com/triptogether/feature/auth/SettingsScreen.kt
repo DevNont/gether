@@ -216,43 +216,8 @@ private fun SettingsMenuContent(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Card(modifier = Modifier.fillMaxWidth()) {
-                StatusRow(
-                    icon = Icons.Default.AccountCircle,
-                    label = stringResource(R.string.settings_account_status),
-                    value =
-                        stringResource(
-                            when {
-                                uiState.linkedWithLine -> R.string.settings_account_line
-                                uiState.linkedWithGoogle -> R.string.settings_account_google
-                                else -> R.string.settings_account_anonymous
-                            },
-                        ),
-                )
-                HorizontalDivider()
-                StatusRow(
-                    icon = if (uiState.isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
-                    label = stringResource(R.string.settings_sync_status),
-                    value =
-                        stringResource(
-                            if (uiState.isOnline) {
-                                R.string.settings_sync_online
-                            } else {
-                                R.string.settings_sync_offline
-                            },
-                        ),
-                    tint =
-                        if (uiState.isOnline) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.error
-                        },
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            LineLinkCard(
-                linkedWithLine = uiState.linkedWithLine,
+            AccountStatusCard(
+                uiState = uiState,
                 onLinkLine = onLinkLine,
                 onUnlinkClick = { showUnlinkConfirm = true },
             )
@@ -308,29 +273,66 @@ private fun SettingsMenuContent(
     }
 }
 
-/** Link LINE when the account has no LINE provider; otherwise offer to unlink it. */
+/** Which provider this account is on, live sync state, and the LINE link/unlink action. */
 @Composable
-private fun LineLinkCard(
-    linkedWithLine: Boolean,
+private fun AccountStatusCard(
+    uiState: SettingsUiState,
     onLinkLine: () -> Unit,
     onUnlinkClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
-        if (!linkedWithLine) {
-            SettingsMenuRow(
-                icon = Icons.Default.Link,
-                label = stringResource(R.string.settings_link_line),
-                value = stringResource(R.string.settings_link_line_hint),
-                onClick = onLinkLine,
-            )
-        } else {
-            SettingsMenuRow(
-                icon = Icons.Default.LinkOff,
-                label = stringResource(R.string.settings_unlink_line),
-                value = stringResource(R.string.settings_unlink_line_hint),
-                onClick = onUnlinkClick,
-            )
+        StatusRow(
+            icon = Icons.Default.AccountCircle,
+            label = stringResource(R.string.settings_account_status),
+            value =
+                stringResource(
+                    when {
+                        uiState.linkedWithLine -> R.string.settings_account_line
+                        uiState.linkedWithGoogle -> R.string.settings_account_google
+                        else -> R.string.settings_account_anonymous
+                    },
+                ),
+        )
+        HorizontalDivider()
+        StatusRow(
+            icon = if (uiState.isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
+            label = stringResource(R.string.settings_sync_status),
+            value =
+                stringResource(
+                    if (uiState.isOnline) {
+                        R.string.settings_sync_online
+                    } else {
+                        R.string.settings_sync_offline
+                    },
+                ),
+            tint =
+                if (uiState.isOnline) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.error
+                },
+        )
+        // Google users picked their provider — show nothing about LINE to them.
+        when {
+            uiState.linkedWithLine -> {
+                HorizontalDivider()
+                SettingsMenuRow(
+                    icon = Icons.Default.LinkOff,
+                    label = stringResource(R.string.settings_unlink_line),
+                    value = stringResource(R.string.settings_unlink_line_hint),
+                    onClick = onUnlinkClick,
+                )
+            }
+            uiState.isAnonymous -> {
+                HorizontalDivider()
+                SettingsMenuRow(
+                    icon = Icons.Default.Link,
+                    label = stringResource(R.string.settings_link_line),
+                    value = stringResource(R.string.settings_link_line_hint),
+                    onClick = onLinkLine,
+                )
+            }
         }
     }
 }
