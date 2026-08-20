@@ -25,8 +25,6 @@ import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode2
@@ -220,17 +218,11 @@ private fun SettingsMenuContent(
             }
 
             SectionHeader(stringResource(R.string.settings_section_account))
-            AccountStatusCard(uiState = uiState)
-
-            // Google users picked their provider — show nothing about LINE to them.
-            if (uiState.linkedWithLine || uiState.isAnonymous) {
-                Spacer(modifier = Modifier.height(24.dp))
-                LineLinkCard(
-                    linkedWithLine = uiState.linkedWithLine,
-                    onLinkLine = onLinkLine,
-                    onUnlinkClick = { showUnlinkConfirm = true },
-                )
-            }
+            AccountStatusCard(
+                uiState = uiState,
+                onLinkLine = onLinkLine,
+                onUnlinkClick = { showUnlinkConfirm = true },
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
@@ -301,21 +293,35 @@ private fun SectionHeader(
 @Composable
 private fun AccountStatusCard(
     uiState: SettingsUiState,
+    onLinkLine: () -> Unit,
+    onUnlinkClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
-        StatusRow(
-            icon = Icons.Default.AccountCircle,
-            label = stringResource(R.string.settings_account_status),
-            value =
-                stringResource(
-                    when {
-                        uiState.linkedWithLine -> R.string.settings_account_line
-                        uiState.linkedWithGoogle -> R.string.settings_account_google
-                        else -> R.string.settings_account_anonymous
-                    },
-                ),
-        )
+        // The account row IS the LINE action: linked -> unlink (confirmed),
+        // device-only -> start linking. Google accounts get a read-only row.
+        when {
+            uiState.linkedWithLine ->
+                SettingsMenuRow(
+                    icon = Icons.Default.AccountCircle,
+                    label = stringResource(R.string.settings_account_status),
+                    value = stringResource(R.string.settings_account_line),
+                    onClick = onUnlinkClick,
+                )
+            uiState.linkedWithGoogle ->
+                StatusRow(
+                    icon = Icons.Default.AccountCircle,
+                    label = stringResource(R.string.settings_account_status),
+                    value = stringResource(R.string.settings_account_google),
+                )
+            else ->
+                SettingsMenuRow(
+                    icon = Icons.Default.AccountCircle,
+                    label = stringResource(R.string.settings_account_status),
+                    value = stringResource(R.string.settings_account_anonymous),
+                    onClick = onLinkLine,
+                )
+        }
         HorizontalDivider()
         StatusRow(
             icon = if (uiState.isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
@@ -335,33 +341,6 @@ private fun AccountStatusCard(
                     MaterialTheme.colorScheme.error
                 },
         )
-    }
-}
-
-/** Link LINE when the account has no LINE provider; otherwise offer to unlink it. */
-@Composable
-private fun LineLinkCard(
-    linkedWithLine: Boolean,
-    onLinkLine: () -> Unit,
-    onUnlinkClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Card(modifier = modifier.fillMaxWidth()) {
-        if (!linkedWithLine) {
-            SettingsMenuRow(
-                icon = Icons.Default.Link,
-                label = stringResource(R.string.settings_link_line),
-                value = stringResource(R.string.settings_link_line_hint),
-                onClick = onLinkLine,
-            )
-        } else {
-            SettingsMenuRow(
-                icon = Icons.Default.LinkOff,
-                label = stringResource(R.string.settings_unlink_line),
-                value = stringResource(R.string.settings_unlink_line_hint),
-                onClick = onUnlinkClick,
-            )
-        }
     }
 }
 
