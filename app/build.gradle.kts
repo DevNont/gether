@@ -19,8 +19,8 @@ android {
         applicationId = "com.triptogether"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "0.1.5"
+        versionCode = 7
+        versionName = "0.2.0"
     }
 
     // Dedicated release keystore. Credentials come from env vars (CI) or
