@@ -169,10 +169,11 @@ private fun SettingsMenuContent(
                     AppCompatDelegate.MODE_NIGHT_YES -> stringResource(R.string.settings_theme_dark)
                     else -> stringResource(R.string.settings_theme_system)
                 }
+            SectionHeader(stringResource(R.string.settings_section_profile))
             Card(modifier = Modifier.fillMaxWidth()) {
                 SettingsMenuRow(
                     icon = Icons.Default.Person,
-                    label = stringResource(R.string.settings_section_profile),
+                    label = stringResource(R.string.settings_display_name),
                     value = uiState.user?.displayName.orEmpty(),
                     onClick = onOpenProfile,
                 )
@@ -185,7 +186,10 @@ private fun SettingsMenuContent(
                             ?: stringResource(R.string.settings_promptpay_not_set),
                     onClick = onOpenPromptpay,
                 )
-                HorizontalDivider()
+            }
+
+            SectionHeader(stringResource(R.string.settings_section_display))
+            Card(modifier = Modifier.fillMaxWidth()) {
                 SettingsMenuRow(
                     icon = Icons.Default.Language,
                     label = stringResource(R.string.settings_language),
@@ -215,7 +219,7 @@ private fun SettingsMenuContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            SectionHeader(stringResource(R.string.settings_section_account))
             AccountStatusCard(uiState = uiState)
 
             // Google users picked their provider — show nothing about LINE to them.
@@ -277,6 +281,20 @@ private fun SettingsMenuContent(
             },
         )
     }
+}
+
+/** Small category label above each settings card. */
+@Composable
+private fun SectionHeader(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier.padding(start = 16.dp, top = 20.dp, bottom = 8.dp),
+    )
 }
 
 /** Which provider this account is on, plus live sync state. */

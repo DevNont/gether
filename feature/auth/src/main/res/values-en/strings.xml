@@ -43,7 +43,8 @@
     <string name="settings_sign_out">Sign out</string>
     <string name="settings_language">Language</string>
     <string name="settings_section_profile">Profile</string>
-    <string name="settings_section_money">Money</string>
+    <string name="settings_section_display">Display</string>
+    <string name="settings_section_account">Account &amp; sync</string>
     <string name="settings_menu_promptpay">PromptPay</string>
     <string name="settings_menu_notifications">Notifications</string>
     <string name="settings_promptpay_not_set">Not set</string>

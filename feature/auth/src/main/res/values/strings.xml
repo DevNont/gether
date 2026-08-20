@@ -43,7 +43,8 @@
     <string name="settings_sign_out">ออกจากระบบ</string>
     <string name="settings_language">ภาษา</string>
     <string name="settings_section_profile">โปรไฟล์</string>
-    <string name="settings_section_money">การเงิน</string>
+    <string name="settings_section_display">การแสดงผล</string>
+    <string name="settings_section_account">บัญชีและการซิงค์</string>
     <string name="settings_menu_promptpay">พร้อมเพย์</string>
     <string name="settings_menu_notifications">การแจ้งเตือน</string>
     <string name="settings_promptpay_not_set">ยังไม่ได้ตั้ง</string>
