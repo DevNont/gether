@@ -37,8 +37,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -213,34 +211,25 @@ private fun SettingsMenuContent(
                     enabled = false,
                     onClick = {},
                 )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            AccountStatusCard(
-                uiState = uiState,
-                onLinkLine = onLinkLine,
-                onUnlinkClick = { showUnlinkConfirm = true },
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Card(modifier = Modifier.fillMaxWidth()) {
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                        )
-                    },
-                    headlineContent = {
-                        Text(
-                            text = stringResource(R.string.settings_sign_out),
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    },
-                    colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                    modifier = Modifier.clickable(onClick = onSignOut),
+                HorizontalDivider()
+                AccountStatusRows(
+                    uiState = uiState,
+                    onLinkLine = onLinkLine,
+                    onUnlinkClick = { showUnlinkConfirm = true },
                 )
+                HorizontalDivider()
+                CompactRow(modifier = Modifier.clickable(onClick = onSignOut)) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                    Text(
+                        text = stringResource(R.string.settings_sign_out),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -275,13 +264,12 @@ private fun SettingsMenuContent(
 
 /** Which provider this account is on, live sync state, and the LINE link/unlink action. */
 @Composable
-private fun AccountStatusCard(
+private fun AccountStatusRows(
     uiState: SettingsUiState,
     onLinkLine: () -> Unit,
     onUnlinkClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
+    Column {
         StatusRow(
             icon = Icons.Default.AccountCircle,
             label = stringResource(R.string.settings_account_status),
